@@ -1,0 +1,38 @@
+<?php
+include 'config/config.php';
+
+/**
+ * Index file that is responsible for managing endpoints.
+ *
+ * @author Szymon Jedrzychowski
+ */
+
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Headers: *");
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    exit(0);
+}
+
+if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
+    $endpoint = new ClientError("Invalid method: " . $_SERVER['REQUEST_METHOD'], 405);
+} else {
+    $url = $_SERVER["REQUEST_URI"];
+    $url = parse_url($url);
+    $path = str_replace("/teamAssessment/api", "", $url['path']);
+    try {
+        switch ($path) {
+            case '/':
+                break;
+            default:
+                $endpoint = new ClientError("Path not found: " . $path, 404);
+                break;
+        }
+    } catch (ClientErrorException $e) {
+        $endpoint = new ClientError($e->getMessage(), $e->getCode());
+    } catch (BadRequest $e) {
+        $endpoint = new ClientError($e->getMessage(), $e->getCode());
+    }
+}
+$response = $endpoint->getData();
+echo json_encode($response);
