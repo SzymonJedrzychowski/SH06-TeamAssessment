@@ -29,7 +29,7 @@ abstract class Endpoint
     public function __construct()
     {
         // Connect to the database.
-        $db = new Database("db/chiplay.sqlite");
+        $db = new Database("db/database.db");
 
         // Initialise the SQL command and parameters and get the data from the database.
         $this->initialiseSQL();
