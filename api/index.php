@@ -24,6 +24,12 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
         switch ($path) {
             case '/':
                 break;
+            case '/getnewsletteritems':
+                $endpoint = new GetNewsletterItems();
+                break;
+            case '/postnewslettersuggestion':
+                $endpoint = new PostNewsletterSuggestion();
+                break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);
                 break;
