@@ -27,6 +27,14 @@ class GetNewsletterItems extends Endpoint
         // Check if correct params were provided.
         $this->checkAvailableParams($this->getAvailableParams());
 
+        if(filter_has_var(INPUT_GET, 'published')){
+            if($_GET['published'] == "true"){
+                $sql .= " WHERE publishedNewsletterID IS NOT NULL";
+            }elseif($_GET['published'] == "false"){
+                $sql .= " WHERE publishedNewsletterID IS NULL";
+            }
+        }
+
         $this->setSQLCommand($sql);
         $this->setSQLParams($params);
     }
@@ -38,6 +46,6 @@ class GetNewsletterItems extends Endpoint
      */
     protected function getAvailableParams()
     {
-        return [];
+        return ['published' => 'boolean'];
     }
 }
