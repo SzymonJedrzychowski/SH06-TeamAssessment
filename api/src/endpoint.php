@@ -151,6 +151,8 @@ abstract class Endpoint
             } else {
                 if ($availableParams[$key] == "int" and !is_numeric($value)) {
                     throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
+                } else if($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))){
+                    throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
                 }
             }
         }
