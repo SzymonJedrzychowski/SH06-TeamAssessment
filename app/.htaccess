@@ -1,0 +1,10 @@
+# Code based on the response of user "BrahimS", 2016, https://stackoverflow.com/a/40591955 (Access date: 6.01.2023)
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteCond %{REQUEST_FILENAME} !-l
+  RewriteRule . /SH01-TeamAssessment/app/index.html [L]
+</IfModule>

@@ -1,23 +1,22 @@
-import logo from './logo.svg';
-import './App.css';
+import { Routes, Route } from "react-router-dom";
+import React, { useState, useEffect } from 'react';
 
+// Import styling.
+import './styles/App.css'
+
+/**
+ * App is responsible for loading data and routing to other pages.
+ *
+ * @author Szymon Jedrzychowski
+ */
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="content">
+        <Routes>
+          <Route path="*" element={<p>Not found</p>} />
+        </Routes>
+      </div>
     </div>
   );
 }
