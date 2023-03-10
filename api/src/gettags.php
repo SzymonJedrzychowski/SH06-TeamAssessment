@@ -21,7 +21,7 @@ class GetTags extends Endpoint
         $this->validateRequestMethod("GET");
 
         // Create SQL command to get newsleter items.
-        $sql = "SELECT tagID, tagName FROM tags";
+        $sql = "SELECT tag_id, tag_name FROM tag";
         $params = array();
 
         // Check if correct params were provided.

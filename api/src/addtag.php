@@ -44,20 +44,20 @@ class AddTag extends Endpoint
      */
     private function validateParameters()
     {
-        // Check if tagName parameter was included.
-        if (!filter_has_var(INPUT_POST, 'tagName')) {
-            throw new ClientErrorException("tagName parameter required", 400);
+        // Check if tag_name parameter was included.
+        if (!filter_has_var(INPUT_POST, 'tag_name')) {
+            throw new ClientErrorException("tag_name parameter required", 400);
         }
     }
 
     protected function initialiseSQL()
     {
-        $sql = "INSERT INTO tags (tagName) 
-        VALUES (:tagName)";
+        $sql = "INSERT INTO tag (tag_name) 
+        VALUES (:tag_name)";
 
         $this->setSQLCommand($sql);
         $this->setSQLParams([
-            'tagName' => $_POST['tagName']
+            'tag_name' => $_POST['tag_name']
         ]);
     }
 }
