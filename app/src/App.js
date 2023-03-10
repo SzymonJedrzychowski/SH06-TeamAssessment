@@ -3,6 +3,8 @@ import React, { useState, useEffect } from 'react';
 
 // Import styling.
 import './styles/App.css'
+import Homepage from "./components/pages/Homepage";
+import Layout from "./components/layout/Layout";
 
 /**
  * App is responsible for loading data and routing to other pages.
@@ -12,11 +14,12 @@ import './styles/App.css'
 function App() {
   return (
     <div className="App">
-      <div className="content">
+      <Layout>
         <Routes>
+          <Route path="/" element={<Homepage/>}/>
           <Route path="*" element={<p>Not found</p>} />
         </Routes>
-      </div>
+      </Layout>
     </div>
   );
 }
