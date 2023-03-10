@@ -44,38 +44,38 @@ class PostNewsletterSuggestion extends Endpoint
      */
     private function validateParameters()
     {
-        // Check if itemID parameter was included.
-        if (!filter_has_var(INPUT_POST, 'itemID')) {
-            throw new ClientErrorException("itemID parameter required", 400);
+        // Check if item_id parameter was included.
+        if (!filter_has_var(INPUT_POST, 'item_id')) {
+            throw new ClientErrorException("item_id parameter required", 400);
         }
 
-        // Check if suggestionContent parameter was included.
-        if (!filter_has_var(INPUT_POST, 'suggestionContent')) {
-            throw new ClientErrorException("suggestionContent parameter required", 400);
+        // Check if suggestion_content parameter was included.
+        if (!filter_has_var(INPUT_POST, 'suggestion_content')) {
+            throw new ClientErrorException("suggestion_content parameter required", 400);
         }
 
-        // Check if suggestionComment parameter was included.
-        if (!filter_has_var(INPUT_POST, 'suggestionComment')) {
-            throw new ClientErrorException("suggestionComment parameter required", 400);
+        // Check if suggestion_comment parameter was included.
+        if (!filter_has_var(INPUT_POST, 'suggestion_comment')) {
+            throw new ClientErrorException("suggestion_comment parameter required", 400);
         }
 
-        // Check if userID parameter was included.
-        if (!filter_has_var(INPUT_POST, 'userID')) {
-            throw new ClientErrorException("userID parameter required", 400);
+        // Check if user_id parameter was included.
+        if (!filter_has_var(INPUT_POST, 'user_id')) {
+            throw new ClientErrorException("user_id parameter required", 400);
         }
     }
 
     protected function initialiseSQL()
     {
-        $sql = "INSERT INTO itemSuggestion (itemID, suggestionContent, suggestionComment, userID) 
-        VALUES (:itemID, :suggestionContent, :suggestionComment, :userID)";
+        $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
+        VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
 
         $this->setSQLCommand($sql);
         $this->setSQLParams([
-            'itemID' => $_POST['itemID'],
-            'suggestionContent' => $_POST['suggestionContent'],
-            'suggestionComment' => $_POST['suggestionComment'],
-            'userID' => $_POST['userID']
+            'item_id' => $_POST['item_id'],
+            'suggestion_content' => $_POST['suggestion_content'],
+            'suggestion_comment' => $_POST['suggestion_comment'],
+            'user_id' => $_POST['user_id']
         ]);
     }
 }
