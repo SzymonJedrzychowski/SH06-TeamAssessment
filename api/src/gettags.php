@@ -30,14 +30,4 @@ class GetTags extends Endpoint
         $this->setSQLCommand($sql);
         $this->setSQLParams($params);
     }
-
-    /**
-     * Set the array of available parameters for /gettags endpoint.
-     *
-     * @return string[] Array of available params.
-     */
-    protected function getAvailableParams()
-    {
-        return [];
-    }
 }

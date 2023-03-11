@@ -1,10 +1,10 @@
 export const pages =[
   {
     label : "Home",
-    path  : "#/"
+    path  : "/"
   },
   {
     label : "Editorial",
-    path  : "#/editorial"
+    path  : "/editorial"
   }
 ];
