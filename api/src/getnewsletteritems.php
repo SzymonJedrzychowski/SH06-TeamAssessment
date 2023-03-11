@@ -21,7 +21,7 @@ class GetNewsletterItems extends Endpoint
         $this->validateRequestMethod("GET");
 
         // Create SQL command to get newsleter items.
-        $sql = "SELECT item_id, user_id, content, date_uploaded, published_newsletter_id, item_title, item_checked FROM newsletter_item";
+        $sql = "SELECT item_id, content, date_uploaded, published_newsletter_id, item_title, item_checked, user.first_name, user.last_name, organisation.organisation_name FROM newsletter_item JOIN user ON newsletter_item.user_id = user.user_id JOIN organisation ON user.organisation_id = organisation.organisation_id";
         $params = array();
 
         // Check if correct params were provided.
