@@ -1,7 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom"
 import ListGroup from "react-bootstrap/ListGroup";
-import Button from 'react-bootstrap/Button';
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import TextEditor from "./TextEditor";
 import { useState } from "react";
 import { EditorState, ContentState } from 'draft-js';
@@ -77,14 +76,14 @@ const SuggestChanges = () => {
             </ListGroup.Item>
             <ListGroup.Item>
                 <h3>Content</h3>
-                <TextEditor type="content" content={contentState} setContent={setContentState} />
+                <TextEditor content={contentState} setContent={setContentState} />
             </ListGroup.Item>
             <ListGroup.Item>
                 <h3>Comment</h3>
-                <TextEditor type="content" content={commentState} setContent={setCommentState} />
+                <TextEditor content={commentState} setContent={setCommentState} />
             </ListGroup.Item>
             <ListGroup.Item>
-                <Button onClick={suggestChange}>Suggest change</Button><Button onClick={() => navigate(-1)}>Go back</Button>
+                <Button variant="contained" onClick={suggestChange}>Suggest change</Button><Button variant="contained" onClick={() => navigate(-1)}>Go back</Button>
             </ListGroup.Item>
         </ListGroup>
     </Box>;
