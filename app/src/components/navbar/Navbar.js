@@ -2,13 +2,14 @@ import {
   AppBar,
   Button,
   IconButton,
-  Link,
   Menu,
   MenuItem,
   Toolbar,
   Tooltip,
   Typography,
+  Link
 } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 import { Box, Container } from "@mui/system";
 import React, { useState } from "react";
 import { pages } from "../../data/Pages";
@@ -68,7 +69,7 @@ const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography noWrap href="#/" variant="h6" sx={logoStyle}>
+        <Typography as={RouterLink} noWrap to="/" variant="h6" sx={logoStyle}>
           IC3
         </Typography>
         <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -101,7 +102,7 @@ const Navbar = () => {
             }}
           >
             {pages.map((page) => (
-              <Link href={page.path} key={page.label}>
+              <Link as={RouterLink} to={page.path} key={page.label}>
                 <MenuItem key={page.label} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
@@ -112,14 +113,14 @@ const Navbar = () => {
         <Typography
           variant="h5"
           noWrap
-          href="/"
+          to="/"
           sx={xsLogoStyle}
         >
           IC3
         </Typography>
         <Box sx={boxMDScreen}>
           {pages.map((page) => (
-            <Link href={page.path} key={page.label}>
+            <Link as={RouterLink} to={page.path} key={page.label}>
               <Button key={pages.label} sx={btnMDScreen}>
                 {page.label}
               </Button>

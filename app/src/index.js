@@ -1,24 +1,23 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import reportWebVitals from './reportWebVitals';
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 
 // Import modules.
 import App from './App';
 
 // Import styling.
 import './styles/index.css';
+import '../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
 // Import bootstrap
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-	<React.StrictMode>
-		<HashRouter>
-			<App />
-		</HashRouter>
-	</React.StrictMode >
+	<BrowserRouter basename='/teamAssessment/app'>
+		<App />
+	</BrowserRouter>
 );
 
 // If you want to start measuring performance in your app, pass a function
