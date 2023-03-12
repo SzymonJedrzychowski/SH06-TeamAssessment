@@ -113,7 +113,7 @@ const Navbar = () => {
         <Typography
           variant="h5"
           noWrap
-          t="/"
+          to="/"
           sx={xsLogoStyle}
         >
           IC3
