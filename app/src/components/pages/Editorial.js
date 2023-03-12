@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from "react-router-dom";
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
-import Button from 'react-bootstrap/Button';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button } from "@mui/material";
 
 
 const Editorial = () => {
@@ -9,6 +8,7 @@ const Editorial = () => {
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
+        rowGap: "10px",
         padding: 3
     };
 
@@ -30,12 +30,12 @@ const Editorial = () => {
             <TableCell>{value.organisation_name}</TableCell>
             <TableCell>{value.date_uploaded}</TableCell>
             <TableCell>{checkValues[value.item_checked]}</TableCell>
-            <TableCell><Button as={Link} to={"/checkItem"} state={[value, tagsList]}>View</Button></TableCell>
+            <TableCell><Button variant="contained" component={Link} to={"/checkItem"} state={[value, tagsList]}>View</Button></TableCell>
         </TableRow>;
     }
 
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?published=false")
             .then(
                 (response) => response.json()
             )
@@ -51,35 +51,39 @@ const Editorial = () => {
                 }
             )
 
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
-                .then(
-                    (response) => response.json()
-                )
-                .then(
-                    (json) => setTagsList(json.data))
-                .catch(
-                    (e) => {
-                        console.log(e.message)
-                    })
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => setTagsList(json.data))
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                })
     }, []);
 
-    return <Box sx={boxStyling}>{!itemsLoading && <TableContainer component={Paper}><Table>
-        <TableHead>
-            <TableRow>
-                <TableCell>Title</TableCell>
-                <TableCell>Author</TableCell>
-                <TableCell>Organisation</TableCell>
-                <TableCell>Uploaded</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell></TableCell>
-            </TableRow>
-        </TableHead>
-        <TableBody>
-            {newsletterItems.map(
-                (value) => createRow(value)
-            )}
-        </TableBody>
-    </Table></TableContainer>}
+    return <Box sx={boxStyling}>{!itemsLoading && <>
+        <Button variant="contained" component={Link} to={"/publish"}>Publish</Button>
+        <Button variant="contained" component={Link} to={"/editPrevious"}>Edit previous</Button>
+        <TableContainer component={Paper}><Table>
+            <TableHead>
+                <TableRow>
+                    <TableCell>Title</TableCell>
+                    <TableCell>Author</TableCell>
+                    <TableCell>Organisation</TableCell>
+                    <TableCell>Uploaded</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell></TableCell>
+                </TableRow>
+            </TableHead>
+            <TableBody>
+                {newsletterItems.map(
+                    (value) => createRow(value)
+                )}
+            </TableBody>
+        </Table></TableContainer>
+    </>}
     </Box>;
 }
 
