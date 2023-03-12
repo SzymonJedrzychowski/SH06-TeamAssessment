@@ -6,5 +6,5 @@
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteCond %{REQUEST_FILENAME} !-l
-  RewriteRule . /SH01-TeamAssessment/app/index.html [L]
+  RewriteRule . /teamAssessment/app/index.html [L]
 </IfModule>

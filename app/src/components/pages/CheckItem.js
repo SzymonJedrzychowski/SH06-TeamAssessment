@@ -21,6 +21,11 @@ const CheckItem = () => {
     };
 
     useEffect(() => {
+        if(!item.state){
+            navigate("/editorial");
+            return;
+        }
+
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state[0].item_id)
             .then(
                 (response) => response.json()
