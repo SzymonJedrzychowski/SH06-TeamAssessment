@@ -20,10 +20,10 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Homepage/>}/>
+          <Route path="/partner" element={<Partner/>}/>
           <Route path="/editorial" element={<Editorial/>}/>
           <Route path="/checkItem" element={<CheckItem/>}/>
           <Route path="/suggestChanges" element={<SuggestChanges/>}/>
-          <Route path="/partner" element={<Partner/>}/>
           <Route path="*" element={<p>Not found</p>} />
         </Routes>
       </Layout>

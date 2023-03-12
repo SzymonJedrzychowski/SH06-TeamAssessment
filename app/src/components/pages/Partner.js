@@ -27,15 +27,15 @@ const Partner = () => {
     // Functions
      // -Navigation
      const setContribute = () => {
-        setShowcontribute(true);
         setShowReview(false);
         setShowPublished(false);
+        setShowcontribute(true);
      }
 
      const setReview = () => {
         setShowcontribute(false);
-        setShowReview(true);
         setShowPublished(false);
+        setShowReview(true);
      }
 
      const setPublished = () => {
@@ -48,25 +48,53 @@ const Partner = () => {
 
     // Content
 
-     // -Contribute
+        // -Contribute
+        const contributeSection = <div className = 'PartnerContribute'>
+        <h2 className = 'PartnerContributeTitle'>Your item</h2>
+        <div className = 'PartnerContributeBox'>
+            Box goes here.
+        </div>
+        <button onClick = {uploadItem}>Upload</button>
+        </div>;
+        
 
-     // -Review
+        // -Review
+        const reviewSection = <div className = 'PartnerReview'>
+        <div className = 'PartnerReviewFilters'>
+            <ul>
+                <button>All</button>
+                <button>Accepted</button>
+                <button>Pending</button>
+                <button>Rejected</button>
+            </ul>
+        </div>
+        <div className = 'PartnerReviewContent'>
+            Boxes go here.
+        </div>
+        </div>
 
-     // -Published
 
+        // -Published
+        const publishedSection = <div className = 'PartnerPublished'>
+            <div className = 'PartnerPublishedContent'>
+                Boxes go here.
+            </div>
+        </div>
+
+    //TODO: Loading
     return(
         <div className = 'Partner'>
             <div className = 'PartnerHeader'>
                 <h1>Partner Page Skeleton</h1>
                 <p>Lorem Ipsum</p>
-                <button onClick = {setContribute}></button>
-                <button onClick = {setReview}></button>
-                <button onClick = {setPublished}></button>
+                <button onClick = {setContribute}>Contribute item!</button>
+                <button onClick = {setReview}>Review items!</button>
+                <button onClick = {setPublished}>See published items!</button>
             </div>
             <div className = 'PartnerBody'>
-            {showContribute && <div className = 'PartnerContribute'> </div>}
-            {showReview && <div className = 'PartnerReview'> </div>}
-            {showPublished && <div className = 'PartnerPublished'> </div>}
+            {showContribute && <div className = 'PartnerContribute'>{contributeSection}</div>}
+            {showReview && <div className = 'PartnerReview'>Review content</div>}
+            {showPublished && <div className = 'PartnerPublished'>Published content</div>}
 
             </div>
         </div>
