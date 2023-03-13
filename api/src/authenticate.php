@@ -1,24 +1,33 @@
 <?php
 
 use FirebaseJWT\JWT;
+use FirebaseJWT\Key;
 
 /**
  * Responsible for handling /authenticate endpoint.
  *
- * This class reads and validates received parameters
- * and find if an account in database matches the credentials.
- * If yes, the JWT is returned.
- * Else, an Exception will be thrown.
+ * This class is responsible for checking if the token is still valid and returning name of current user.
  *
  * @author Mikolaj Furmanczak
  */
 class Authenticate extends Endpoint
 {
     /**
-     * Override the __construct method to match the requirements of the /authenticate endpoint.
+     * @var array $decoded Array containing data from JWT.
+     */
+    protected $decoded;
+
+    /**
+     * @var int $accountId value of account_id column for current user.
+     */
+    protected $accountId;
+
+    /**
+     * Override the __construct method to match the requirements of the /verify endpoint.
      *
-     * @throws BadRequest               If request method is incorrect.
-     * @throws ClientErrorException     If there are problems with login process.
+     * @throws BadRequest           If request method is incorrect.
+     * @throws ClientErrorException If token format is wrong, decoding of token threw an Exception
+     *                              or issuer does not agree with the host.
      */
     public function __construct()
     {
@@ -26,26 +35,17 @@ class Authenticate extends Endpoint
         $db = new Database("db/database.db");
 
         // Check if correct request method was used.
-        $this->validateRequestMethod("POST");
+        $this->validateRequestMethod("GET");
 
-        // Check if authentication parameters are provided.
-        $this->validateAuthParameters();
+        // Validate the JWT.
+        $this->validateToken();
+
+        // Set the userID based on the JWT.
+        $this->setAccountId($this->getDecoded()->sub);
 
         // Initialise the SQL command and parameters and get the data from the database.
         $this->initialiseSQL();
-        $queryResult = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-
-        // Check if credentials correspond to account in database.
-        $this->validateCredentials($queryResult);
-
-        // Create the token and append it to data array.
-        $data['token'] = $this->createJWT($queryResult);
-
-        // Append the name of username to data array.
-        $data['email'] = $queryResult[0]["email"];
-        $data['authorisation'] = $queryResult[0]["authorisation"];
-        $data['user_id'] = $queryResult[0]["user_id"];
-        $data['password'] = $queryResult[0]["password"];
+        $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
         $this->setData(array(
             "length" => count($data),
@@ -54,71 +54,91 @@ class Authenticate extends Endpoint
         ));
     }
 
-
     /**
-     * Validate if auth parameters are provided.
+     * Check if the token is valid.
      *
-     * @throws ClientErrorException If parameters are not provided.
+     * @throws ClientErrorException If token format is wrong, decoding of token threw an Exception
+     *                              or issuer does not agree with the host.
      */
-    private function validateAuthParameters()
+    protected function validateToken()
     {
-        if (!isset($_SERVER['PHP_AUTH_USER']) || !isset($_SERVER['PHP_AUTH_PW'])) {
-            throw new ClientErrorException("Parameters email and password should be provided.", 401);
+        $key = SECRET;
+
+        $allHeaders = getallheaders();
+        $authorizationHeader = "";
+
+        // Check if correct authorization method was used.
+        if (array_key_exists('Authorization', $allHeaders)) {
+            $authorizationHeader = $allHeaders['Authorization'];
+        } elseif (array_key_exists('authorization', $allHeaders)) {
+            $authorizationHeader = $allHeaders['authorization'];
+        }
+
+        // Check if token was included.
+        if (substr($authorizationHeader, 0, 7) != 'Bearer ') {
+            throw new ClientErrorException("Bearer token required", 401);
+        }
+
+        // Remove "Bearer" text from the data.
+        $jwt = trim(substr($authorizationHeader, 7));
+
+        // Validate token.
+        try {
+            $this->setDecoded(JWT::decode($jwt, new Key($key, 'HS256')));
+        } catch (Exception $e) {
+            throw new ClientErrorException($e->getMessage(), 401);
+        }
+
+        // Check if issuer is the same as the host.
+        if ($this->getDecoded()->iss != $_SERVER['HTTP_HOST']) {
+            throw new ClientErrorException("invalid token issuer", 401);
         }
     }
 
-    /**
-     * Set SQL command to get the user data from database.
-     */
     protected function initialiseSQL()
     {
-        // Create SQL command to get users data.
+        // Create SQL command to get data of the user.
         $sql = "SELECT user_id, email, password, authorisation FROM user WHERE email = :email";
         $this->setSQLCommand($sql);
-        $this->setSQLParams(['email' => $_SERVER['PHP_AUTH_USER']]);
+        $this->setSQLParams(['email' => $this->getUserEmail()]);
+    }
+    /**
+     * Getter for $decoded.
+     *
+     * @return array Data read from token.
+     */
+    public function getDecoded()
+    {
+        return $this->decoded;
     }
 
     /**
-     * Validate if auth parameters correspond to account in database.
+     * Setter for $decoded.
      *
-     * @param array $data Entry of username from database.
-     *
-     * @throws ClientErrorException If username and password do not correspond to accounts in the database.
+     * @param array $decoded Data read from token.
      */
-    private function validateCredentials($data)
+    public function setDecoded($decoded)
     {
-        if (count($data) < 1) {
-            throw new ClientErrorException("Incorrect credentials.", 401);
-        } elseif (!password_verify($_SERVER['PHP_AUTH_PW'], $data[0]['password'])) {
-            throw new ClientErrorException("Incorrect credentials.", 401);
-        }
+        $this->decoded = $decoded;
     }
 
     /**
-     * Create the JWT for authorized user.
+     * Getter for $accountId.
      *
-     * @param array $queryResult Entry of username from database.
-     *
-     * @return string JWT for authorized user.
+     * @return int AccountId of current user.
      */
-    private function createJWT($queryResult)
+    public function getUserEmail()
     {
-        // Get the global secret key.
-        $secretKey = SECRET;
+        return $this->email;
+    }
 
-        // Get the time for 'iat' and 'exp' claims.
-        $time = time();
-
-        // Set the claims for the token.
-        $tokenPayload = [
-            'iat' => $time,
-            'exp' => strtotime('+60 minutes', $time),
-            'iss' => $_SERVER['HTTP_HOST'],
-            'sub' => $queryResult[0]['user_id'],
-            'auth' => $queryResult[0]['authorisation']
-        ];
-
-        // Encode the token.
-        return JWT::encode($tokenPayload, $secretKey, 'HS256');
+    /**
+     * Setter for $accountId.
+     *
+     * @param int $accountId AccountId of current user.
+     */
+    public function setAccountId($accountId)
+    {
+        $this->accountId = $accountId;
     }
 }
