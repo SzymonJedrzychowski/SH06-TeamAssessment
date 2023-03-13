@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import {Markup} from 'interweave';
 
 /**
  * Partner page
@@ -107,11 +108,12 @@ const Partner = () => {
         
             // --Items
             const createItemBox = (value) => {
+                const itemContent = <Markup content={value.content}/>
                 return(
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>
                         <div>{checkValues[value.item_checked]}</div>
-                        <div>{/*truncateText(value.content)*/}Banana</div>
+                        <div>{truncateText(itemContent)}</div>
                         <div><button>Edit</button></div>
                     </div>);
             }
