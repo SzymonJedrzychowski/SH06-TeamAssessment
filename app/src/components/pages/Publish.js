@@ -53,7 +53,7 @@ const Publish = () => {
                     let temp = [...newsletterItems];
                     console.log(newsletter_id == null);
                     setNewsletterItems(temp.concat(json.data.filter(news => (
-                        (news["item_checked"] === "3" && newsletter_id == null) || (newsletter_id != null && news["published_newsletter_id"] === newsletter_id))
+                        (news["item_checked"] === "3" && news["published_newsletter_id"] == null) || (newsletter_id != null && news["published_newsletter_id"] === newsletter_id))
                     )));
                 }
             )
@@ -121,12 +121,19 @@ const Publish = () => {
         if (!newsletterItems[selectedItem]) {
             return;
         }
+        let temp = [...newsletterItems];
+        temp.splice(selectedItem, 1);
+        setNewsletterItems(temp);
         changeFiles(files => [...files, { "type": "newsletter", "data": newsletterItems[selectedItem] }]);
+        setSelectedItem('');
     }
 
     const handleRemoveItem = (e) => {
         if (editMode !== -1) return;
-        const temp = [...files];
+        let temp = [...files];
+        let temp2 = [...newsletterItems];
+        temp2.push(files[e]["data"]);
+        setNewsletterItems(temp2);
         temp.splice(e, 1);
         changeFiles(temp);
     };
@@ -184,6 +191,9 @@ const Publish = () => {
                 temp.push(element["data"]["item_id"]);
             }
         });
+        if(temp.length === 0){
+            temp.push(null);
+        }
         formData.append('newsletter_items', JSON.stringify(temp));
 
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/editnewsletter",

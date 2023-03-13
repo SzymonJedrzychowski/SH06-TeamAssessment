@@ -43,7 +43,7 @@ const CheckItem = () => {
                 })
     }, [item.state, navigate])
 
-    const approveItem = (newStatus) => {
+    const changeStatus = (newStatus) => {
         const formData = new FormData();
         formData.append('item_checked', newStatus);
         formData.append('item_id', item.state[0].item_id);
@@ -64,7 +64,35 @@ const CheckItem = () => {
                     console.log(e.message)
                 })
     }
-    
+
+    const submitTags = () => {
+        const formData = new FormData();
+        let temp = [];
+        tags.forEach(element => {
+            temp.push(element["tag_id"]);
+        });
+        formData.append('item_tags', temp.length > 0 ? JSON.stringify(temp) : JSON.stringify([null]));
+        formData.append('item_id', item.state[0].item_id);
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postitemtags",
+            {
+                method: 'POST',
+                body: formData
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => console.log(json))
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                })
+    }
+
+    const handleChange = (event) => {
+        setTags(event);
+    };
+
     return <Box sx={boxStyling}>{!loading && <ListGroup>
         <ListGroup.Item>
             {item.state[0].item_title}
@@ -80,23 +108,25 @@ const CheckItem = () => {
         </ListGroup.Item>
         <ListGroup.Item>
             <Select
-                defaultValue={tags}
+                value={tags}
                 isMulti
                 name="colors"
+                onChange={handleChange}
                 options={item.state[1]}
                 getOptionLabel={(option) => option.tag_name}
                 getOptionValue={(option) => option.tag_id}
                 className="basic-multi-select"
                 classNamePrefix="select"
             />
+            {status !== "-1" && <Button variant="contained" onClick={submitTags}>Save</Button>}
         </ListGroup.Item>
         <ListGroup.Item>
-            {status === "3" && <Button variant="contained" disabled>Approved</Button>}
-            {status === "-1" && <Button variant="contained" disabled>Removed</Button>}
-            {["0,", "1", "2"].includes(status) && <Button variant="contained" onClick={()=>approveItem("3")}>Approve</Button>}
-            {status === "-1" && <Button variant="contained" disabled>Removed</Button>}
-            {status !== "-1" && <Button variant="contained" onClick={()=>approveItem("-1")}>Remove</Button>}
-            <Button variant="contained" component={Link} to={"/suggestChanges"} state={item.state[0]}>Edit</Button>
+            {["-1", "1", "3"].includes(status) && <Button variant="contained" disabled>Approve</Button>}
+            {["0", "2"].includes(status) && <Button variant="contained" onClick={() => changeStatus("3")}>Approve</Button>}
+            {status === "-1" && <Button variant="contained" disabled>Remove</Button>}
+            {status !== "-1" && <Button variant="contained" onClick={() => changeStatus("-1")}>Remove</Button>}
+            {["0", "2", "3"].includes(status) && <Button variant="contained" component={Link} to={"/suggestChanges"} state={item.state[0]}>Edit</Button>}
+            {["-1", "1"].includes(status) && <Button variant="contained" disabled>Edit</Button>}
             <Button variant="contained" onClick={() => navigate(-1)}>Go back</Button>
         </ListGroup.Item>
     </ListGroup>}</Box>;
