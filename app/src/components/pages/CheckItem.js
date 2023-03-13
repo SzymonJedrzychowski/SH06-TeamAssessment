@@ -11,7 +11,7 @@ const CheckItem = () => {
     const navigate = useNavigate();
     const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [approved, setApproved] = useState(false);
+    const [status, setStatus] = useState("0");
 
     const boxStyling = {
         minHeight: "100vh",
@@ -25,7 +25,7 @@ const CheckItem = () => {
             navigate("/editorial");
             return;
         } else {
-            setApproved(item.state[0].item_checked === "3");
+            setStatus(item.state[0].item_checked);
         }
 
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state[0].item_id)
@@ -43,9 +43,9 @@ const CheckItem = () => {
                 })
     }, [item.state, navigate])
 
-    const approveItem = () => {
+    const approveItem = (newStatus) => {
         const formData = new FormData();
-        formData.append('item_checked', 3);
+        formData.append('item_checked', newStatus);
         formData.append('item_id', item.state[0].item_id);
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
             {
@@ -57,7 +57,7 @@ const CheckItem = () => {
             )
             .then(
                 (json) => {
-                    setApproved(true);
+                    setStatus(newStatus);
                 })
             .catch(
                 (e) => {
@@ -91,8 +91,11 @@ const CheckItem = () => {
             />
         </ListGroup.Item>
         <ListGroup.Item>
-            {approved && <Button variant="contained" disabled>Approved</Button>}
-            {!approved && <Button variant="contained" onClick={approveItem}>Approve</Button>}
+            {status === "3" && <Button variant="contained" disabled>Approved</Button>}
+            {status === "-1" && <Button variant="contained" disabled>Removed</Button>}
+            {["0,", "1", "2"].includes(status) && <Button variant="contained" onClick={()=>approveItem("3")}>Approve</Button>}
+            {status === "-1" && <Button variant="contained" disabled>Removed</Button>}
+            {status !== "-1" && <Button variant="contained" onClick={()=>approveItem("-1")}>Remove</Button>}
             <Button variant="contained" component={Link} to={"/suggestChanges"} state={item.state[0]}>Edit</Button>
             <Button variant="contained" onClick={() => navigate(-1)}>Go back</Button>
         </ListGroup.Item>

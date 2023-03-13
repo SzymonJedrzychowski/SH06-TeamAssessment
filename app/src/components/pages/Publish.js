@@ -173,6 +173,38 @@ const Publish = () => {
 
     }
 
+    const edit = () => {
+        if (editMode !== -1) return;
+        const formData = new FormData();
+        formData.append('newsletter_id', item.state["newsletter_id"]);
+        formData.append('newsletter_content', JSON.stringify(files));
+        let temp = [];
+        files.forEach(element => {
+            if (element["type"] === "newsletter") {
+                temp.push(element["data"]["item_id"]);
+            }
+        });
+        formData.append('newsletter_items', JSON.stringify(temp));
+
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
+            {
+                method: 'POST',
+                body: formData
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    console.log(json);
+                })
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                })
+
+    }
+
     return <Box sx={boxStyling}>
         <List>
             {files.map((value, index) => createEntry(value, index))}
@@ -200,7 +232,8 @@ const Publish = () => {
                 {editMode !== -1 && <Button variant="contained" onClick={cancelEdit}>Cancel edit</Button>}
             </ListItem>
         </List>
-        <Button variant="contained" onClick={submit}>Submit</Button>
+        {item.state === null && <Button variant="contained" onClick={submit}>Submit</Button>}
+        {item.state !== null && <Button variant="contained" onClick={edit}>Confirm</Button>}
         <Button variant="contained" onClick={() => navigate(-1)}>Cancel</Button>
     </Box>;
 }
