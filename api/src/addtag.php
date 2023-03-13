@@ -46,11 +46,9 @@ class AddTag extends Endpoint
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {
-        // Check if tag_name parameter was included.
-        if (!filter_has_var(INPUT_POST, 'tag_name')) {
-            throw new ClientErrorException("tag_name parameter required", 400);
-        }
+    {   
+        $requiredParameters = array('tag_name');
+        $this->checkRequiredParameters($requiredParameters);
     }
 
     protected function initialiseSQL()

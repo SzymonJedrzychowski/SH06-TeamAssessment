@@ -21,7 +21,7 @@ class GetNewsletterItems extends Endpoint
         $this->validateRequestMethod("GET");
 
         // Create SQL command to get newsleter items.
-        $sql = "SELECT item_id, content, date_uploaded, published_newsletter_id, item_title, item_checked, user.first_name, user.last_name, organisation.organisation_name FROM newsletter_item JOIN user ON newsletter_item.user_id = user.user_id JOIN organisation ON user.organisation_id = organisation.organisation_id";
+        $sql = "SELECT item_id, content, date_uploaded, published_newsletter_id, item_title, item_checked, user.first_name, user.last_name, organisation.organisation_name FROM newsletter_item JOIN user ON newsletter_item.user_id = user.user_id JOIN organisation ON user.organisation_id = organisation.organisation_id WHERE item_checked != -1";
         $params = array();
 
         // Check if correct params were provided.
@@ -29,9 +29,9 @@ class GetNewsletterItems extends Endpoint
 
         if(filter_has_var(INPUT_GET, 'published')){
             if($_GET['published'] == "true"){
-                $sql .= " WHERE published_newsletter_id IS NOT NULL";
+                $sql .= " AND published_newsletter_id IS NOT NULL";
             }elseif($_GET['published'] == "false"){
-                $sql .= " WHERE published_newsletter_id IS NULL";
+                $sql .= " AND published_newsletter_id IS NULL";
             }
         }
 

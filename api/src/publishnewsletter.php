@@ -83,26 +83,9 @@ class PublishNewsletter extends Endpoint
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {
-        // Check if newsletter_content parameter was included.
-        if (!filter_has_var(INPUT_POST, 'newsletter_content')) {
-            throw new ClientErrorException("newsletter_content parameter required", 400);
-        }
-
-        // Check if date_published parameter was included.
-        if (!filter_has_var(INPUT_POST, 'date_published')) {
-            throw new ClientErrorException("date_published parameter required", 400);
-        }
-
-        // Check if user_id parameter was included.
-        if (!filter_has_var(INPUT_POST, 'user_id')) {
-            throw new ClientErrorException("user_id parameter required", 400);
-        }
-
-        // Check if newsletter_items parameter was included.
-        if (!filter_has_var(INPUT_POST, 'newsletter_items')) {
-            throw new ClientErrorException("newsletter_items parameter required", 400);
-        }
+    {   
+        $requiredParameters = array('newsletter_content', 'date_published', 'user_id', 'newsletter_items');
+        $this->checkRequiredParameters($requiredParameters);
     }
 
     /**

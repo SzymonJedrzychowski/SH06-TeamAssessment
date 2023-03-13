@@ -45,15 +45,8 @@ class ChangeItemStatus extends Endpoint
      */
     private function validateParameters()
     {
-        // Check if item_id parameter was included.
-        if (!filter_has_var(INPUT_POST, 'item_id')) {
-            throw new ClientErrorException("item_id parameter required", 400);
-        }
-
-        // Check if status parameter was included.
-        if (!filter_has_var(INPUT_POST, 'item_checked')) {
-            throw new ClientErrorException("item_checked parameter required", 400);
-        }
+        $requiredParameters = array('item_id', 'item_checked');
+        $this->checkRequiredParameters($requiredParameters);
     }
 
     protected function initialiseSQL()
