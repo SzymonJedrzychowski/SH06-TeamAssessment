@@ -146,8 +146,17 @@ const Navbar = () => {
             open={Boolean(anchorAccount)}
             onClose={handleCloseAccount}
           >
-            <MenuItem>
-              <Button as={RouterLink} to={'/createAccount'}>Create Account</Button>
+            <MenuItem
+              component={RouterLink} 
+              to='/loginUser'
+              >
+              Login
+            </MenuItem>
+            <MenuItem
+              component={RouterLink}
+              to='/createAccount'
+            >
+              Create Account
             </MenuItem>
           </Menu>
         </Box>

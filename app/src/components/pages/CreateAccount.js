@@ -12,21 +12,17 @@ function CreateUser() {
   const handleSubmit = (event) => {
     event.preventDefault();
     // console.log(JSON.stringify(Object.fromEntries(formData)));
+    try{
     fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/adduser", {
       method: "POST",
       headers: {
         "Content-Type": "multipart/form-data",
       },
       body: formData,
-    })
-
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Success:", formData);
-      })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    })}
+    catch(error){
+      console.log(error);
+    }
   };     
   
   return (

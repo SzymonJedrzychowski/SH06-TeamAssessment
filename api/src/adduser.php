@@ -3,9 +3,6 @@
 /**
  * Responsible for handling /adduser endpoint.
  *
- * This class reads and validates received parameters
- * and adds new newsletter suggestion.
- *
  * @author Mikolaj Furmanczak
  */
 class AddUser extends Endpoint
@@ -33,16 +30,7 @@ class AddUser extends Endpoint
 
         // Set the response data.
         $this->setData(array(
-            "message" => "User added successfully",
-            "data" => array(
-                "email" => $_POST["email"],
-                "first_name" => $_POST["first_name"],
-                "last_name" => $_POST["last_name"],
-                "organisation" => $_POST["organisation_id"],
-                "password" => $_POST["password"],
-                "confirmPassword" => $_POST["confirmPassword"],
-                "authorisation_id" => 0
-            )
+            "message" => "Success",
         ));
     }
     /**
@@ -55,7 +43,7 @@ class AddUser extends Endpoint
         // Check if required parameters are present.
         $requiredParameters = array("email", "first_name","last_name","organisation_id","password","confirmPassword");
         foreach ($requiredParameters as &$value) {
-            if (!filter_has_var(INPUT_POST, $value)) {
+            if (!filter_has_var(INPUT_POST, $value) || empty($_POST[$value]) ) {
                 throw new ClientErrorException($value . " parameter required", 400);
             }
         }
@@ -69,7 +57,7 @@ class AddUser extends Endpoint
             throw new ClientErrorException("Password must be at least 8 characters long", 400);
         }
 
-        // Check if password and confirm password match.
+        // Check if password and confirmed password match.
         if ($_POST["password"] != $_POST["confirmPassword"]) {
             throw new ClientErrorException("Passwords do not match", 400);
         }
@@ -91,9 +79,9 @@ class AddUser extends Endpoint
             ":email" => $_POST["email"],
             ":first_name" => $_POST["first_name"],
             ":last_name" => $_POST["last_name"],
-            ":password" => $this->encodePassword($this->$_POST["password"]),
+            ":password" => $this->encodePassword($_POST["password"]),
             ":organisation_id" => $_POST["organisation_id"],
-            ":authorisation" => 0
+            ":authorisation" => 1
         ));
     }
 }
