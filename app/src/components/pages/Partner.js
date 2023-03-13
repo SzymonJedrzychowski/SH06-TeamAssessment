@@ -10,41 +10,70 @@ import React, { useState, useEffect } from 'react';
 
 const Partner = () => {
 
-    // On render hooks
-    useEffect(() => {
-        //TODO: fetch request for data
-        console.log("Render complete")
-    }, [])
-
     // State variable hooks
+    const [loadingReviewItems, setLoadingReviewItems] = useState(true);
+    const [loadingPage, setLoadingPage] = useState(true);
     const [showContribute, setShowcontribute] = useState(true);
     const [showReview, setShowReview] = useState(false);
     const [showPublished, setShowPublished] = useState(false);
+    const [itemsInReview, setItemsInReview] = useState([]);
+
+    // On render hook
+    useEffect(() => {
+        //TODO: filter by authenitcated user
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
+        .then(
+            //Process response into JSON
+            function(response){
+                if (response.status === 200){
+                    return response.json();
+                }
+            }
+        )
+        .then(
+            function(data) {
+                setItemsInReview(data);
+                setLoadingReviewItems(false);
+            }
+        )
+        .catch(
+            function(e){
+                console.log("The following error occurred: ", e);
+            }
+        )
+
+        console.log("Render complete")
+    }, [])
 
     // Other variables
 
 
     // Functions
-     // -Navigation
-     const setContribute = () => {
-        setShowReview(false);
-        setShowPublished(false);
-        setShowcontribute(true);
-     }
-
-     const setReview = () => {
-        setShowcontribute(false);
-        setShowPublished(false);
-        setShowReview(true);
-     }
-
-     const setPublished = () => {
-        setShowcontribute(false);
-        setShowReview(false);
-        setShowPublished(true);
-     }
-
-
+        // -Navigation
+        const setContribute = () => {
+            setShowReview(false);
+            setShowPublished(false);
+            setShowcontribute(true);
+            }
+    
+            const setReview = () => {
+            setShowcontribute(false);
+            setShowPublished(false);
+            setShowReview(true);
+            }
+    
+            const setPublished = () => {
+            setShowcontribute(false);
+            setShowReview(false);
+            setShowPublished(true);
+            }
+    
+    
+    
+        // -Other
+        const uploadItem = () =>{
+            console.log("Upload");
+        }
 
     // Content
 
@@ -69,9 +98,14 @@ const Partner = () => {
             </ul>
         </div>
         <div className = 'PartnerReviewContent'>
-            Boxes go here.
+            itemsTable goes here
         </div>
         </div>
+
+            // --Items
+            const itemsTable = <div>
+                <table></table>
+            </div>
 
 
         // -Published
@@ -93,8 +127,8 @@ const Partner = () => {
             </div>
             <div className = 'PartnerBody'>
             {showContribute && <div className = 'PartnerContribute'>{contributeSection}</div>}
-            {showReview && <div className = 'PartnerReview'>Review content</div>}
-            {showPublished && <div className = 'PartnerPublished'>Published content</div>}
+            {showReview && <div className = 'PartnerReview'>{reviewSection}</div>}
+            {showPublished && <div className = 'PartnerPublished'>{publishedSection}</div>}
 
             </div>
         </div>
