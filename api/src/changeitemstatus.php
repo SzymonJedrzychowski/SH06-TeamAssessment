@@ -23,7 +23,8 @@ class ChangeItemStatus extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
 
-        // Validate the update parameters.
+        // Check if correct params were provided.
+        $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
 
         // Initialise the SQL command and parameters to insert new data to database.
@@ -44,15 +45,8 @@ class ChangeItemStatus extends Endpoint
      */
     private function validateParameters()
     {
-        // Check if item_id parameter was included.
-        if (!filter_has_var(INPUT_POST, 'item_id')) {
-            throw new ClientErrorException("item_id parameter required", 400);
-        }
-
-        // Check if status parameter was included.
-        if (!filter_has_var(INPUT_POST, 'item_checked')) {
-            throw new ClientErrorException("item_checked parameter required", 400);
-        }
+        $requiredParameters = array('item_id', 'item_checked');
+        $this->checkRequiredParameters($requiredParameters);
     }
 
     protected function initialiseSQL()
@@ -65,5 +59,18 @@ class ChangeItemStatus extends Endpoint
             'item_id' => $_POST['item_id'],
             'item_checked' => $_POST['item_checked']
         ]);
+    }
+
+    /**
+     * Set the array of available parameters for /changeitemstatus endpoint.
+     *
+     * @return string[] Array of available params.
+     */
+    protected function getAvailableParams()
+    {
+        return [
+            'item_id' => "int",
+            'item_checked' => "int"
+        ];
     }
 }

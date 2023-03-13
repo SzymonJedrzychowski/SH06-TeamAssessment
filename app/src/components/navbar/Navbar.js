@@ -69,7 +69,7 @@ const Navbar = () => {
   return (
     <AppBar position="static">
       <Toolbar>
-        <Typography as={RouterLink} noWrap to="/" variant="h6" sx={logoStyle}>
+        <Typography component={RouterLink} noWrap to="/" variant="h6" sx={logoStyle}>
           IC3
         </Typography>
         <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
@@ -102,7 +102,7 @@ const Navbar = () => {
             }}
           >
             {pages.map((page) => (
-              <Link as={RouterLink} to={page.path} key={page.label}>
+              <Link component={RouterLink} to={page.path} key={page.label}>
                 <MenuItem key={page.label} onClick={handleCloseNavMenu}>
                   <Typography textAlign="center">{page.label}</Typography>
                 </MenuItem>
@@ -120,7 +120,7 @@ const Navbar = () => {
         </Typography>
         <Box sx={boxMDScreen}>
           {pages.map((page) => (
-            <Link as={RouterLink} to={page.path} key={page.label}>
+            <Link component={RouterLink} to={page.path} key={page.label}>
               <Button key={pages.label} sx={btnMDScreen}>
                 {page.label}
               </Button>

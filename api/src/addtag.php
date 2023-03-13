@@ -23,6 +23,9 @@ class AddTag extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
 
+        // Check if correct params were provided.
+        $this->checkAvailableParams($this->getAvailableParams());
+
         // Validate the update parameters.
         $this->validateParameters();
 
@@ -43,11 +46,9 @@ class AddTag extends Endpoint
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {
-        // Check if tag_name parameter was included.
-        if (!filter_has_var(INPUT_POST, 'tag_name')) {
-            throw new ClientErrorException("tag_name parameter required", 400);
-        }
+    {   
+        $requiredParameters = array('tag_name');
+        $this->checkRequiredParameters($requiredParameters);
     }
 
     protected function initialiseSQL()
@@ -59,5 +60,15 @@ class AddTag extends Endpoint
         $this->setSQLParams([
             'tag_name' => $_POST['tag_name']
         ]);
+    }
+
+    /**
+     * Set the array of available parameters for /addtag endpoint.
+     *
+     * @return string[] Array of available params.
+     */
+    protected function getAvailableParams()
+    {
+        return ['tag_name' => 'string'];
     }
 }

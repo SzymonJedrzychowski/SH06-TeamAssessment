@@ -54,4 +54,44 @@ class Database
         // Return the fetched data.
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Method responsible for starting a transaction.
+     *
+     * @return bool Success of transaction start.
+     */
+    public function beginTransaction()
+    {
+        $this->dbConnection->beginTransaction();
+    }
+
+    /**
+     * Method responsible for commiting the transaction.
+     *
+     * @return bool Success of transaction commit.
+     */
+    public function commitTransaction()
+    {
+        $this->dbConnection->commit();
+    }
+
+    /**
+     * Method responsible for rolling back the transaction.
+     *
+     * @return bool Success of rollback.
+     */
+    public function rollbackTransaction()
+    {
+        $this->dbConnection->rollBack();
+    }
+
+   /**
+     * Method responsible for getting the ID of last insert.
+     * 
+     * @return int ID of last inserted row.
+     */
+    public function getLastId()
+    {
+        return $this->dbConnection->lastInsertId();
+    }
 }

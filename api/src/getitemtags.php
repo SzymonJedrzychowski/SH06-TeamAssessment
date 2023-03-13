@@ -40,10 +40,8 @@ class GetItemTags extends Endpoint
      */
     private function validateParameters()
     {
-        // Check if item_id parameter was included.
-        if (!filter_has_var(INPUT_GET, 'item_id')) {
-            throw new ClientErrorException("item_id parameter required", 400);
-        }
+        $requiredParameters = array('item_id');
+        $this->checkRequiredParameters($requiredParameters);
     }
 
     /**
@@ -53,6 +51,6 @@ class GetItemTags extends Endpoint
      */
     protected function getAvailableParams()
     {
-        return ["item_id" => "integer"];
+        return ['item_id' => 'int'];
     }
 }

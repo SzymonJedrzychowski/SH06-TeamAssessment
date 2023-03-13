@@ -1,7 +1,6 @@
 import { useLocation, Link, useNavigate } from "react-router-dom"
 import ListGroup from "react-bootstrap/ListGroup";
-import Button from 'react-bootstrap/Button';
-import { Box } from "@mui/material";
+import { Box, Button } from "@mui/material";
 import Select from 'react-select';
 
 import { Markup } from 'interweave';
@@ -12,6 +11,7 @@ const CheckItem = () => {
     const navigate = useNavigate();
     const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [approved, setApproved] = useState(false);
 
     const boxStyling = {
         minHeight: "100vh",
@@ -21,9 +21,11 @@ const CheckItem = () => {
     };
 
     useEffect(() => {
-        if(!item.state){
+        if (!item.state) {
             navigate("/editorial");
             return;
+        } else {
+            setApproved(item.state[0].item_checked === "3");
         }
 
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state[0].item_id)
@@ -39,7 +41,7 @@ const CheckItem = () => {
                 (e) => {
                     console.log(e.message)
                 })
-    }, [])
+    }, [item.state, navigate])
 
     const approveItem = () => {
         const formData = new FormData();
@@ -54,13 +56,15 @@ const CheckItem = () => {
                 (response) => response.json()
             )
             .then(
-                (json) => console.log(json))
+                (json) => {
+                    setApproved(true);
+                })
             .catch(
                 (e) => {
                     console.log(e.message)
                 })
     }
-
+    
     return <Box sx={boxStyling}>{!loading && <ListGroup>
         <ListGroup.Item>
             {item.state[0].item_title}
@@ -80,17 +84,17 @@ const CheckItem = () => {
                 isMulti
                 name="colors"
                 options={item.state[1]}
-                getOptionLabel  = {(option)=>option.tag_name}
-                getOptionValue = {(option)=>option.tag_id}
+                getOptionLabel={(option) => option.tag_name}
+                getOptionValue={(option) => option.tag_id}
                 className="basic-multi-select"
                 classNamePrefix="select"
             />
         </ListGroup.Item>
         <ListGroup.Item>
-            {item.state[0].item_checked === "3" && <Button disabled>Approved</Button>}
-            {item.state[0].item_checked !== "3" && <Button onClick={approveItem}>Approve</Button>}
-            <Button as={Link} to={"/suggestChanges"} state={item.state[0]}>Edit</Button>
-            <Button onClick={() => navigate(-1)}>Go back</Button>
+            {approved && <Button variant="contained" disabled>Approved</Button>}
+            {!approved && <Button variant="contained" onClick={approveItem}>Approve</Button>}
+            <Button variant="contained" component={Link} to={"/suggestChanges"} state={item.state[0]}>Edit</Button>
+            <Button variant="contained" onClick={() => navigate(-1)}>Go back</Button>
         </ListGroup.Item>
     </ListGroup>}</Box>;
 }
