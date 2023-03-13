@@ -47,6 +47,7 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
                 break;
             case '/getpublishednewsletters':
                 $endpoint = new GetPublishedNewsletters();
+                break;
             case '/adduser':
                 $endpoint = new AddUser();
                 break;
