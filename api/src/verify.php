@@ -3,7 +3,7 @@
 use FirebaseJWT\JWT;
 
 /**
- * Responsible for handling /authenticate endpoint.
+ * Responsible for handling /verify endpoint.
  *
  * This class reads and validates received parameters
  * and find if an account in database matches the credentials.
@@ -40,12 +40,6 @@ class Verify extends Endpoint
 
         // Create the token and append it to data array.
         $data['token'] = $this->createJWT($queryResult);
-
-        // Append the name of username to data array.
-        $data['email'] = $queryResult[0]["email"];
-        $data['authorisation'] = $queryResult[0]["authorisation"];
-        $data['user_id'] = $queryResult[0]["user_id"];
-        $data['password'] = $queryResult[0]["password"];
 
         $this->setData(array(
             "length" => count($data),

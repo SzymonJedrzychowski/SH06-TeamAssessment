@@ -12,7 +12,7 @@ function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
     // console.log(JSON.stringify(Object.fromEntries(formData)));
-    fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/loginuser", {
+    fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/authenticate", {
       method: "POST",
       headers: {
         "Content-Type": "multipart/form-data",

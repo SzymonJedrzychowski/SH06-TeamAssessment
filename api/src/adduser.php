@@ -12,7 +12,16 @@ class AddUser extends Endpoint
      *
      * @throws BadRequest           If request method is incorrect.
      */
+
+     /*
     
+
+    1. add domain verification (@domain.com of partners)
+    2. add user uniqueness (email)
+    3. add header to main page after login
+    4. 
+
+     */
     public  function __construct()
     { 
         // Connect to the database.

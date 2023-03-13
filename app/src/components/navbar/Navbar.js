@@ -148,7 +148,7 @@ const Navbar = () => {
           >
             <MenuItem
               component={RouterLink} 
-              to='/loginUser'
+              to='/login'
               >
               Login
             </MenuItem>

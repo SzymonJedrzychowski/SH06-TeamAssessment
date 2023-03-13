@@ -6,7 +6,8 @@ use FirebaseJWT\Key;
 /**
  * Responsible for handling /authenticate endpoint.
  *
- * This class is responsible for checking if the token is still valid and returning name of current user.
+ * This class is responsible for checking if the token is still valid
+ *  and returning name of current user.
  *
  * @author Mikolaj Furmanczak
  */
@@ -20,7 +21,7 @@ class Authenticate extends Endpoint
     /**
      * @var int $accountId value of account_id column for current user.
      */
-    protected $accountId;
+    protected $userId;
 
     /**
      * Override the __construct method to match the requirements of the /verify endpoint.
@@ -41,7 +42,7 @@ class Authenticate extends Endpoint
         $this->validateToken();
 
         // Set the userID based on the JWT.
-        $this->setAccountId($this->getDecoded()->sub);
+        $this->setUserId($this->getDecoded()->sub);
 
         // Initialise the SQL command and parameters and get the data from the database.
         $this->initialiseSQL();
@@ -98,9 +99,9 @@ class Authenticate extends Endpoint
     protected function initialiseSQL()
     {
         // Create SQL command to get data of the user.
-        $sql = "SELECT user_id, email, password, authorisation FROM user WHERE email = :email";
+        $sql = "SELECT user_id, email, password, authorisation FROM user WHERE user_id = :user_id";
         $this->setSQLCommand($sql);
-        $this->setSQLParams(['email' => $this->getUserEmail()]);
+        $this->setSQLParams(['user_id' => $this->getUserId()]);
     }
     /**
      * Getter for $decoded.
@@ -127,9 +128,9 @@ class Authenticate extends Endpoint
      *
      * @return int AccountId of current user.
      */
-    public function getUserEmail()
+    public function getUserId()
     {
-        return $this->email;
+        return $this->userId;
     }
 
     /**
@@ -137,8 +138,8 @@ class Authenticate extends Endpoint
      *
      * @param int $accountId AccountId of current user.
      */
-    public function setAccountId($accountId)
+    public function setUserId($userId)
     {
-        $this->accountId = $accountId;
+        $this->userId= $userId;
     }
 }

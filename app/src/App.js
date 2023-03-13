@@ -25,7 +25,7 @@ function App() {
           <Route path="/checkItem" element={<CheckItem/>}/>
           <Route path="/suggestChanges" element={<SuggestChanges/>}/>
           <Route path="/createAccount" element={<CreateAccount/>}/>
-          <Route path="/loginUser" element={<Login/>}/>
+          <Route path="/login" element={<Login/>}/>
           <Route path="*" element={<p>Not found</p>} />
         </Routes>
       </Layout>
