@@ -20,7 +20,7 @@ const Partner = () => {
 
     // On render hook
     useEffect(() => {
-        //TODO: filter by authenitcated user
+        //TODO: filter by authenticated user
         fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
         .then(
             //Process response into JSON
@@ -31,8 +31,8 @@ const Partner = () => {
             }
         )
         .then(
-            function(data) {
-                setItemsInReview(data);
+            (json) => {
+                setItemsInReview(json.data);
                 setLoadingReviewItems(false);
             }
         )
@@ -46,7 +46,13 @@ const Partner = () => {
     }, [])
 
     // Other variables
-
+    const checkValues = {
+        "-1" : "Rejected",
+        "0"  : "In review",
+        "1"  : "Edit requested!",
+        "2"  : "In review",
+        "3"  : "In review"
+    }
 
     // Functions
         // -Navigation
@@ -71,8 +77,18 @@ const Partner = () => {
     
     
         // -Other
-        const uploadItem = () =>{
+        const uploadItem = () => {
             console.log("Upload");
+        }
+
+        const truncateText = (text) => {
+            // Credit: https://stackoverflow.com/a/1199420
+            return(
+                (text.length > 100 ) ?
+                    text.slice(0, 99) + '&hellip;'
+                    :
+                    text
+            )
         }
 
     // Content
@@ -88,6 +104,18 @@ const Partner = () => {
         
 
         // -Review
+        
+            // --Items
+            const createItemBox = (value) => {
+                return(
+                    <div key = {value.item_id}>
+                        <div>{value.item_title}</div>
+                        <div>{checkValues[value.item_checked]}</div>
+                        <div>{/*truncateText(value.content)*/}Banana</div>
+                        <div><button>Edit</button></div>
+                    </div>);
+            }
+
         const reviewSection = <div className = 'PartnerReview'>
         <div className = 'PartnerReviewFilters'>
             <ul>
@@ -97,16 +125,18 @@ const Partner = () => {
                 <button>Rejected</button>
             </ul>
         </div>
+        <div className = 'PartnerReviewLoading'>
+            {loadingReviewItems && <p>Loading...</p>}
+        </div>
         <div className = 'PartnerReviewContent'>
-            itemsTable goes here
+            itemsInReview
+            {itemsInReview.map(
+                function (value) {
+                return createItemBox(value);
+            }
+            )}
         </div>
         </div>
-
-            // --Items
-            const itemsTable = <div>
-                <table></table>
-            </div>
-
 
         // -Published
         const publishedSection = <div className = 'PartnerPublished'>
