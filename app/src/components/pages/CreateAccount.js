@@ -15,14 +15,14 @@ function CreateUser() {
     fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/adduser", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "multipart/form-data",
       },
-      body: JSON.stringify(Object.fromEntries(formData),
-      ),
+      body: formData,
     })
+
       .then((response) => response.json())
       .then((data) => {
-        console.log("Success:", data);
+        console.log("Success:", formData);
       })
       .catch((error) => {
         console.error("Error:", error);
