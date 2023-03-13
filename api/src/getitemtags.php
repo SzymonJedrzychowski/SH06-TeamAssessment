@@ -53,6 +53,6 @@ class GetItemTags extends Endpoint
      */
     protected function getAvailableParams()
     {
-        return ["item_id" => "integer"];
+        return ['item_id' => 'int'];
     }
 }

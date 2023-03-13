@@ -23,6 +23,9 @@ class AddTag extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
 
+        // Check if correct params were provided.
+        $this->checkAvailableParams($this->getAvailableParams());
+
         // Validate the update parameters.
         $this->validateParameters();
 
@@ -59,5 +62,15 @@ class AddTag extends Endpoint
         $this->setSQLParams([
             'tag_name' => $_POST['tag_name']
         ]);
+    }
+
+    /**
+     * Set the array of available parameters for /addtag endpoint.
+     *
+     * @return string[] Array of available params.
+     */
+    protected function getAvailableParams()
+    {
+        return ['tag_name' => 'string'];
     }
 }

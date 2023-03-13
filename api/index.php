@@ -42,6 +42,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/getitemtags':
                 $endpoint = new GetItemTags();
                 break;
+            case '/publishnewsletter':
+                $endpoint = new PublishNewsletter();
+                break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);
                 break;

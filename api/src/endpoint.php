@@ -145,14 +145,28 @@ abstract class Endpoint
      */
     protected function checkAvailableParams($availableParams)
     {
-        foreach ($_GET as $key => $value) {
-            if (!key_exists($key, $availableParams)) {
-                throw new BadRequest("Invalid parameter " . $key);
-            } else {
-                if ($availableParams[$key] == "int" and !is_numeric($value)) {
-                    throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
-                } else if($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))){
-                    throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+        if ($_SERVER['REQUEST_METHOD'] == "GET") {
+            foreach ($_GET as $key => $value) {
+                if (!key_exists($key, $availableParams)) {
+                    throw new BadRequest("Invalid parameter " . $key);
+                } else {
+                    if ($availableParams[$key] == "int" and !is_numeric($value)) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
+                    } else if ($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+                    }
+                }
+            }
+        }else if($_SERVER['REQUEST_METHOD'] == "POST") {
+            foreach ($_POST as $key => $value) {
+                if (!key_exists($key, $availableParams)) {
+                    throw new BadRequest("Invalid parameter " . $key);
+                } else {
+                    if ($availableParams[$key] == "int" and !is_numeric($value)) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
+                    } else if ($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+                    }
                 }
             }
         }

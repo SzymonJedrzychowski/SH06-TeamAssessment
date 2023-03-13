@@ -23,7 +23,8 @@ class PostNewsletterSuggestion extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
 
-        // Validate the update parameters.
+        // Check if correct params were provided.
+        $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
 
         // Initialise the SQL command and parameters to insert new data to database.
@@ -77,5 +78,20 @@ class PostNewsletterSuggestion extends Endpoint
             'suggestion_comment' => $_POST['suggestion_comment'],
             'user_id' => $_POST['user_id']
         ]);
+    }
+
+    /**
+     * Set the array of available parameters for /postnewslettersuggestion endpoint.
+     *
+     * @return string[] Array of available params.
+     */
+    protected function getAvailableParams()
+    {
+        return [
+            'item_id' => 'int',
+            'suggestion_content' => 'string',
+            'suggestion_comment' => 'string',
+            'user_id' => 'int'
+        ];
     }
 }
