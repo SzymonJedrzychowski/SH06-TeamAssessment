@@ -19,6 +19,7 @@ const Partner = () => {
     const [showReview, setShowReview] = useState(false);
     const [showPublished, setShowPublished] = useState(false);
     const [itemsInReview, setItemsInReview] = useState([]);
+    const [itemsFilter, setItemsFilter] = useState([null]);
 
     // On render hook
     useEffect(() => {
@@ -55,6 +56,7 @@ const Partner = () => {
         "2"  : "In review",
         "3"  : "In review"
     }
+
 
     // Functions
         // -Navigation
@@ -93,6 +95,18 @@ const Partner = () => {
             )
         }
 
+        const filterChecked = (value) => {
+            if (itemsFilter.includes(null)){
+                return true;
+            }
+            else if (itemsFilter.includes(value.item_checked)){
+                return true;
+            }
+            else{
+                return false;
+            }
+        }
+
     // Content
 
         // -Contribute
@@ -127,10 +141,10 @@ const Partner = () => {
         const reviewSection = <div className = 'PartnerReview'>
         <div className = 'PartnerReviewFilters'>
             <ul>
-                <button>All</button>
-                <button>Accepted</button>
-                <button>Pending</button>
-                <button>Rejected</button>
+                <button onClick = {()=>setItemsFilter([null])}>All</button>
+                <button onClick = {()=>setItemsFilter(["3"])}>Accepted</button>
+                <button onClick = {()=>setItemsFilter(["0", "1", "2"])}>Pending</button>
+                <button onClick = {()=>setItemsFilter(["-1"])}>Rejected</button>
             </ul>
         </div>
         <div className = 'PartnerReviewLoading'>
@@ -138,7 +152,7 @@ const Partner = () => {
         </div>
         <div className = 'PartnerReviewContent'>
             itemsInReview
-            {itemsInReview.map(
+            {itemsInReview.filter(filterChecked).map(
                 function (value) {
                 return createItemBox(value);
             }
