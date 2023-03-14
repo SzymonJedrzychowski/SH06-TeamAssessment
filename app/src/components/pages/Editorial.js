@@ -35,7 +35,7 @@ const Editorial = () => {
     }
 
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
             .then(
                 (response) => response.json()
             )
@@ -51,7 +51,7 @@ const Editorial = () => {
                 }
             )
 
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/gettags")
                 .then(
                     (response) => response.json()
                 )

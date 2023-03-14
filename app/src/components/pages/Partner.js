@@ -13,7 +13,6 @@ const Partner = () => {
 
     // State variable hooks
     const [loadingReviewItems, setLoadingReviewItems] = useState(true);
-    const [loadingPage, setLoadingPage] = useState(true);
     const [showContribute, setShowcontribute] = useState(true);
     const [showReview, setShowReview] = useState(false);
     const [showPublished, setShowPublished] = useState(false);
@@ -113,7 +112,7 @@ const Partner = () => {
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>
                         <div>{checkValues[value.item_checked]}</div>
-                        <div>{truncateText(itemContent)}</div>
+                        <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
                         <div><button>Edit</button></div>
                     </div>);
             }
