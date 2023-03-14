@@ -8,7 +8,7 @@
  *
  * @author Szymon Jedrzychowski
  */
-class AddTag extends Endpoint
+class AddTag extends Verify
 {
     /**
      * Override the __construct method to match the requirements of the /addtag endpoint.
@@ -29,15 +29,51 @@ class AddTag extends Endpoint
         // Validate the update parameters.
         $this->validateParameters();
 
-        // Initialise the SQL command and parameters to insert new data to database.
-        $this->initialiseSQL();
-        $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+        // Validate the JWT.
+        $tokenData = parent::validateToken();
 
-        $this->setData(array(
-            "length" => 0,
-            "message" => "Success",
-            "data" => null
-        ));
+        if (!in_array($tokenData->auth, ["2", "3"])) {
+            throw new BadRequest("Only editor and admin can edit tags.");
+        }
+
+        // Start the transaction.
+        $db->beginTransaction();
+
+        try {
+            $sql = "SELECT * FROM tag WHERE tag_name = :tag_name";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'tag_name' => $_POST['tag_name']
+            ]);
+
+            $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            if (count($data) > 0) {
+                throw new Exception("Tag with given name already exists.");
+            }
+
+            $sql = "INSERT INTO tag (tag_name) VALUES (:tag_name)";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'tag_name' => $_POST['tag_name']
+            ]);
+
+            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Commit the transaction.
+            $db->commitTransaction();
+
+            $this->setData(array(
+                "length" => 0,
+                "message" => "Success",
+                "data" => null
+            ));
+        } catch (Exception $e) {
+            $db->rollbackTransaction();
+            throw $e;
+        }
     }
 
     /**
@@ -49,17 +85,6 @@ class AddTag extends Endpoint
     {   
         $requiredParameters = array('tag_name');
         $this->checkRequiredParameters($requiredParameters);
-    }
-
-    protected function initialiseSQL()
-    {
-        $sql = "INSERT INTO tag (tag_name) 
-        VALUES (:tag_name)";
-
-        $this->setSQLCommand($sql);
-        $this->setSQLParams([
-            'tag_name' => $_POST['tag_name']
-        ]);
     }
 
     /**

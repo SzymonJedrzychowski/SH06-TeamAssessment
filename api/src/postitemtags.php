@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Responsible for handling /changeitemstatus endpoint.
+ * Responsible for handling /postitemtags endpoint.
  *
  * This class reads and validates received parameters
- * and modifies status of newsletter item
+ * and changes tags on newsletter item.
  *
  * @author Szymon Jedrzychowski
  */
-class ChangeItemStatus extends Verify
+class PostItemTags extends Verify
 {
     /**
-     * Override the __construct method to match the requirements of the /changeitemstatus endpoint.
+     * Override the __construct method to match the requirements of the /postitemtags endpoint.
      *
      * @throws BadRequest           If request method is incorrect.
      */
@@ -30,32 +30,44 @@ class ChangeItemStatus extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
+        if(!in_array($tokenData->auth, ["2", "3"])){
+            throw new BadRequest("Only editor and admin can submit tags for newsletter_item.");
+        }
+
         // Start the transaction.
         $db->beginTransaction();
 
         try {
-            $sql = "SELECT item_id, user_id FROM newsletter_item WHERE item_id = :item_id";
+            
+            // Initialise the SQL command and parameters to insert new data to database.
+            $sql = "DELETE FROM item_tag WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
                 'item_id' => $_POST['item_id']
             ]);
 
-            $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            if (count($data) == 0) {
-                throw new BadRequest("Problem with getting newsletter_item occured.");
-            } else if ($data[0]["user_id"] != $tokenData->sub and $tokenData->auth == "1") {
-                throw new BadRequest("Editors can only edit their own items.");
+            // Initialise the SQL command and parameters to modify data of newsletter items.
+            $array = json_decode($_POST["item_tags"]);
+
+            if($array == null){
+                throw new BadRequest("Incorrect format of newsletter_items array.");
             }
 
-            $sql = "UPDATE newsletter_item SET item_checked = :item_checked WHERE item_id = :item_id";
+            $in = join(',', array_fill(0, count($array), '(?, ?)'));
+            $sql = "INSERT INTO item_tag (item_id, tag_id) VALUES ". $in;
 
             $this->setSQLCommand($sql);
-            $this->setSQLParams([
-                'item_id' => $_POST['item_id'],
-                'item_checked' => $_POST['item_checked']
-            ]);
+            $temp = array();
+            foreach($array as &$item){
+                array_push($temp, $_POST['item_id']);
+                array_push($temp, $item);
+            }
+            $this->setSQLParams(
+                $temp
+            );
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
@@ -79,21 +91,21 @@ class ChangeItemStatus extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {
-        $requiredParameters = array('item_id', 'item_checked');
+    {   
+        $requiredParameters = array('item_id', 'item_tags');
         $this->checkRequiredParameters($requiredParameters);
     }
 
     /**
-     * Set the array of available parameters for /changeitemstatus endpoint.
+     * Set the array of available parameters for /postitemtags endpoint.
      *
      * @return string[] Array of available params.
      */
     protected function getAvailableParams()
     {
         return [
-            'item_id' => "int",
-            'item_checked' => "int"
+            'item_id' => 'int',
+            'item_tags' => 'string'
         ];
     }
 }
