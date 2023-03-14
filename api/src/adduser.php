@@ -13,63 +13,49 @@ class AddUser extends Endpoint
      */
     public  function __construct()
     { 
-        // Connect to the database.
-        $db = new Database("db/database.db");
-        // Check if correct request method was used.
-        $this->validateRequestMethod("POST");
-        // Validate the parameters.
-        $this->validateParameters();
         try{
-            // Initialise the SQL command and parameters to get domain list from database.
-            $sql = "SELECT organisation_domain FROM organisation;";
-            $this->setSQLCommand($sql);
+            // Connect to the database.
+            $db = new Database("db/database.db");
+            // Check if correct request method was used.
+            $this->validateRequestMethod("POST");
+            // Validate the parameters.
+            $this->validateParameters();
 
-            // Get domain list from database.
-            $domains = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-            
+            // Initialise the SQL command and parameters to get domain list from database.
+            $sql = "SELECT organisation_domain FROM organisation WHERE organisation_domain = :organisation_domain;";
+            $this->setSQLCommand($sql);
             // Get user domain from email.
             $user_email = $_POST["email"];
             $user_domain = substr($user_email, strpos($user_email, "@") + 1);
+            // Set SQL parameters.
+            $this->setSQLParams(array(
+                ":organisation_domain" => $user_domain
+            ));
+            // Get domain list from database.
+            $domain = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // Add domains to array.
-            $domain_list = array();
-            for ($domain = 0; $domain < count($domains); $domain++) {
-                array_push($domain_list, $domains[$domain]['organisation_domain']);
-            }
-
-            $domainFound = false;
-            // Check if user domain is in domain list.
-            foreach ($domain_list as $domain) {
-                if ($domain == $user_domain) {
-                    $domainFound = true;
-                    break;
-                }
-            }
-            if ($domainFound == false) {
-                throw new ClientErrorException("Invalid domain", 400);
+            // Check if user domain exists.
+            if(empty($domain)){
+                throw new ClientErrorException("Domain does not exist", 400);
             }
 
             // Initialise the SQL command and parameters to get email list from database.
-            $sql = "SELECT email FROM user;";
+            $sql = "SELECT email FROM user WHERE email = :email;";
             $this->setSQLCommand($sql);
-
+            $this->setSQLParams(array(
+                ":email" => $_POST["email"]
+            ));
             // Get email list from database.
-            $emails = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-            // Add emails to array.
-            $email_list = array();
-            for($email = 0; $email < count($emails); $email++){
-                array_push($email_list, $emails[$email]['email']);
-            }
-            // Check if user email already exists.
-            foreach($email_list as $email){
-                if($email == $user_email){
-                    throw new ClientErrorException("Email already exists", 400);
-                }
+            $email = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            
+            // Check if email already exists.
+            if(!empty($email)){
+                throw new ClientErrorException("Email already exists", 400);
             }
             
             // Initialise the SQL command and parameters to insert new data to database.
-            $sql = "INSERT INTO user (email, first_name, last_name, password, organisation_id, authorisation) 
-            VALUES (:email, :first_name, :last_name, :password, :organisation_id, :authorisation)";
+            $sql = "INSERT INTO user (email, first_name, last_name, password, authorisation) 
+            VALUES (:email, :first_name, :last_name, :password, :authorisation)";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams(array(
@@ -77,7 +63,6 @@ class AddUser extends Endpoint
                 ":first_name" => $_POST["first_name"],
                 ":last_name" => $_POST["last_name"],
                 ":password" => $this->encodePassword($_POST["password"]),
-                ":organisation_id" => $_POST["organisation_id"],
                 ":authorisation" => 1
             ));
             // Insert new data to database.

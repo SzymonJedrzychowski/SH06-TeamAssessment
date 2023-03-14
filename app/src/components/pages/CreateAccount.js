@@ -43,16 +43,6 @@ function CreateUser() {
       </label>
       <br />
       <label>
-        Organisation:
-        <select name="organisation_id" onChange={handleInputChange}>
-          <option value="0">Select Organisation</option>
-          <option value="1">Northumbria</option>
-          <option value="2">IC3</option>
-          <option value="3">GOV</option>
-        </select>
-      </label>
-      <br />
-      <label>
         Password:
         <input type="password" name="password" onChange={handleInputChange} />
       </label>
