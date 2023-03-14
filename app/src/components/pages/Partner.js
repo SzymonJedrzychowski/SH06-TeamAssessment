@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {Markup} from 'interweave';
+import { Editor } from 'react-draft-wysiwyg'; // Found here https://www.npmjs.com/package/react-draft-wysiwyg 
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 
 /**
  * Partner page
@@ -98,6 +100,11 @@ const Partner = () => {
         <h2 className = 'PartnerContributeTitle'>Your item</h2>
         <div className = 'PartnerContributeBox'>
             Box goes here.
+            <Editor
+                toolbarClassName="toolbarClassName"
+                wrapperClassName="wrapperClassName"
+                editorClassName="editorClassName"
+            />;
         </div>
         <button onClick = {uploadItem}>Upload</button>
         </div>;
@@ -146,6 +153,7 @@ const Partner = () => {
             </div>
         </div>
 
+    // OUTPUT
     //TODO: Loading
     return(
         <div className = 'Partner'>
