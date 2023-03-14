@@ -15,7 +15,7 @@ use FirebaseJWT\JWT;
 class Verify extends Endpoint
 {
     /**
-     * Override the __construct method to match the requirements of the /authenticate endpoint.
+     * Override the __construct method to match the requirements of the /verify endpoint.
      *
      * @throws BadRequest               If request method is incorrect.
      * @throws ClientErrorException     If there are problems with login process.

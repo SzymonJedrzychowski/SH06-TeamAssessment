@@ -24,7 +24,7 @@ class Authenticate extends Endpoint
     protected $userId;
 
     /**
-     * Override the __construct method to match the requirements of the /verify endpoint.
+     * Override the __construct method to match the requirements of the /authenticate endpoint.
      *
      * @throws BadRequest           If request method is incorrect.
      * @throws ClientErrorException If token format is wrong, decoding of token threw an Exception

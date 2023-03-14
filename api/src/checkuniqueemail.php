@@ -1,36 +1,34 @@
 <?php
 
 /**
- * Responsible for handling /addsubscriber endpoint.
+ * Responsible for handling /checkuniqueemail endpoint.
  *
  * @author Mikolaj Furmanczak
  */
-class AddSubscriber extends Endpoint
+class CheckUniqueEmail extends Endpoint
 {
     /**
-     * Override the __construct method to match the requirements of the /addsubscriber endpoint.
+     * Override the __construct method to match the requirements of the /checkuniqueemail endpoint.
      *
      * @throws BadRequest           If request method is incorrect.
      */
+    // Connect to the database.
+    $db = new Database("db/database.db");
+    // Check if correct request method was used.
+    $this->validateRequestMethod("POST");
+    // Validate the parameters.
+    $this->validateParameters();
+
     public  function __construct()
     { 
-        // Connect to the database.
-        $db = new Database("db/database.db");
-
-        // Check if correct request method was used.
-        $this->validateRequestMethod("POST");
-
-        // Validate the parameters.
-        $this->validateParameters();
+        $sql = "SELECT organisation_domain FROM organisation;";  
+        $this->setSQLCommand($sql);
+        $this->setSQLParams();
 
         // Initialise the SQL command and parameters to insert new data to database.
-        $this->initialiseSQL();
-        $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+        $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-        // Set the response data.
-        $this->setData(array(
-            "message" => "Success",
-        ));
+        
     }
     /**
      * Check if correct parameters were used.
@@ -50,16 +48,8 @@ class AddSubscriber extends Endpoint
         if (!filter_var($_POST["subscriber_email"], FILTER_VALIDATE_EMAIL)) {
             throw new ClientErrorException("Invalid email", 400);
         }
-    }
-    protected function initialiseSQL()
-    {
-        $sql = "INSERT INTO newsletter_subscriber (subscriber_email) 
-        VALUES (:subscriber_email)";
-
-        $this->setSQLCommand($sql);
-        $this->setSQLParams(array(
-            ":subscriber_email" => $_POST["subscriber_email"],
-        ));
+        // check if organisation_domain exists in the organisation table
+        if 
     }
 }
 ?>

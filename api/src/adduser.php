@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Responsible for handling /adduser endpoint.
  *
@@ -13,28 +12,66 @@ class AddUser extends Endpoint
      * @throws BadRequest           If request method is incorrect.
      */
 
-     /*
-    
-
+    /* TODO
     1. add domain verification (@domain.com of partners)
     2. add user uniqueness (email)
     3. add header to main page after login
     4. 
-
      */
     public  function __construct()
     { 
         // Connect to the database.
         $db = new Database("db/database.db");
-
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
-
         // Validate the parameters.
         $this->validateParameters();
 
+        $sql = "SELECT organisation_domain FROM organisation;";
+        $this->setSQLCommand($sql);
+        $this->setSQLParams();
+
+        $domains = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+        $user_organisation = $_POST["organisation_id"];
+        $user_domain = explode("@", $user_organisation);
+        $user_domain = $user_domain[1];
+
+        $this->setData(array(
+            "message" => "Debugging",
+            "domains" => $domains,
+            "user_domain" => $user_domain
+        ));
+        // log user_domain to file
+        $myfile = fopen("newfile.txt", "w") or die("Unable to open file!");
+        fwrite($myfile, $user_domain);
+        fclose($myfile);
+
+        //check if organisation_domain exists in the organisation table
+        if (!in_array($user_domain, $domains)) {
+            throw new ClientErrorException("Invalid organisation domain", 400);
+        }
+        
+        $this->setData(array(
+            "message" => "Success",
+            "domains" => $domains
+        ));
+
+
+
         // Initialise the SQL command and parameters to insert new data to database.
-        $this->initialiseSQL();
+        $sql = "INSERT INTO user (email, first_name, last_name, password, organisation_id, authorisation) 
+        VALUES (:email, :first_name, :last_name, :password, :organisation_id, :authorisation)";
+
+        $this->setSQLCommand($sql);
+        $this->setSQLParams(array(
+            ":email" => $_POST["email"],
+            ":first_name" => $_POST["first_name"],
+            ":last_name" => $_POST["last_name"],
+            ":password" => $this->encodePassword($_POST["password"]),
+            ":organisation_id" => $_POST["organisation_id"],
+            ":authorisation" => 1
+        ));
+
         $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
         // Set the response data.
@@ -75,23 +112,6 @@ class AddUser extends Endpoint
     function encodePassword($password)
     {
         return password_hash($password, PASSWORD_DEFAULT);
-    }
-
-    protected function initialiseSQL()
-    {
-        
-        $sql = "INSERT INTO user (email, first_name, last_name, password, organisation_id, authorisation) 
-        VALUES (:email, :first_name, :last_name, :password, :organisation_id, :authorisation)";
-
-        $this->setSQLCommand($sql);
-        $this->setSQLParams(array(
-            ":email" => $_POST["email"],
-            ":first_name" => $_POST["first_name"],
-            ":last_name" => $_POST["last_name"],
-            ":password" => $this->encodePassword($_POST["password"]),
-            ":organisation_id" => $_POST["organisation_id"],
-            ":authorisation" => 1
-        ));
     }
 }
 ?>
