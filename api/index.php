@@ -36,6 +36,12 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/addtag':
                 $endpoint = new AddTag();
                 break;
+            case '/edittag':
+                $endpoint = new EditTag();
+                break;
+            case '/removetag':
+                $endpoint = new RemoveTag();
+                break;
             case '/gettags':
                 $endpoint = new GetTags();
                 break;

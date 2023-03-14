@@ -8,7 +8,7 @@
  *
  * @author Szymon Jedrzychowski
  */
-class PublishNewsletter extends Endpoint
+class PublishNewsletter extends Verify
 {
     /**
      * Override the __construct method to match the requirements of the /publishnewsletter endpoint.
@@ -27,6 +27,13 @@ class PublishNewsletter extends Endpoint
         $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
 
+        // Validate the JWT.
+        $tokenData = parent::validateToken();
+
+        if(!in_array($tokenData->auth, ["2", "3"])){
+            throw new BadRequest("Only editor and admin can publish a newsletter.");
+        }
+
         // Start the transaction.
         $db->beginTransaction();
 
@@ -40,7 +47,7 @@ class PublishNewsletter extends Endpoint
             $this->setSQLParams([
                 'newsletter_content' => $_POST['newsletter_content'],
                 'date_published' => $_POST['date_published'],
-                'user_id' => $_POST['user_id']
+                'user_id' => $tokenData->sub
             ]);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
@@ -84,7 +91,7 @@ class PublishNewsletter extends Endpoint
      */
     private function validateParameters()
     {   
-        $requiredParameters = array('newsletter_content', 'date_published', 'user_id', 'newsletter_items');
+        $requiredParameters = array('newsletter_content', 'date_published', 'newsletter_items');
         $this->checkRequiredParameters($requiredParameters);
     }
 
@@ -98,7 +105,6 @@ class PublishNewsletter extends Endpoint
         return [
             'newsletter_content' => 'string',
             'date_published' => 'string',
-            'user_id' => 'int',
             'newsletter_items' => 'string'
         ];
     }

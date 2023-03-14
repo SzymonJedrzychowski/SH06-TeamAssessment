@@ -22,6 +22,9 @@ const Publish = () => {
     const [paragraph, setParagraph] = useState(() => EditorState.createEmpty());
     const [selectedItem, setSelectedItem] = React.useState('');
     const [editMode, setEditMode] = React.useState(-1);
+    const [authenticated, setAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
+
     const navigate = useNavigate();
     const item = useLocation();
 
@@ -44,17 +47,56 @@ const Publish = () => {
             newsletter_id = item.state["newsletter_id"];
         }
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
             .then(
                 (response) => response.json()
             )
             .then(
                 (json) => {
-                    let temp = [...newsletterItems];
-                    console.log(newsletter_id == null);
-                    setNewsletterItems(temp.concat(json.data.filter(news => (
-                        (news["item_checked"] === "3" && news["published_newsletter_id"] == null) || (newsletter_id != null && news["published_newsletter_id"] === newsletter_id))
-                    )));
+                    if (json.message === "Success") {
+                        if (["2", "3"].includes(json.data[0]["authorisation"])) {
+                            setAuthenticated(true);
+                        } else {
+                            setAuthenticated(false);
+                            setLoading(false);
+                            return;
+                        }
+                    } else {
+                        localStorage.removeItem('token');
+                        setAuthenticated(false);
+                        setLoading(false);
+                        return;
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        setNewsletterItems(json.data.filter(news => (
+                            (news["item_checked"] === "3" && news["published_newsletter_id"] == null) || (newsletter_id != null && news["published_newsletter_id"] === newsletter_id))
+                        ));
+                        setLoading(false);
+                    } else {
+                        localStorage.removeItem('token');
+                        setAuthenticated(false);
+                        setLoading(false);
+                    }
                 }
             )
             .catch(
@@ -131,9 +173,11 @@ const Publish = () => {
     const handleRemoveItem = (e) => {
         if (editMode !== -1) return;
         let temp = [...files];
-        let temp2 = [...newsletterItems];
-        temp2.push(files[e]["data"]);
-        setNewsletterItems(temp2);
+        if(files[e]["type"] === "newsletter"){
+            let temp2 = [...newsletterItems];
+            temp2.push(files[e]["data"]);
+            setNewsletterItems(temp2);
+        }
         temp.splice(e, 1);
         changeFiles(temp);
     };
@@ -152,7 +196,6 @@ const Publish = () => {
         yourDate = new Date(yourDate.getTime() - (offset * 60 * 1000))
         formData.append('newsletter_content', JSON.stringify(files));
         formData.append('date_published', yourDate.toISOString().split('T')[0]);
-        formData.append('user_id', 1);
         let temp = [];
         files.forEach(element => {
             if (element["type"] === "newsletter") {
@@ -164,6 +207,7 @@ const Publish = () => {
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
             {
                 method: 'POST',
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
                 body: formData
             })
             .then(
@@ -171,7 +215,11 @@ const Publish = () => {
             )
             .then(
                 (json) => {
-                    console.log(json);
+                    if (json.message !== "Success") {
+                        console.log(json);
+                        localStorage.removeItem('token');
+                        setAuthenticated(false);
+                    }
                 })
             .catch(
                 (e) => {
@@ -191,14 +239,12 @@ const Publish = () => {
                 temp.push(element["data"]["item_id"]);
             }
         });
-        if(temp.length === 0){
-            temp.push(null);
-        }
         formData.append('newsletter_items', JSON.stringify(temp));
 
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
             {
                 method: 'POST',
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
                 body: formData
             })
             .then(
@@ -206,7 +252,11 @@ const Publish = () => {
             )
             .then(
                 (json) => {
-                    console.log(json);
+                    if (json.message !== "Success") {
+                        console.log(json);
+                        localStorage.removeItem('token');
+                        setAuthenticated(false);
+                    }
                 })
             .catch(
                 (e) => {
@@ -216,7 +266,7 @@ const Publish = () => {
     }
 
     return <Box sx={boxStyling}>
-        <List>
+        {(!loading && authenticated) && <><List>
             {files.map((value, index) => createEntry(value, index))}
             <ListItem>
                 <Box sx={{ minWidth: 120 }}>
@@ -242,9 +292,18 @@ const Publish = () => {
                 {editMode !== -1 && <Button variant="contained" onClick={cancelEdit}>Cancel edit</Button>}
             </ListItem>
         </List>
-        {item.state === null && <Button variant="contained" onClick={submit}>Submit</Button>}
-        {item.state !== null && <Button variant="contained" onClick={edit}>Confirm</Button>}
-        <Button variant="contained" onClick={() => navigate(-1)}>Cancel</Button>
+            {(item.state === null && files.length > 0) && <Button variant="contained" onClick={submit}>Submit</Button>}
+            {(item.state === null && files.length === 0) && <Button variant="contained" disabled>Submit</Button>}
+            {(item.state !== null && files.length > 0) && <Button variant="contained" onClick={edit}>Confirm</Button>}
+            {(item.state !== null && files.length === 0) && <Button variant="contained" disabled>Confirm</Button>}
+            <Button variant="contained" onClick={() => navigate(-1)}>Cancel</Button>
+        </>}
+        {(!loading && !authenticated && localStorage.getItem('token') === undefined) &&
+            <p>You are not logged in.</p>
+        }
+        {(!loading && !authenticated && localStorage.getItem('token') !== undefined) &&
+            <p>You don't have access to this page.</p>
+        }
     </Box>;
 }
 

@@ -8,7 +8,7 @@
  *
  * @author Szymon Jedrzychowski
  */
-class EditNewsletter extends Endpoint
+class EditNewsletter extends Verify
 {
     /**
      * Override the __construct method to match the requirements of the /editnewsletter endpoint.
@@ -26,6 +26,13 @@ class EditNewsletter extends Endpoint
         // Check if correct params were provided.
         $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
+
+        // Validate the JWT.
+        $tokenData = parent::validateToken();
+
+        if(!in_array($tokenData->auth, ["2", "3"])){
+            throw new BadRequest("Only editor and admin can modify the newsletter.");
+        }
 
         // Start the transaction.
         $db->beginTransaction();

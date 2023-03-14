@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Responsible for handling /changeitemstatus endpoint.
+ * Responsible for handling /edittag endpoint.
  *
  * This class reads and validates received parameters
- * and modifies status of newsletter item
+ * and changes name of tag in database.
  *
  * @author Szymon Jedrzychowski
  */
-class ChangeItemStatus extends Verify
+class EditTag extends Verify
 {
     /**
-     * Override the __construct method to match the requirements of the /changeitemstatus endpoint.
+     * Override the __construct method to match the requirements of the /edittag endpoint.
      *
      * @throws BadRequest           If request method is incorrect.
      */
@@ -25,36 +25,40 @@ class ChangeItemStatus extends Verify
 
         // Check if correct params were provided.
         $this->checkAvailableParams($this->getAvailableParams());
+
+        // Validate the update parameters.
         $this->validateParameters();
 
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
+        if (!in_array($tokenData->auth, ["2", "3"])) {
+            throw new BadRequest("Only editor and admin can edit tags.");
+        }
+
         // Start the transaction.
         $db->beginTransaction();
 
         try {
-            $sql = "SELECT item_id, user_id FROM newsletter_item WHERE item_id = :item_id";
+            $sql = "SELECT * FROM tag WHERE tag_name = :tag_name";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-                'item_id' => $_POST['item_id']
+                'tag_name' => $_POST['tag_name']
             ]);
 
             $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            if (count($data) == 0) {
-                throw new BadRequest("Problem with getting newsletter_item occured.");
-            } else if ($data[0]["user_id"] != $tokenData->sub and $tokenData->auth == "1") {
-                throw new BadRequest("Editors can only edit their own items.");
+            if (count($data) > 0) {
+                throw new Exception("Tag with given name already exists.");
             }
 
-            $sql = "UPDATE newsletter_item SET item_checked = :item_checked WHERE item_id = :item_id";
+            $sql = "UPDATE tag SET tag_name = :tag_name WHERE tag_id = :tag_id";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-                'item_id' => $_POST['item_id'],
-                'item_checked' => $_POST['item_checked']
+                'tag_name' => $_POST['tag_name'],
+                'tag_id' => $_POST['tag_id']
             ]);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
@@ -80,20 +84,20 @@ class ChangeItemStatus extends Verify
      */
     private function validateParameters()
     {
-        $requiredParameters = array('item_id', 'item_checked');
+        $requiredParameters = array('tag_id', 'tag_name');
         $this->checkRequiredParameters($requiredParameters);
     }
 
     /**
-     * Set the array of available parameters for /changeitemstatus endpoint.
+     * Set the array of available parameters for /edittag endpoint.
      *
      * @return string[] Array of available params.
      */
     protected function getAvailableParams()
     {
         return [
-            'item_id' => "int",
-            'item_checked' => "int"
+            'tag_id' => 'int',
+            'tag_name' => 'string'
         ];
     }
 }
