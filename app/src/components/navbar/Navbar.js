@@ -10,7 +10,8 @@ import {
   Link
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { Box, Container } from "@mui/system";
+// import { Box, Container } from "@mui/system";
+import { Box} from "@mui/system";
 import React, { useState } from "react";
 import { pages } from "../../data/Pages";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -157,6 +158,12 @@ const Navbar = () => {
               to='/createAccount'
             >
               Create Account
+            </MenuItem>
+            <MenuItem
+              component={RouterLink}
+              to='/signUp'
+            >
+              Sign Up For The Newsletter
             </MenuItem>
           </Menu>
         </Box>

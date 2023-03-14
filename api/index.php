@@ -56,6 +56,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/authenticate':
                 $endpoint = new Authenticate();
                 break;
+            case '/addsubscriber':
+                $endpoint = new AddSubscriber();
+                break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);
                 break;
