@@ -22,7 +22,7 @@ class AddUser extends Endpoint
             $this->validateParameters();
 
             // Initialise the SQL command and parameters to get domain list from database.
-            $sql = "SELECT organisation_domain FROM organisation WHERE organisation_domain = :organisation_domain;";
+            $sql = "SELECT organisation_domain, organisation_id FROM organisation WHERE organisation_domain = :organisation_domain;";
             $this->setSQLCommand($sql);
             // Get user domain from email.
             $user_email = $_POST["email"];
@@ -35,7 +35,7 @@ class AddUser extends Endpoint
             $domain = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
             // Check if user domain exists.
-            if(empty($domain)){
+            if(empty($domain[0]["organisation_domain"])){
                 throw new ClientErrorException("Domain does not exist", 400);
             }
 
@@ -52,10 +52,9 @@ class AddUser extends Endpoint
             if(!empty($email)){
                 throw new ClientErrorException("Email already exists", 400);
             }
-            
             // Initialise the SQL command and parameters to insert new data to database.
-            $sql = "INSERT INTO user (email, first_name, last_name, password, authorisation) 
-            VALUES (:email, :first_name, :last_name, :password, :authorisation)";
+            $sql = "INSERT INTO user (email, first_name, last_name, password, authorisation, organisation_id) 
+            VALUES (:email, :first_name, :last_name, :password, :authorisation, :organisation_id)";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams(array(
@@ -63,7 +62,8 @@ class AddUser extends Endpoint
                 ":first_name" => $_POST["first_name"],
                 ":last_name" => $_POST["last_name"],
                 ":password" => $this->encodePassword($_POST["password"]),
-                ":authorisation" => 1
+                ":authorisation" => 1,
+                ":organisation_id" => $domain[0]["organisation_id"]
             ));
             // Insert new data to database.
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
@@ -84,7 +84,7 @@ class AddUser extends Endpoint
     private function validateParameters()
     {   
         // Check if required parameters are present.
-        $requiredParameters = array("email", "first_name","last_name","organisation_id","password","confirmPassword");
+        $requiredParameters = array("email", "first_name","last_name","password","confirmPassword");
         foreach ($requiredParameters as &$value) {
             if (!filter_has_var(INPUT_POST, $value) || empty($_POST[$value]) ) {
                 throw new ClientErrorException($value . " parameter required", 400);

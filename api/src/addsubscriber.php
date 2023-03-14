@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Responsible for handling /addsubscriber endpoint.
  *
@@ -14,45 +13,29 @@ class AddSubscriber extends Endpoint
      */
     public  function __construct()
     { 
+        try{
         // Connect to the database.
         $db = new Database("db/database.db");
-
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
-
         // Validate the parameters.
         $this->validateParameters();
 
-        // Initialise the SQL command and parameters to insert new data to database.
-        $this->initialiseSQL();
-        $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-
-        // Set the response data.
-        $this->setData(array(
-            "message" => "Success",
+        // Initialise the SQL command and parameters to get email list from database.
+        $sql = "SELECT subscriber_email FROM newsletter_subscriber WHERE subscriber_email = :subscriber_email;";
+        $this->setSQLCommand($sql);
+        $this->setSQLParams(array(
+            ":subscriber_email" => $_POST["subscriber_email"]
         ));
-    }
-    /**
-     * Check if correct parameters were used.
-     *
-     * @throws ClientErrorException If incorrect parameters were used.
-     */
-    private function validateParameters()
-    {   
-        // Check if required parameters are present.
-        $requiredParameters = array("subscriber_email");
-        foreach ($requiredParameters as &$value) {
-            if (!filter_has_var(INPUT_POST, $value) || empty($_POST[$value]) ) {
-                throw new ClientErrorException($value . " parameter required", 400);
-            }
+        // Get email list from database.
+        $email = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+        
+        // Check if email already exists.
+        if(!empty($email)){
+            throw new ClientErrorException("Email already exists", 400);
         }
-        // Check if email is valid.
-        if (!filter_var($_POST["subscriber_email"], FILTER_VALIDATE_EMAIL)) {
-            throw new ClientErrorException("Invalid email", 400);
-        }
-    }
-    protected function initialiseSQL()
-    {
+
+        
         $sql = "INSERT INTO newsletter_subscriber (subscriber_email) 
         VALUES (:subscriber_email)";
 
@@ -60,6 +43,30 @@ class AddSubscriber extends Endpoint
         $this->setSQLParams(array(
             ":subscriber_email" => $_POST["subscriber_email"],
         ));
+        $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+        // Set the response data.
+        $this->setData(array(
+            "message" => "Success",
+        ));
+        } catch(Exception $e){
+            throw new ClientErrorException($e->getMessage(), 400);
+        }
+    }
+    /**
+     * Check if correct parameters were used.
+     *
+     * @throws ClientErrorException If incorrect parameters were used.
+     */
+    private function validateParameters(){   
+        // Check if required parameters are present.
+        if (!filter_has_var(INPUT_POST, "subscriber_email")) {
+            throw new ClientErrorException("email parameter required", 400);
+        }
+        // Check if email is valid.
+        if (!filter_var($_POST["subscriber_email"], FILTER_VALIDATE_EMAIL)) {
+            throw new ClientErrorException("Invalid email", 400);
+        }
     }
 }
 ?>
