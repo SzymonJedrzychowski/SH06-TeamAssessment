@@ -8,7 +8,7 @@
  *
  * @author Szymon Jedrzychowski
  */
-class PostNewsletterSuggestion extends Endpoint
+class PostNewsletterSuggestion extends Verify
 {
     /**
      * Override the __construct method to match the requirements of the /postnewslettersuggestion endpoint.
@@ -27,8 +27,26 @@ class PostNewsletterSuggestion extends Endpoint
         $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
 
+        // Validate the JWT.
+        $tokenData = parent::validateToken();
+
+        if(!in_array($tokenData->auth, ["2", "3"])){
+            throw new BadRequest("Only editor and admin can publish a newsletter suggestion.");
+        }
+
         // Initialise the SQL command and parameters to insert new data to database.
-        $this->initialiseSQL();
+        $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
+        VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
+
+        $this->setSQLCommand($sql);
+        $this->setSQLParams([
+            'item_id' => $_POST['item_id'],
+            'suggestion_content' => $_POST['suggestion_content'],
+            'suggestion_comment' => $_POST['suggestion_comment'],
+            'user_id' => $tokenData->sub
+        ]);
+
+
         $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
         $this->setData(array(
@@ -45,22 +63,8 @@ class PostNewsletterSuggestion extends Endpoint
      */
     private function validateParameters()
     {   
-        $requiredParameters = array('item_id', 'suggestion_content', 'suggestion_comment', 'user_id');
+        $requiredParameters = array('item_id', 'suggestion_content', 'suggestion_comment');
         $this->checkRequiredParameters($requiredParameters);
-    }
-
-    protected function initialiseSQL()
-    {
-        $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
-        VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
-
-        $this->setSQLCommand($sql);
-        $this->setSQLParams([
-            'item_id' => $_POST['item_id'],
-            'suggestion_content' => $_POST['suggestion_content'],
-            'suggestion_comment' => $_POST['suggestion_comment'],
-            'user_id' => $_POST['user_id']
-        ]);
     }
 
     /**
@@ -73,8 +77,7 @@ class PostNewsletterSuggestion extends Endpoint
         return [
             'item_id' => 'int',
             'suggestion_content' => 'string',
-            'suggestion_comment' => 'string',
-            'user_id' => 'int'
+            'suggestion_comment' => 'string'
         ];
     }
 }

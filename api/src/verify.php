@@ -48,6 +48,8 @@ class Verify extends Endpoint
     /**
      * Check if the token is valid.
      *
+     * @return Object   Token data.
+     * 
      * @throws ClientErrorException If token format is wrong, decoding of token threw an Exception
      *                              or issuer does not agree with the host.
      */
@@ -84,6 +86,8 @@ class Verify extends Endpoint
         if ($this->getDecoded()->iss != $_SERVER['HTTP_HOST']) {
             throw new ClientErrorException("invalid token issuer", 401);
         }
+
+        return $this->getDecoded();
     }
 
     protected function initialiseSQL()
@@ -130,6 +134,6 @@ class Verify extends Endpoint
      */
     public function setUserId($userId)
     {
-        $this->userId= $userId;
+        $this->userId = $userId;
     }
 }

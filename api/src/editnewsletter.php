@@ -1,17 +1,17 @@
 <?php
 
 /**
- * Responsible for handling /publishnewsletter endpoint.
+ * Responsible for handling /editnewsletter endpoint.
  *
  * This class reads and validates received parameters
- * and adds posts newsletter to public.
+ * and adds changes the published newsletter.
  *
  * @author Szymon Jedrzychowski
  */
-class PublishNewsletter extends Verify
+class EditNewsletter extends Verify
 {
     /**
-     * Override the __construct method to match the requirements of the /publishnewsletter endpoint.
+     * Override the __construct method to match the requirements of the /editnewsletter endpoint.
      *
      * @throws BadRequest           If request method is incorrect.
      */
@@ -31,7 +31,7 @@ class PublishNewsletter extends Verify
         $tokenData = parent::validateToken();
 
         if(!in_array($tokenData->auth, ["2", "3"])){
-            throw new BadRequest("Only editor and admin can publish a newsletter.");
+            throw new BadRequest("Only editor and admin can modify the newsletter.");
         }
 
         // Start the transaction.
@@ -40,23 +40,31 @@ class PublishNewsletter extends Verify
         try {
 
             // Initialise the SQL command and parameters to insert new data to database.
-            $sql = "INSERT INTO published_newsletter (newsletter_content, date_published, user_id) 
-            VALUES (:newsletter_content, :date_published, :user_id)";
+            $sql = "UPDATE published_newsletter SET newsletter_content = :newsletter_content WHERE newsletter_id = :newsletter_id";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-                'newsletter_content' => $_POST['newsletter_content'],
-                'date_published' => $_POST['date_published'],
-                'user_id' => $tokenData->sub
+                'newsletter_id' => $_POST['newsletter_id'],
+                'newsletter_content' => $_POST['newsletter_content']
             ]);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-            $last_id = $db->getLastId();
+
+            // Initialise the SQL command and parameters to insert new data to database.
+            $sql = "UPDATE newsletter_item SET published_newsletter_id = :value WHERE published_newsletter_id = :newsletter_id";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'newsletter_id' => $_POST['newsletter_id'],
+                'value' => null
+            ]);
+
+            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
             // Initialise the SQL command and parameters to modify data of newsletter items.
             $array = json_decode($_POST["newsletter_items"]);
 
-            if($array == null){
+            if ($array == null) {
                 throw new BadRequest("Incorrect format of newsletter_items array.");
             }
 
@@ -65,7 +73,7 @@ class PublishNewsletter extends Verify
 
             $this->setSQLCommand($sql);
             $this->setSQLParams(
-                array_merge(array($last_id), $array)
+                array_merge(array($_POST['newsletter_id']), $array)
             );
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
@@ -90,8 +98,8 @@ class PublishNewsletter extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
-        $requiredParameters = array('newsletter_content', 'date_published', 'newsletter_items');
+    {
+        $requiredParameters = array('newsletter_content', 'newsletter_items', 'newsletter_id');
         $this->checkRequiredParameters($requiredParameters);
     }
 
@@ -104,8 +112,8 @@ class PublishNewsletter extends Verify
     {
         return [
             'newsletter_content' => 'string',
-            'date_published' => 'string',
-            'newsletter_items' => 'string'
+            'newsletter_items' => 'string',
+            'newsletter_id' => 'int'
         ];
     }
 }

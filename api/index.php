@@ -36,6 +36,12 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/addtag':
                 $endpoint = new AddTag();
                 break;
+            case '/edittag':
+                $endpoint = new EditTag();
+                break;
+            case '/removetag':
+                $endpoint = new RemoveTag();
+                break;
             case '/gettags':
                 $endpoint = new GetTags();
                 break;
@@ -56,6 +62,12 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
                 break;
             case '/authenticate':
                 $endpoint = new Authenticate();
+                break;
+            case '/editnewsletter':
+                $endpoint = new EditNewsletter();
+                break;
+            case '/postitemtags':
+                $endpoint = new PostItemTags();
                 break;
             case '/addsubscriber':
                 $endpoint = new AddSubscriber();
