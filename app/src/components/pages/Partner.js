@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {Markup} from 'interweave';
+import {link} from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg'; // Found here https://www.npmjs.com/package/react-draft-wysiwyg 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import Button from 'react-bootstrap/Button';
 
 /**
  * Partner page
@@ -92,7 +94,7 @@ const Partner = () => {
                     text.slice(0, 99) + '&hellip;'
                     :
                     text
-            )
+            );
         }
 
         const filterChecked = (value) => {
@@ -134,8 +136,8 @@ const Partner = () => {
                         <div>{value.item_title}</div>
                         <div>{checkValues[value.item_checked]}</div>
                         <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
-                        <div><button>Edit</button></div>
-                    </div>);
+                        <div><Button as = {link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>
+                    </div>); 
             }
 
         const reviewSection = <div className = 'PartnerReview'>
