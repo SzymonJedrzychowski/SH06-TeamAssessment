@@ -47,7 +47,9 @@ class AddSubscriber extends Endpoint
 
         // Set the response data.
         $this->setData(array(
+            "length" => 0,
             "message" => "Success",
+            "data" => null
         ));
         } catch(Exception $e){
             throw new ClientErrorException($e->getMessage(), 400);

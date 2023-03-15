@@ -39,9 +39,9 @@ class Verify extends Endpoint
         $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
         $this->setData(array(
-            "length" => count($data),
+            "length" => 0,
             "message" => "Success",
-            "data" => $data
+            "data" => null
         ));
     }
 

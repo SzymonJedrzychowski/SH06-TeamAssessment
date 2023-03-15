@@ -52,9 +52,9 @@ class Authenticate extends Endpoint
         $data['token'] = $this->createJWT($queryResult);
 
         $this->setData(array(
-            "length" => count($data),
+            "length" => 0,
             "message" => "Success",
-            "data" => $data
+            "data" => null
         ));
     }
 

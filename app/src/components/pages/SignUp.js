@@ -1,40 +1,46 @@
-import FormData from 'form-data'; 
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
 
-function SignUp() {
-    const formData = new FormData();
-  
-    const handleEmail = (event) => {
-        formData.append(event.target.name, event.target.value);
-      //   for (var key of formData.entries()) {
-      //     console.log(key[0] + ', ' + key[1]);
-      // }
-      };
+function SignUp() {  
     const handleSubmit = (event) => {
-        event.preventDefault();
-        // console.log(JSON.stringify(Object.fromEntries(formData)));
-        try{
-        fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/addsubscriber", {
-          method: "POST",
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          body: formData,
-        })}
-        catch(error){
-          console.log(error);
-        }
+      event.preventDefault();  
+
+      const formData = new FormData();
+      formData.append("subscriber_email", event.target.subscriber_email.value);
+
+      fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/addsubscriber", {
+        method: "POST",
+        body: formData,
+      })    
+      .then((response) => response.json())
+      .then(
+        (json) => console.log(json)
+      )
       };     
   
     return (
-      <form onSubmit={handleSubmit}>
-        <label>
-          Email:
-          <input type="text" name="subscriber_email" onChange={handleEmail} />
-        </label>
-        <br />
-
-        <button type="submit">Sign up</button>
-      </form>
+      <form onSubmit={handleSubmit} alignItems="center">
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        width="28%"
+        margin="0 auto"
+      >
+      <TextField
+        label="Email"
+        type="text"
+        name="subscriber_email"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+      />
+      <Button type="submit" variant="outlined" color="primary">
+        Sign Up
+      </Button>
+      </Box>
+  </form>
     );
   }
   
