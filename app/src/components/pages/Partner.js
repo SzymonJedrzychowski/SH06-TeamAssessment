@@ -23,15 +23,60 @@ const Partner = () => {
     const [itemsInReview, setItemsInReview] = useState([]);
     const [itemsFilter, setItemsFilter] = useState([null]);
 
+    const [authenticated, setAuthenticated] = useState(false); //TODO: apply
+    const [loading, setLoading] = useState(true); //TODO: apply
+
     // On render hook
     useEffect(() => {
-        //TODO: filter by authenticated user
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
+        //WIP
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        if (["1", "2", "3"].includes(json.data[0]["authorisation"])) {
+                            setAuthenticated(true);
+                        } else {
+                            setAuthenticated(false);
+                            setLoading(false);
+                            return;
+                        }
+                    } else {
+                        console.log(json);
+                        localStorage.removeItem('token');
+                        setAuthenticated(false);
+                        setLoading(false);
+                        return;
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        {
+            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+        })
         .then(
             //Process response into JSON
             function(response){
+                setLoading(false);
                 if (response.status === 200){
                     return response.json();
+                }
+                else {
+                    console.log(response.json);
+                    localStorage.removeItem('token');
+                    setAuthenticated(false);
+                    setLoading(false);
                 }
             }
         )
@@ -42,7 +87,7 @@ const Partner = () => {
             }
         )
         .catch(
-            function(e){
+            (e) => {
                 console.log("The following error occurred: ", e);
             }
         )
@@ -173,20 +218,33 @@ const Partner = () => {
     //TODO: Loading
     return(
         <div className = 'Partner'>
-            <div className = 'PartnerHeader'>
-                <h1>Partner Page Skeleton</h1>
-                <p>Lorem Ipsum</p>
-                <button onClick = {setContribute}>Contribute item!</button>
-                <button onClick = {setReview}>Review items!</button> {/*TODO Maybe cache box content*/}
-                <button onClick = {setPublished}>See published items!</button>
-            </div>
-            <div className = 'PartnerBody'>
-            {showContribute && <div className = 'PartnerContribute'>{contributeSection}</div>}
-            {showReview && <div className = 'PartnerReview'>{reviewSection}</div>}
-            {showPublished && <div className = 'PartnerPublished'>{publishedSection}</div>}
+            {(!loading && authenticated) && <div className = 'PartnerAuthenticated'>
+                <div className = 'PartnerHeader'>
+                    <h1>Partner Page Skeleton</h1>
+                    <p>Lorem Ipsum</p>
+                    <button onClick = {setContribute}>Contribute item!</button>
+                    <button onClick = {setReview}>Review items!</button> {/*TODO Maybe cache box content*/}
+                    <button onClick = {setPublished}>See published items!</button>
+                </div>
+                <div className = 'PartnerBody'>
+                {showContribute && <div className = 'PartnerContribute'>{contributeSection}</div>}
+                {showReview && <div className = 'PartnerReview'>{reviewSection}</div>}
+                {showPublished && <div className = 'PartnerPublished'>{publishedSection}</div>}
 
-            </div>
+                </div>
+            </div>}
+            
+            {(!loading && !authenticated && localStorage.getItem('token') === undefined) && 
+                <div className = 'PartnerNonAuthenticated'>
+                    <h1>Please log in or sign up to contribute</h1>
+                </div>}
+
+            {(!loading && !authenticated) && 
+                <div className = 'PartnerNonAuthenticated2'>
+                    <h1>Please log in or sign up to contribute</h1>
+                </div>}
         </div>
+        
     )
 }
 
