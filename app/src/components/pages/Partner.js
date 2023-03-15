@@ -26,7 +26,7 @@ const Partner = () => {
     // On render hook
     useEffect(() => {
         //TODO: filter by authenticated user
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems")
         .then(
             //Process response into JSON
             function(response){
