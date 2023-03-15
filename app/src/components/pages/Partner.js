@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {Markup} from 'interweave';
 import {Link} from 'react-router-dom';
-import { Editor } from 'react-draft-wysiwyg'; // Found here https://www.npmjs.com/package/react-draft-wysiwyg 
+import { Editor } from 'react-draft-wysiwyg';
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import Button from 'react-bootstrap/Button';
+import Button from '@mui/material';
 
 /**
  * Partner page
