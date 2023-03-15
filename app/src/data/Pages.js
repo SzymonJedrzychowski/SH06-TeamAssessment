@@ -4,6 +4,10 @@ export const pages =[
     path  : "/"
   },
   {
+    label : "Partner",
+    path : "/partner"
+  },
+  {
     label : "Editorial",
     path  : "/editorial"
   }

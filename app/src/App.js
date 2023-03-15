@@ -3,6 +3,8 @@ import { Routes, Route } from "react-router-dom";
 // Import styling.
 import './styles/App.css'
 import Homepage from "./components/pages/Homepage";
+import Partner from "./components/pages/Partner";
+import PartnerEditItem from "./components/pages/PartnerEditItem";
 import Layout from "./components/layout/Layout";
 import Editorial from "./components/pages/Editorial";
 import CheckItem from "./components/pages/CheckItem";
@@ -24,6 +26,8 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Homepage/>}/>
+          <Route path="/partner" element={<Partner/>}/>
+          <Route path="/partnerEditItem" element={<PartnerEditItem/>}/>
           <Route path="/editorial" element={<Editorial/>}/>
           <Route path="/checkItem" element={<CheckItem/>}/>
           <Route path="/suggestChanges" element={<SuggestChanges/>}/>
