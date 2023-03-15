@@ -30,7 +30,7 @@ class AddTag extends Verify
         $this->validateParameters();
 
         // Validate the JWT.
-        $tokenData = parent::validateToken();
+        $tokenData = parent::validateToken(false);
 
         if (!in_array($tokenData->auth, ["2", "3"])) {
             throw new BadRequest("Only editor and admin can edit tags.");
@@ -50,7 +50,7 @@ class AddTag extends Verify
             $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
             if (count($data) > 0) {
-                throw new Exception("Tag with given name already exists.");
+                throw new Exception("EM: Tag with given name already exists");
             }
 
             $sql = "INSERT INTO tag (tag_name) VALUES (:tag_name)";

@@ -28,7 +28,7 @@ class PostItemTags extends Verify
         $this->validateParameters();
 
         // Validate the JWT.
-        $tokenData = parent::validateToken();
+        $tokenData = parent::validateToken(false);
 
         if(!in_array($tokenData->auth, ["2", "3"])){
             throw new BadRequest("Only editor and admin can submit tags for newsletter_item.");

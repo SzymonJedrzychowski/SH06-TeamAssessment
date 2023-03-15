@@ -118,10 +118,10 @@ const Editorial = () => {
                 </TableBody>
             </Table></TableContainer>
         </>}
-        {(!loading && !authenticated && localStorage.getItem('token') === undefined) &&
+        {(!loading && !authenticated && localStorage.getItem('token') === null) &&
             <p>You are not logged in.</p>
         }
-        {(!loading && !authenticated && localStorage.getItem('token') !== undefined) &&
+        {(!loading && !authenticated && localStorage.getItem('token') !== null) &&
             <p>You don't have access to this page.</p>
         }
     </Box>;

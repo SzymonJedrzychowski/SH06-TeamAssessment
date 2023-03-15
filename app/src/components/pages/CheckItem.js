@@ -2,9 +2,11 @@ import { useLocation, Link, useNavigate } from "react-router-dom"
 import ListGroup from "react-bootstrap/ListGroup";
 import { Box, Button } from "@mui/material";
 import Select from 'react-select';
+import AlertDialog from './AlertDialog';
 
 import { Markup } from 'interweave';
 import { useEffect, useState } from "react";
+import InformationDialog from "./InformationDialog";
 
 const CheckItem = () => {
     const item = useLocation();
@@ -16,6 +18,8 @@ const CheckItem = () => {
     const [newsletterItem, setNewsletterItem] = useState();
     const [authenticated, setAuthenticated] = useState(false);
     const [update, setUpdate] = useState(0);
+    const [open, setOpen] = useState(false);
+    const [informData, setInformData] = useState([false, null, null, null]);
 
     const boxStyling = {
         minHeight: "100vh",
@@ -144,6 +148,7 @@ const CheckItem = () => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
+                        setInformData([true, ()=>navigate(-1), "Success", "The status was changes."])
                         setUpdate(update + 1);
                     } else {
                         localStorage.removeItem('token');
@@ -175,8 +180,10 @@ const CheckItem = () => {
             )
             .then(
                 (json) => {
-                    setUpdate(update + 1)
-                    if (json.message !== "Success") {
+                    if (json.message === "Success") {
+                        setInformData([true, ()=>{setInformData([false, null, "Success", "The tags were updated."])}, "Success", "The tags were updated."])
+                        setUpdate(update + 1);
+                    } else {
                         console.log(json);
                         localStorage.removeItem('token');
                         setAuthenticated(false);
@@ -186,6 +193,13 @@ const CheckItem = () => {
                 (e) => {
                     console.log(e.message)
                 })
+    }
+
+    const handleClose = (confirmation) => {
+        setOpen(false);
+        if(confirmation){
+            changeStatus("-1")
+        }
     }
 
     return <Box sx={boxStyling}>
@@ -228,18 +242,20 @@ const CheckItem = () => {
                 {["-1", "1", "3"].includes(newsletterItem["item_checked"]) && <Button variant="contained" disabled>Approve</Button>}
                 {["0", "2"].includes(newsletterItem["item_checked"]) && <Button variant="contained" onClick={() => changeStatus("3")}>Approve</Button>}
                 {newsletterItem["item_checked"] === "-1" && <Button variant="contained" disabled>Remove</Button>}
-                {newsletterItem["item_checked"] !== "-1" && <Button variant="contained" onClick={() => changeStatus("-1")}>Remove</Button>}
+                {newsletterItem["item_checked"] !== "-1" && <Button variant="contained" onClick={() => setOpen(true)}>Remove</Button>}
                 {["0", "2", "3"].includes(newsletterItem["item_checked"]) && <Button variant="contained" component={Link} to={"/suggestChanges"} state={item.state}>Edit</Button>}
                 {["-1", "1"].includes(newsletterItem["item_checked"]) && <Button variant="contained" disabled>Edit</Button>}
                 <Button variant="contained" onClick={() => navigate(-1)}>Go back</Button>
             </ListGroup.Item>
         </ListGroup>}
-        {(!loading && !authenticated && localStorage.getItem('token') === undefined && newsletterItem !== undefined) &&
+        {(!loading && !authenticated && localStorage.getItem('token') === null) &&
             <p>You are not logged in.</p>
         }
-        {(!loading && !authenticated && localStorage.getItem('token') !== undefined && newsletterItem !== undefined) &&
+        {(!loading && !authenticated && localStorage.getItem('token') !== null) &&
             <p>You don't have access to this page.</p>
         }
+        <InformationDialog open={informData[0]} handleClose={()=> informData[1]} title={informData[2]} message={informData[3]}/>
+        <AlertDialog open={open} handleClose={handleClose} title={"Are you sure you want to remove this newsletter item?"} message={"You cannot undo this operation."} option1={"Remove the item"} option2={"Keep the item"} />
     </Box>;
 }
 

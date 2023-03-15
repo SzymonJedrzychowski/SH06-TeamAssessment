@@ -41,7 +41,7 @@ class GetNewsletterItems extends Verify
         }
 
         // Validate the JWT.
-        $tokenData = parent::validateToken();
+        $tokenData = parent::validateToken(false);
 
         if ($tokenData->auth == "1") {
             $sql .= " AND newsletter_item.user_id = :user_id";

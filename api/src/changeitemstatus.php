@@ -28,7 +28,7 @@ class ChangeItemStatus extends Verify
         $this->validateParameters();
 
         // Validate the JWT.
-        $tokenData = parent::validateToken();
+        $tokenData = parent::validateToken(false);
 
         // Start the transaction.
         $db->beginTransaction();

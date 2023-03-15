@@ -1,5 +1,6 @@
 <?php
 
+use FirebaseJWT\ExpiredException;
 use FirebaseJWT\JWT;
 use FirebaseJWT\Key;
 
@@ -39,7 +40,7 @@ class Verify extends Endpoint
         $this->validateRequestMethod("GET");
 
         // Validate the JWT.
-        $this->validateToken();
+        $this->validateToken(true);
 
         // Set the userID based on the JWT.
         $this->setUserId($this->getDecoded()->sub);
@@ -57,13 +58,15 @@ class Verify extends Endpoint
 
     /**
      * Check if the token is valid.
+     * 
+     * @param bool true if call from /verify, false if from child endpoints.
      *
      * @return Object   Token data.
      * 
      * @throws ClientErrorException If token format is wrong, decoding of token threw an Exception
      *                              or issuer does not agree with the host.
      */
-    protected function validateToken()
+    protected function validateToken($fromVerify)
     {
         $key = SECRET;
 
@@ -88,6 +91,10 @@ class Verify extends Endpoint
         // Validate token.
         try {
             $this->setDecoded(JWT::decode($jwt, new Key($key, 'HS256')));
+        } catch (ExpiredException $e) {
+            if ($fromVerify) {
+                throw new ClientErrorException($e->getMessage(), 401);
+            }
         } catch (Exception $e) {
             throw new ClientErrorException($e->getMessage(), 401);
         }
@@ -97,6 +104,9 @@ class Verify extends Endpoint
             throw new ClientErrorException("invalid token issuer", 401);
         }
 
+        if (time() >= $this->getDecoded()->exp + 21600) {
+            throw new ClientErrorException('Expired token', 401);
+        }
         return $this->getDecoded();
     }
 
