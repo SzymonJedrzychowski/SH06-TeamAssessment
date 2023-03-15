@@ -3,7 +3,7 @@ import {Markup} from 'interweave';
 import {Link} from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import Button from '@mui/material';
+import {Button} from '@mui/material';
 
 /**
  * Partner page
