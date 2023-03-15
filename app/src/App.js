@@ -13,6 +13,7 @@ import Publish from "./components/pages/Publish";
 import EditPrevious from "./components/pages/EditPrevious";
 import CreateAccount from "./components/pages/CreateAccount";
 import Login from "./components/pages/Login";
+import SignUp from "./components/pages/SignUp";
 import ManageTags from "./components/pages/ManageTags";
 
 /**
@@ -36,6 +37,7 @@ function App() {
           <Route path="/createAccount" element={<CreateAccount/>}/>
           <Route path="/manageTags" element={<ManageTags/>}/>
           <Route path="/login" element={<Login/>}/>
+          <Route path="/signUp" element={<SignUp/>}/>
           <Route path="*" element={<p>Not found</p>} />
         </Routes>
       </Layout>

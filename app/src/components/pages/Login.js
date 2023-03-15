@@ -1,5 +1,9 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { Buffer } from 'buffer';
+import TextField from '@mui/material/TextField';
+import Button from '@mui/material/Button';
+import Box from '@mui/material/Box';
+
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -22,39 +26,44 @@ function Login() {
       method: "POST",
       headers: new Headers({ "Authorization": "Basic " + encodedString })
     })
-
-      .then((response) => response.json())
-      .then(
-        (json) => {
-          if (json.message === "Success") {
-            console.log("Success: ");
-            localStorage.setItem('token', json.data.token);
-          } else {
-            console.log("Not success: ");
-            localStorage.removeItem('token');
-          }
-          console.log(json);
-        })
-      .catch((error) => {
-        console.error("Error:", error);
-      });
+    .then((response) => response.json())
+    .then(
+      (json) => console.log(json)
+    )
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Email:
-        <input type="text" name="email" onChange={handleEmail} />
-      </label>
-      <br />
-      <label>
-        Password:
-        <input type="password" name="password" onChange={handlePassword} />
-      </label>
-      <br />
-
-      <button type="submit">Log In</button>
-    </form>
+    <form onSubmit={handleSubmit} alignItems="center">
+    <Box
+      display="flex"
+      flexDirection="column"
+      alignItems="center"
+      width="28%"
+      margin="0 auto"
+    >
+    <TextField
+      label="Email"
+      type="text"
+      name="email"
+      variant="outlined"
+      fullWidth
+      margin="normal"
+      onChange={handleEmail}
+    />    
+    <TextField
+      label="Password"
+      type="password"
+      name="password"
+      variant="outlined"
+      fullWidth
+      margin="normal"
+      onChange={handlePassword}
+    />
+    <Button type="submit" variant="outlined" color="primary">
+      Log in
+    </Button>
+    </Box>
+  </form>
   );
 }
 
