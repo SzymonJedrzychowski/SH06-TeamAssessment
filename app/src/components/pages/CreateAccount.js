@@ -79,35 +79,6 @@ function CreateUser() {
     </Button>
     </Box>
   </form>
-
-      //  <form onSubmit={handleSubmit}>
-      // <label>
-      //   Email:
-      //   <input type="text" name="email" onChange={handleInputChange} />
-      // </label>
-      // <br />
-      // <label>
-      //   First Name:
-      //   <input type="text" name="first_name" onChange={handleInputChange} />
-      // </label>
-      // <br />
-      // <label>
-      //   Last Name:
-      //   <input type="text" name="last_name" onChange={handleInputChange} />
-      // </label>
-      // <br />
-      // <label>
-      //   Password:
-      //   <input type="password" name="password" onChange={handleInputChange} />
-      // </label>
-      // <br />
-      // <label>
-      //   Confirm Password:
-      //   <input type="password" name="confirmPassword" onChange={handleInputChange} />
-      // </label>
-      // <br />
-      // <button type="submit">Create User</button>
-    // </form>
   );
 }
 
