@@ -3,6 +3,8 @@ import {Markup} from 'interweave';
 import { Editor } from 'react-draft-wysiwyg'; // Found here https://www.npmjs.com/package/react-draft-wysiwyg 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import Button from 'react-bootstrap/Button';
 
 /**
  * PartnerEditItem page
@@ -18,10 +20,27 @@ const PartnerEditItem = () => {
     const item = useLocation();
     
 
+    //TEMP
+    const uploadItem = () => {
+        console.log("Upload");
+    }
+    console.log(item.state);
     //OUTPUT
     return(
-        <div>WIP</div>
+        <div className = 'PartnerEditItem'>
+            <h2 className = 'PartnerEditItemTitle'>Your item</h2>
+            <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
+            <div className = 'PartnerContributeBox'>
+                Box goes here.
+                <Editor
+                    toolbarClassName="toolbarClassName"
+                    wrapperClassName="wrapperClassName"
+                    editorClassName="editorClassName"
+                />
+            </div>
+        <button onClick = {uploadItem}>Upload</button>
+        </div>
     )
 }
 
-export default PartnerEditItem
+export default PartnerEditItem;

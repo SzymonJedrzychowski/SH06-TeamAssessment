@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Markup} from 'interweave';
-import {link} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg'; // Found here https://www.npmjs.com/package/react-draft-wysiwyg 
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import Button from 'react-bootstrap/Button';
@@ -120,7 +120,7 @@ const Partner = () => {
                 toolbarClassName="toolbarClassName"
                 wrapperClassName="wrapperClassName"
                 editorClassName="editorClassName"
-            />;
+            />
         </div>
         <button onClick = {uploadItem}>Upload</button>
         </div>;
@@ -136,7 +136,7 @@ const Partner = () => {
                         <div>{value.item_title}</div>
                         <div>{checkValues[value.item_checked]}</div>
                         <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
-                        <div><Button as = {link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>
+                        <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>
                     </div>); 
             }
 
@@ -177,7 +177,7 @@ const Partner = () => {
                 <h1>Partner Page Skeleton</h1>
                 <p>Lorem Ipsum</p>
                 <button onClick = {setContribute}>Contribute item!</button>
-                <button onClick = {setReview}>Review items!</button>
+                <button onClick = {setReview}>Review items!</button> {/*TODO Maybe cache box content*/}
                 <button onClick = {setPublished}>See published items!</button>
             </div>
             <div className = 'PartnerBody'>
