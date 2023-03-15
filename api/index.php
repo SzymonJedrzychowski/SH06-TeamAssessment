@@ -36,11 +36,38 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/addtag':
                 $endpoint = new AddTag();
                 break;
+            case '/edittag':
+                $endpoint = new EditTag();
+                break;
+            case '/removetag':
+                $endpoint = new RemoveTag();
+                break;
             case '/gettags':
                 $endpoint = new GetTags();
                 break;
             case '/getitemtags':
                 $endpoint = new GetItemTags();
+                break;
+            case '/publishnewsletter':
+                $endpoint = new PublishNewsletter();
+                break;
+            case '/getpublishednewsletters':
+                $endpoint = new GetPublishedNewsletters();
+                break;
+            case '/adduser':
+                $endpoint = new AddUser();
+                break;
+            case '/verify':
+                $endpoint = new Verify();
+                break;
+            case '/authenticate':
+                $endpoint = new Authenticate();
+                break;
+            case '/editnewsletter':
+                $endpoint = new EditNewsletter();
+                break;
+            case '/postitemtags':
+                $endpoint = new PostItemTags();
                 break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);

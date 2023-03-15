@@ -145,14 +145,50 @@ abstract class Endpoint
      */
     protected function checkAvailableParams($availableParams)
     {
-        foreach ($_GET as $key => $value) {
-            if (!key_exists($key, $availableParams)) {
-                throw new BadRequest("Invalid parameter " . $key);
-            } else {
-                if ($availableParams[$key] == "int" and !is_numeric($value)) {
-                    throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
-                } else if($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))){
-                    throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+        if ($_SERVER['REQUEST_METHOD'] == "GET") {
+            foreach ($_GET as $key => $value) {
+                if (!key_exists($key, $availableParams)) {
+                    throw new BadRequest("Invalid parameter " . $key);
+                } else {
+                    if ($availableParams[$key] == "int" and !is_numeric($value)) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
+                    } else if ($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+                    }
+                }
+            }
+        } else if ($_SERVER['REQUEST_METHOD'] == "POST") {
+            foreach ($_POST as $key => $value) {
+                if (!key_exists($key, $availableParams)) {
+                    throw new BadRequest("Invalid parameter " . $key);
+                } else {
+                    if ($availableParams[$key] == "int" and !is_numeric($value)) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
+                    } else if ($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if all required parameters were provided.
+     *
+     * @param string[] $requiredParameters Array of required parameters.
+     *
+     * @throws ClientErrorException If required parameter(s) was provided.
+     */
+    protected function checkRequiredParameters($requiredParameters)
+    {
+        foreach ($requiredParameters as &$value) {
+            if ($_SERVER['REQUEST_METHOD'] == "GET") {
+                if (!filter_has_var(INPUT_GET, $value)) {
+                    throw new ClientErrorException($value . " parameter required", 400);
+                }
+            } else if ($_SERVER['REQUEST_METHOD'] == "POST") {
+                if (!filter_has_var(INPUT_POST, $value)) {
+                    throw new ClientErrorException($value . " parameter required", 400);
                 }
             }
         }

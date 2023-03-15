@@ -8,7 +8,7 @@
  *
  * @author Szymon Jedrzychowski
  */
-class PostNewsletterSuggestion extends Endpoint
+class PostNewsletterSuggestion extends Verify
 {
     /**
      * Override the __construct method to match the requirements of the /postnewslettersuggestion endpoint.
@@ -23,11 +23,30 @@ class PostNewsletterSuggestion extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
 
-        // Validate the update parameters.
+        // Check if correct params were provided.
+        $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
 
+        // Validate the JWT.
+        $tokenData = parent::validateToken();
+
+        if(!in_array($tokenData->auth, ["2", "3"])){
+            throw new BadRequest("Only editor and admin can publish a newsletter suggestion.");
+        }
+
         // Initialise the SQL command and parameters to insert new data to database.
-        $this->initialiseSQL();
+        $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
+        VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
+
+        $this->setSQLCommand($sql);
+        $this->setSQLParams([
+            'item_id' => $_POST['item_id'],
+            'suggestion_content' => $_POST['suggestion_content'],
+            'suggestion_comment' => $_POST['suggestion_comment'],
+            'user_id' => $tokenData->sub
+        ]);
+
+
         $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
         $this->setData(array(
@@ -43,39 +62,22 @@ class PostNewsletterSuggestion extends Endpoint
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {
-        // Check if item_id parameter was included.
-        if (!filter_has_var(INPUT_POST, 'item_id')) {
-            throw new ClientErrorException("item_id parameter required", 400);
-        }
-
-        // Check if suggestion_content parameter was included.
-        if (!filter_has_var(INPUT_POST, 'suggestion_content')) {
-            throw new ClientErrorException("suggestion_content parameter required", 400);
-        }
-
-        // Check if suggestion_comment parameter was included.
-        if (!filter_has_var(INPUT_POST, 'suggestion_comment')) {
-            throw new ClientErrorException("suggestion_comment parameter required", 400);
-        }
-
-        // Check if user_id parameter was included.
-        if (!filter_has_var(INPUT_POST, 'user_id')) {
-            throw new ClientErrorException("user_id parameter required", 400);
-        }
+    {   
+        $requiredParameters = array('item_id', 'suggestion_content', 'suggestion_comment');
+        $this->checkRequiredParameters($requiredParameters);
     }
 
-    protected function initialiseSQL()
+    /**
+     * Set the array of available parameters for /postnewslettersuggestion endpoint.
+     *
+     * @return string[] Array of available params.
+     */
+    protected function getAvailableParams()
     {
-        $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
-        VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
-
-        $this->setSQLCommand($sql);
-        $this->setSQLParams([
-            'item_id' => $_POST['item_id'],
-            'suggestion_content' => $_POST['suggestion_content'],
-            'suggestion_comment' => $_POST['suggestion_comment'],
-            'user_id' => $_POST['user_id']
-        ]);
+        return [
+            'item_id' => 'int',
+            'suggestion_content' => 'string',
+            'suggestion_comment' => 'string'
+        ];
     }
 }
