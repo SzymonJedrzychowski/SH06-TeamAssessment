@@ -1,13 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom"
-import ListGroup from "react-bootstrap/ListGroup";
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
-import TextEditor from "./TextEditor";
-import { EditorState, ContentState } from 'draft-js';
+import { EditorState, ContentState, convertToRaw } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
-import { convertToRaw } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
-import { useEffect } from "react";
+
+import TextEditor from "./TextEditor";
 
 const SuggestChanges = (props) => {
     const item = useLocation();
@@ -15,11 +13,41 @@ const SuggestChanges = (props) => {
     const [newsletterItem, setNewsletterItem] = useState(null);
     const [contentState, setContentState] = useState(null);
     const [commentState, setCommentState] = useState(() => EditorState.createEmpty());
-    const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const setInformData = props.dialogData.setInformData; 
-    const setAlertData = props.dialogData.setAlertData; 
+    const setInformData = props.dialogData.setInformData;
+    const setAlertData = props.dialogData.setAlertData;
+    const resetInformData = props.dialogData.resetInformData;
+
+    const loadData = () => {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success" && json.data.length === 1) {
+                        setNewsletterItem(json.data[0]);
+                        const contentBlock = htmlToDraft(json.data[0]["content"]);
+                        const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+                        setContentState(EditorState.createWithContent(content));
+                        setLoading(false);
+                    } else if (json.message === "Success" && json.data.length === 0) {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+    }
 
     useEffect(() => {
         if (!item.state) {
@@ -38,49 +66,15 @@ const SuggestChanges = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
-                            setAuthenticated(true);
+                            loadData();
                         } else {
-                            setAuthenticated(false);
-                            setLoading(false);
-                            return;
+                            setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
                         }
+                    } else if (json.message === "Log in session is ending.") {
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
+                        localStorage.removeItem("token");
                     } else {
-                        console.log(json)
-                        localStorage.removeItem('token');
-                        setAuthenticated(false);
-                        setLoading(false);
-                        return;
-                    }
-                }
-            )
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                }
-            )
-
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
-            {
-                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
-            })
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if (json.message === "Success" && json.data.length === 1) {
-                        setNewsletterItem(json.data[0]);
-                        const contentBlock = htmlToDraft(json.data[0]["content"]);
-                        const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-                        setContentState(EditorState.createWithContent(content));
-                        setLoading(false);
-                    } else if (json.message === "Success" && json.data.length === 0) {
-                        navigate('/editorial');
-                    } else {
-                        console.log(json);
-                        localStorage.removeItem('token');
-                        setAuthenticated(false);
-                        setLoading(false);
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
                     }
                 }
             )
@@ -92,30 +86,6 @@ const SuggestChanges = (props) => {
     }, []);
 
     const suggestChange = () => {
-        const formData = new FormData();
-        formData.append('item_checked', 1);
-        formData.append('item_id', item.state);
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
-            {
-                method: 'POST',
-                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
-                body: formData
-            })
-            .then(
-                (response) => response.json()
-            )
-            .then((json) => {
-                if (json.message !== "Success") {
-                    console.log(json);
-                    localStorage.removeItem('token');
-                    setAuthenticated(false);
-                }
-            })
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                })
-
         const changeData = new FormData();
         changeData.append('item_id', item.state);
         changeData.append('suggestion_content', draftToHtml(convertToRaw(contentState.getCurrentContent())));
@@ -131,12 +101,9 @@ const SuggestChanges = (props) => {
             )
             .then((json) => {
                 if (json.message === "Success") {
-                    setInformData([true, () => navigate(-1), "Success", ["Suggestion was sent. You can now leave the page."]])
-                }
-                else {
-                    console.log(json);
-                    localStorage.removeItem('token');
-                    setAuthenticated(false);
+                    setInformData([true, () => { resetInformData(); navigate(-1) }, "Success", ["Suggestion was sent. You can now leave the page."]])
+                } else {
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                 }
             })
             .catch(
@@ -160,11 +127,11 @@ const SuggestChanges = (props) => {
     }
 
     const handleReturn = () => {
-        setAlertData([true, (confirmation)=>handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
+        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
     }
 
     return <Box sx={boxStyling}>
-        {(!loading && authenticated) && <Box>
+        {!loading && <Box>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Suggest changes</Typography>
             <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
                 <Table>
@@ -208,8 +175,8 @@ const SuggestChanges = (props) => {
                         <TableRow>
                             <TableCell colSpan={2}>
                                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "25px", alignItems: "stretch", rowGap: "5px" }}>
-                                    <Button sx={{minWidth: { xs: "none", sm: "45%" }}} variant="contained" onClick={suggestChange}>Suggest change</Button>
-                                    <Button sx={{minWidth: { xs: "none", sm: "45%" }}} variant="contained" onClick={handleReturn}>Go back</Button>
+                                    <Button sx={{ minWidth: { xs: "none", sm: "45%" } }} variant="contained" onClick={suggestChange}>Suggest change</Button>
+                                    <Button sx={{ minWidth: { xs: "none", sm: "45%" } }} variant="contained" onClick={handleReturn}>Go back</Button>
                                 </Box>
                             </TableCell>
                         </TableRow>
@@ -219,6 +186,6 @@ const SuggestChanges = (props) => {
         </Box>
         }
     </Box >;
-        }
+}
 
 export default SuggestChanges;

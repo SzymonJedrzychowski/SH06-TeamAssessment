@@ -1,25 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom"
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
-import AlertDialog from './AlertDialog';
 import TablePagination from "@mui/material/TablePagination";
 
 const ManageTags = (props) => {
     const [tags, setTags] = useState([]);
     const [selectedItem, setSelectedItem] = useState('');
     const [editMode, setEditMode] = useState(-1);
-    const [authenticated, setAuthenticated] = useState(false);
-    const [loading, setLoading] = useState([true, true]);
+    const [loading, setLoading] = useState(true);
     const [update, setUpdate] = useState(0);
     const [newTag, setNewTag] = useState('');
     const [page, setPage] = useState(0);
     const [rows, setRows] = useState(5);
     const [search, setSearch] = useState('');
 
-    const setInformData = props.dialogData.setInformData; 
-    const setAlertData = props.dialogData.setAlertData; 
+    const setInformData = props.dialogData.setInformData;
+    const setAlertData = props.dialogData.setAlertData;
+    const resetInformData = props.dialogData.resetInformData;
 
     const navigate = useNavigate();
+
+    const loadData = () => {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        setTags(json.data);
+                        setLoading(false);
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+    }
 
     useEffect(() => {
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
@@ -33,39 +54,15 @@ const ManageTags = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
-                            setLoading([false, loading[1]]);
-                            setAuthenticated(true);
+                            loadData();
                         } else {
-                            setAuthenticated(false);
-                            return;
+                            setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
                         }
                     } else if (json.message === "Log in session is ending.") {
-                        setInformData([true, () => { navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
-                        setAuthenticated(false);
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
                         localStorage.removeItem("token");
-                        return;
                     } else {
-                        setInformData([true, () => { navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
-                        setAuthenticated(false);
-                        return;
-                    }
-                }
-            )
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                }
-            )
-
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if (json.message === "Success") {
-                        setTags(json.data);
-                        setLoading([loading[0], false]);
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
                     }
                 }
             )
@@ -80,12 +77,12 @@ const ManageTags = (props) => {
         if (selectedItem === tagsToShow[index]["tag_name"]) {
             setEditMode(-1);
             setSelectedItem('');
-            setInformData([true, () => { setInformData([false, null, "Action failed", ["No changes in tag name were made."]]) }, "Action failed", ["No changes in tag name were made."]])
+            setInformData([true, resetInformData, "Action failed", ["No changes in tag name were made."]])
             return;
         } else if (selectedItem.length === 0) {
             setEditMode(-1);
             setSelectedItem('');
-            setInformData([true, () => { setInformData([false, null, "Action failed", ["Tag name must be longer than 0 letters."]]) }, "Action failed", ["Tag name must be longer than 0 letters."]])
+            setInformData([true, resetInformData, "Action failed", ["Tag name must be longer than 0 letters."]])
             return;
         }
 
@@ -142,10 +139,10 @@ const ManageTags = (props) => {
                 .then(
                     (json) => {
                         if (json.message === "Success") {
-                            setUpdate(update + 1); 
-                            setInformData([true, () => { setInformData([false, null, "Success", ["Tag was removed successfully."]]) }, "Success", ["Tag was removed successfully."]])
+                            setUpdate(update + 1);
+                            setInformData([true, resetInformData, "Success", ["Tag was removed successfully."]])
                         } else {
-                            setInformData([true, () => { navigate("/"); setInformData([false, null, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]]) }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
+                            setInformData([true, () => { navigate("/"); resetInformData() }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
                         }
                     }
                 )
@@ -158,7 +155,7 @@ const ManageTags = (props) => {
     }
 
     const handleRemove = (event) => {
-        setAlertData([true, (confirmation)=>handleClose(confirmation, event.target.value), "Are you sure you want to remove this tag?", ["Removing the tag will cause its removal from all newsletter items."], "Remove the tag", "Keep the tag"])
+        setAlertData([true, (confirmation) => handleClose(confirmation, event.target.value), "Are you sure you want to remove this tag?", ["Removing the tag will cause its removal from all newsletter items."], "Remove the tag", "Keep the tag"])
     }
 
     const addNewTag = () => {
@@ -182,7 +179,7 @@ const ManageTags = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         setInformData([true, () => { setInformData([false, null, "Success", ["New tag was added."]]) }, "Success", ["New tag was added."]]);
-                        setUpdate(update + 1); 
+                        setUpdate(update + 1);
                     } else if (json.message.slice(0, 3) === "EM:") {
                         setInformData([true, () => { setInformData([false, null, "Action failed", [json.message.slice(4)]]) }, "Action failed", [json.message.slice(4)]])
                     } else {
@@ -202,7 +199,7 @@ const ManageTags = (props) => {
     const filterTags = (value) => (value.tag_name.toLowerCase().includes(search.toLowerCase()));
 
     let tagsToShow = null;
-    if (tags !== null) {
+    if (tags !== null && tags !== undefined) {
         tagsToShow = tags.filter(filterTags);
     }
 
@@ -232,10 +229,10 @@ const ManageTags = (props) => {
     };
 
     return <Box sx={pageStyling}>
-        {(!loading.every(v => v === true) && authenticated && tagsToShow !== null) && <>
+        {(!loading && tagsToShow !== null) && <>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Edit tags</Typography>
             <Paper>
-                <Box sx={{padding: "10px !important" }}>
+                <Box sx={{ padding: "10px !important" }}>
                     <Tooltip title="Search by tag name.">
                         <TextField sx={{ minWidth: "50%", float: "right" }} id="outlined-basic" variant="outlined" label="Search" value={search} onChange={(event) => setSearch(event.target.value)} />
                     </Tooltip>
@@ -266,12 +263,12 @@ const ManageTags = (props) => {
                     onPageChange={(event, page) => { setPage(page); setEditMode(-1) }}
                     onRowsPerPageChange={(event) => { setRows(parseInt(event.target.value, 10)); setPage(0); setEditMode(-1) }} />
             </Paper>
-            <Box sx={{display: "flex", flexDirection: "column", rowGap: "5px"}}>
+            <Box sx={{ display: "flex", flexDirection: "column", rowGap: "5px" }}>
                 <Typography variant="h6" sx={{ textAlign: "center", marginTop: "2em" }}>Add new tag</Typography>
                 <TextField id="outlined-basic" variant="outlined" label="Tag name" value={newTag} onChange={(event) => setNewTag(event.target.value)} />
                 {newTag.length > 0 && <Button variant="contained" onClick={addNewTag}>Add new tag</Button>}
                 {newTag.length === 0 && <Button variant="contained" disabled>Add new tag</Button>}
-                <Button sx={{marginTop: "2em"}}variant="contained" onClick={() => navigate('/editorial')}>Go back</Button>
+                <Button sx={{ marginTop: "2em" }} variant="contained" onClick={() => navigate('/editorial')}>Go back</Button>
             </Box>
         </>}
     </Box>;

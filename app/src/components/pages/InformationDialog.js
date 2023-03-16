@@ -8,7 +8,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 //Code based on the example dialog from https://mui.com/material-ui/react-dialog/ (Access date: 14/03/2023)
 export default function InformationDialog(props) {
-    return (
+    return (props.open === true && 
         <div>
             <Dialog
                 open={props.open}
