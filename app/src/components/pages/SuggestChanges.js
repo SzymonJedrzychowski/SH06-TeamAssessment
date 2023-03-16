@@ -8,10 +8,8 @@ import htmlToDraft from 'html-to-draftjs';
 import { convertToRaw } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
 import { useEffect } from "react";
-import AlertDialog from './AlertDialog';
-import InformationDialog from "./InformationDialog";
 
-const SuggestChanges = () => {
+const SuggestChanges = (props) => {
     const item = useLocation();
     const navigate = useNavigate();
     const [newsletterItem, setNewsletterItem] = useState(null);
@@ -19,8 +17,9 @@ const SuggestChanges = () => {
     const [commentState, setCommentState] = useState(() => EditorState.createEmpty());
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [open, setOpen] = useState(false);
-    const [informData, setInformData] = useState([false, null, null, null]);
+
+    const setInformData = props.dialogData.setInformData; 
+    const setAlertData = props.dialogData.setAlertData; 
 
     useEffect(() => {
         if (!item.state) {
@@ -154,10 +153,14 @@ const SuggestChanges = () => {
     };
 
     const handleClose = (confirmation) => {
-        setOpen(false);
-        if (confirmation) {
+        setAlertData([false, null, null, null, null, null]);
+        if (confirmation.target.value === "true") {
             navigate(-1);
         }
+    }
+
+    const handleReturn = () => {
+        setAlertData([true, (confirmation)=>handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
     }
 
     return <Box sx={boxStyling}>
@@ -206,7 +209,7 @@ const SuggestChanges = () => {
                             <TableCell colSpan={2}>
                                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "25px", alignItems: "stretch", rowGap: "5px" }}>
                                     <Button sx={{minWidth: { xs: "none", sm: "45%" }}} variant="contained" onClick={suggestChange}>Suggest change</Button>
-                                    <Button sx={{minWidth: { xs: "none", sm: "45%" }}} variant="contained" onClick={() => setOpen(true)}>Go back</Button>
+                                    <Button sx={{minWidth: { xs: "none", sm: "45%" }}} variant="contained" onClick={handleReturn}>Go back</Button>
                                 </Box>
                             </TableCell>
                         </TableRow>
@@ -215,17 +218,7 @@ const SuggestChanges = () => {
             </TableContainer>
         </Box>
         }
-        {
-            (!loading && !authenticated && localStorage.getItem('token') === null) &&
-            <p>You are not logged in.</p>
-        }
-        {
-            (!loading && !authenticated && localStorage.getItem('token') !== null) &&
-            <p>You don't have access to this page.</p>
-        }
-        <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
-        <AlertDialog open={open} handleClose={handleClose} title={"Are you sure you want to leave without submiting?"} message={"All changes will not be saved when you leave."} option1={"Leave"} option2={"Stay"} />
     </Box >;
-}
+        }
 
 export default SuggestChanges;
