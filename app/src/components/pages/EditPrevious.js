@@ -8,7 +8,6 @@ const EditPrevious = () => {
     const [loading, setLoading] = useState(true);
 
     const boxStyling = {
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         rowGap: "10px",
@@ -94,10 +93,10 @@ const EditPrevious = () => {
                 )}
             </TableBody>
         </Table></TableContainer>}
-        {(!loading && !authenticated && localStorage.getItem('token') === undefined) &&
+        {(!loading && !authenticated && localStorage.getItem('token') === null) &&
             <p>You are not logged in.</p>
         }
-        {(!loading && !authenticated && localStorage.getItem('token') !== undefined) &&
+        {(!loading && !authenticated && localStorage.getItem('token') !== null) &&
             <p>You don't have access to this page.</p>
         }
     </Box>;

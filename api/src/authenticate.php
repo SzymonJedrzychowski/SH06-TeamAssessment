@@ -116,7 +116,7 @@ class Authenticate extends Endpoint
         // Set the claims for the token.
         $tokenPayload = [
             'iat' => $time,
-            'exp' => strtotime('+60 minutes', $time),
+            'exp' => strtotime('+3 days', $time),
             'iss' => $_SERVER['HTTP_HOST'],
             'sub' => $queryResult[0]['user_id'],
             'auth' => $queryResult[0]['authorisation']

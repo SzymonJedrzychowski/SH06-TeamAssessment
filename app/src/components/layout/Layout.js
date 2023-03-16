@@ -1,3 +1,4 @@
+import { Box } from '@mui/material'
 import React from 'react'
 import Footer from '../footer/Footer'
 import Navbar from '../navbar/Navbar'
@@ -9,14 +10,22 @@ import Navbar from '../navbar/Navbar'
  * @author Noorullah Niamatullah
  */
 const Layout = ({ children }) => {
+  const appStyle = {
+    minHeight: "100vh",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between"
+  }
   return (
-    <>
-      <Navbar/>
+    <Box sx={appStyle}>
+      <Box>
+        <Navbar />
 
-      {children}
-      
-      <Footer/>
-    </>
+        {children}
+      </Box>
+
+      <Footer />
+    </Box >
   )
 }
 

@@ -1,5 +1,6 @@
 <?php
 
+use FirebaseJWT\ExpiredException;
 use FirebaseJWT\JWT;
 use FirebaseJWT\Key;
 
@@ -30,6 +31,11 @@ class Verify extends Endpoint
 
         // Validate the JWT.
         $this->validateToken();
+
+        $time = time();
+        if(strtotime('+10 hours', $time)> $this->getDecoded()->exp){
+            throw new ClientErrorException("Log in session is ending.");
+        }
 
         // Set the userID based on the JWT.
         $this->setUserId($this->getDecoded()->sub);
