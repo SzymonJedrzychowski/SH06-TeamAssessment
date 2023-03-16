@@ -20,7 +20,7 @@ const SuggestChanges = (props) => {
     const resetInformData = props.dialogData.resetInformData;
 
     const loadData = () => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -55,7 +55,7 @@ const SuggestChanges = (props) => {
             return;
         }
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -90,7 +90,7 @@ const SuggestChanges = (props) => {
         changeData.append('item_id', item.state);
         changeData.append('suggestion_content', draftToHtml(convertToRaw(contentState.getCurrentContent())));
         changeData.append('suggestion_comment', draftToHtml(convertToRaw(commentState.getCurrentContent())));
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewslettersuggestion",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewslettersuggestion",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

@@ -42,7 +42,7 @@ const Publish = (props) => {
     };
 
     const loadData = (newsletter_id) => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -76,7 +76,7 @@ const Publish = (props) => {
             newsletter_id = item.state["newsletter_id"];
         }
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -204,7 +204,7 @@ const Publish = (props) => {
         });
         formData.append('newsletter_items', JSON.stringify(temp));
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -240,7 +240,7 @@ const Publish = (props) => {
         });
         formData.append('newsletter_items', JSON.stringify(temp));
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

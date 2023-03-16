@@ -22,7 +22,7 @@ function Login() {
   const handleSubmit = (event) => {
     event.preventDefault();
     const encodedString = Buffer.from(email + ":" + password).toString('base64');
-    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/authenticate", {
+    fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/authenticate", {
       method: "POST",
       headers: new Headers({ "Authorization": "Basic " + encodedString })
     })

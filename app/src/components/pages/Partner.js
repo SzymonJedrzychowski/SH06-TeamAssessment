@@ -29,7 +29,7 @@ const Partner = () => {
     // On render hook
     useEffect(() => {
         //WIP
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -61,7 +61,7 @@ const Partner = () => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })

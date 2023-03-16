@@ -49,7 +49,7 @@ const CheckItem = (props) => {
     }
 
     const loadData = () => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -74,7 +74,7 @@ const CheckItem = (props) => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
             .then(
                 (response) => response.json()
             )
@@ -93,7 +93,7 @@ const CheckItem = (props) => {
                     console.log(e.message)
                 })
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/gettags")
             .then(
                 (response) => response.json()
             )
@@ -120,7 +120,7 @@ const CheckItem = (props) => {
             return;
         }
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -154,7 +154,7 @@ const CheckItem = (props) => {
         const formData = new FormData();
         formData.append('item_checked', newStatus);
         formData.append('item_id', item.state);
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -185,7 +185,7 @@ const CheckItem = (props) => {
         const formData = new FormData();
         formData.append('item_tags', newTags.length > 0 ? JSON.stringify(newTags) : JSON.stringify([null]));
         formData.append('item_id', item.state);
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postitemtags",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postitemtags",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
