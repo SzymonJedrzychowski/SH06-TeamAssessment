@@ -175,8 +175,8 @@ const SuggestChanges = (props) => {
                         <TableRow>
                             <TableCell colSpan={2}>
                                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "25px", alignItems: "stretch", rowGap: "5px" }}>
-                                    <Button sx={{ minWidth: { xs: "none", sm: "45%" } }} variant="contained" onClick={suggestChange}>Suggest change</Button>
-                                    <Button sx={{ minWidth: { xs: "none", sm: "45%" } }} variant="contained" onClick={handleReturn}>Go back</Button>
+                                    <Button sx={{ minWidth: "45%" }} variant="contained" onClick={suggestChange}>Suggest change</Button>
+                                    <Button sx={{ minWidth: "45%" }} variant="contained" onClick={handleReturn}>Go back</Button>
                                 </Box>
                             </TableCell>
                         </TableRow>

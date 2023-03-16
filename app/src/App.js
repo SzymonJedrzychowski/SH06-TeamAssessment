@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { useState } from "react";
 
-// Import styling.
-import './styles/App.css'
 import Homepage from "./components/pages/Homepage";
 import Partner from "./components/pages/Partner";
 import PartnerEditItem from "./components/pages/PartnerEditItem";
@@ -15,7 +14,6 @@ import CreateAccount from "./components/pages/CreateAccount";
 import Login from "./components/pages/Login";
 import SignUp from "./components/pages/SignUp";
 import ManageTags from "./components/pages/ManageTags";
-import { useState } from "react";
 import InformationDialog from "./components/pages/InformationDialog";
 import AlertDialog from "./components/pages/AlertDialog";
 

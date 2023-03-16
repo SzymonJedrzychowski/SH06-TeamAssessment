@@ -1,10 +1,12 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box } from "@mui/material";
+import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box, Typography, TablePagination } from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const EditPrevious = (props) => {
     const [newsletters, setNewsletters] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(0);
+    const [rows, setRows] = useState(5);
 
     const navigate = useNavigate();
 
@@ -81,21 +83,34 @@ const EditPrevious = (props) => {
     }
 
     return <Box sx={boxStyling}>
-        {!loading && <TableContainer component={Paper}><Table>
-            <TableHead>
-                <TableRow>
-                    <TableCell>Newsletter ID</TableCell>
-                    <TableCell>Published by</TableCell>
-                    <TableCell>Date published</TableCell>
-                    <TableCell></TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {newsletters.map(
-                    (value, index) => createRow(value, index)
-                )}
-            </TableBody>
-        </Table></TableContainer>}
+        {!loading && <>
+            <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Previous newsletters</Typography>
+            <TableContainer component={Paper}><Table>
+                <TableHead>
+                    <TableRow>
+                        <TableCell>Newsletter ID</TableCell>
+                        <TableCell>Published by</TableCell>
+                        <TableCell>Date published</TableCell>
+                        <TableCell></TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {newsletters.map(
+                        (value, index) => createRow(value, index)
+                    )}
+                </TableBody>
+            </Table></TableContainer>
+            <TablePagination
+                sx={{ 'div > p': { marginBottom: "0px !important" } }}
+                rowsPerPageOptions={[5, 10, 25]}
+                component="div"
+                count={newsletters.length}
+                rowsPerPage={rows}
+                page={page}
+                onPageChange={(event, page) => setPage(page)}
+                onRowsPerPageChange={(event) => { setRows(parseInt(event.target.value, 10)); setPage(0) }} />
+            <Button sx={{ marginTop: "2em" }} variant="contained" onClick={() => navigate('/editorial')}>Go back</Button>
+        </>}
     </Box>;
 }
 
