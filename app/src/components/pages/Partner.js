@@ -23,8 +23,8 @@ const Partner = () => {
     const [itemsInReview, setItemsInReview] = useState([]);
     const [itemsFilter, setItemsFilter] = useState([null]);
 
-    const [authenticated, setAuthenticated] = useState(false); //TODO: apply
-    const [loading, setLoading] = useState(true); //TODO: apply
+    const [authenticated, setAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     // On render hook
     useEffect(() => {

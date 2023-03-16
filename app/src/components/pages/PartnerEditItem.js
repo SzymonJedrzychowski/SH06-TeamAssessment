@@ -17,7 +17,46 @@ const PartnerEditItem = () => {
 
     // Get the relevant newsletter item details
     const item = useLocation();
+
+    // State variable hooks
+    const [authenticated, setAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
     
+    // On render hook
+    useEffect(() => {
+        // Verify user identity
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        if (["1", "2", "3"].includes(json.data[0]["authorisation"])) {
+                            setAuthenticated(true);
+                        } else {
+                            setAuthenticated(false);
+                            setLoading(false);
+                            return;
+                        }
+                    } else {
+                        console.log(json);
+                        localStorage.removeItem('token');
+                        setAuthenticated(false);
+                        setLoading(false);
+                        return;
+                    }
+                }
+            )
+
+    })
+
+
+
+
 
     //TEMP
     const uploadItem = () => {
@@ -27,17 +66,29 @@ const PartnerEditItem = () => {
     //OUTPUT
     return(
         <div className = 'PartnerEditItem'>
-            <h2 className = 'PartnerEditItemTitle'>Your item</h2>
-            <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
-            <div className = 'PartnerContributeBox'>
-                Box goes here.
-                <Editor
-                    toolbarClassName="toolbarClassName"
-                    wrapperClassName="wrapperClassName"
-                    editorClassName="editorClassName"
-                />
-            </div>
-        <button onClick = {uploadItem}>Upload</button>
+             {(!loading && authenticated) && <div className = 'PartnerEditItemAuthenticated'>
+                <h2 className = 'PartnerEditItemTitle'>Your item</h2>
+                <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
+                <div className = 'PartnerContributeBox'>
+                    Box goes here.
+                    <Editor
+                        toolbarClassName="toolbarClassName"
+                        wrapperClassName="wrapperClassName"
+                        editorClassName="editorClassName"
+                    />
+                </div>
+            <button onClick = {uploadItem}>Upload</button>
+            </div>}
+
+            {(!loading && !authenticated && localStorage.getItem('token') === undefined) && 
+                <div className = 'PartnerNonAuthenticated'>
+                    <h1>Please log in or sign up to contribute</h1>
+                </div>}
+
+            {(!loading && !authenticated) && 
+                <div className = 'PartnerNonAuthenticated2'>
+                    <h1>Please log in or sign up to contribute</h1>
+                </div>}
         </div>
     )
 }
