@@ -3,22 +3,21 @@ import { useNavigate } from "react-router-dom"
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import AlertDialog from './AlertDialog';
 import TablePagination from "@mui/material/TablePagination";
-import InformationDialog from "./InformationDialog";
 
-const ManageTags = () => {
+const ManageTags = (props) => {
     const [tags, setTags] = useState([]);
     const [selectedItem, setSelectedItem] = useState('');
     const [editMode, setEditMode] = useState(-1);
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState([true, true]);
-    const [open, setOpen] = useState(false);
-    const [tagToRemove, setTagToRemove] = useState(-1);
     const [update, setUpdate] = useState(0);
     const [newTag, setNewTag] = useState('');
     const [page, setPage] = useState(0);
     const [rows, setRows] = useState(5);
     const [search, setSearch] = useState('');
-    const [informData, setInformData] = useState([false, null, null, null]);
+
+    const setInformData = props.dialogData.setInformData; 
+    const setAlertData = props.dialogData.setAlertData; 
 
     const navigate = useNavigate();
 
@@ -125,11 +124,11 @@ const ManageTags = () => {
             )
     }
 
-    const handleClose = (confirmation) => {
-        setOpen(false);
+    const handleClose = (confirmation, tagToRemove) => {
+        setAlertData([false, null, null, null, null, null]);
         let formData = new FormData();
         formData.append('tag_id', tagToRemove);
-        if (confirmation) {
+        if (confirmation.target.value === "true") {
             fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removetag",
                 {
                     method: 'POST',
@@ -156,7 +155,10 @@ const ManageTags = () => {
                     }
                 )
         }
-        setTagToRemove(-1);
+    }
+
+    const handleRemove = (event) => {
+        setAlertData([true, (confirmation)=>handleClose(confirmation, event.target.value), "Are you sure you want to remove this tag?", ["Removing the tag will cause its removal from all newsletter items."], "Remove the tag", "Keep the tag"])
     }
 
     const addNewTag = () => {
@@ -215,7 +217,7 @@ const ManageTags = () => {
             {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
             {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
 
-            {editMode === -1 && <TableCell><Button variant="contained" onClick={() => { setOpen(true); setTagToRemove(value.tag_id) }}>Remove</Button></TableCell>}
+            {editMode === -1 && <TableCell><Button variant="contained" value={value.tag_id} onClick={handleRemove}>Remove</Button></TableCell>}
             {editMode !== -1 && <TableCell><Button variant="contained" disabled>Remove</Button></TableCell>}
         </TableRow>;
     }
@@ -272,8 +274,6 @@ const ManageTags = () => {
                 <Button sx={{marginTop: "2em"}}variant="contained" onClick={() => navigate('/editorial')}>Go back</Button>
             </Box>
         </>}
-        <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
-        <AlertDialog open={open} handleClose={handleClose} title={"Are you sure you want to remove this tag?"} message={"Removing the tag will cause its removal from all newsletter items."} option1={"Remove the tag"} option2={"Keep the tag"} />
     </Box>;
 }
 

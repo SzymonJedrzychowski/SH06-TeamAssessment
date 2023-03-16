@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom"
 import { Box, Button, Chip, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
-import AlertDialog from './AlertDialog';
 import { Markup } from 'interweave';
-import InformationDialog from "./InformationDialog";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -25,7 +23,7 @@ function getStyles(name, personName, theme) {
     };
 }
 
-const CheckItem = () => {
+const CheckItem = (props) => {
     const item = useLocation();
     const theme = useTheme();
     const [tags, setTags] = useState([]);
@@ -35,8 +33,9 @@ const CheckItem = () => {
     const [newsletterItem, setNewsletterItem] = useState();
     const [authenticated, setAuthenticated] = useState(false);
     const [update, setUpdate] = useState(0);
-    const [open, setOpen] = useState(false);
-    const [informData, setInformData] = useState([false, null, null, null]);
+
+    const setInformData = props.dialogData.setInformData; 
+    const setAlertData = props.dialogData.setAlertData; 
 
     const navigate = useNavigate();
 
@@ -209,10 +208,14 @@ const CheckItem = () => {
     }
 
     const handleClose = (confirmation) => {
-        setOpen(false);
-        if (confirmation) {
+        setAlertData([false, null, null, null, null, null]);
+        if (confirmation.target.value === "true") {
             changeStatus("-1")
         }
+    }
+
+    const handleRemove = () => {
+        setAlertData([true, (confirmation)=>handleClose(confirmation), "Are you sure you want to remove this newsletter item?", ["You cannot undo this operation."], "Remove the item", "Keep the item"])
     }
 
     const handleChange = (event) => {
@@ -320,7 +323,7 @@ const CheckItem = () => {
                                     {["-1", "1", "3"].includes(newsletterItem["item_checked"]) && <Button variant="contained" disabled>Approve</Button>}
                                     {["0", "2"].includes(newsletterItem["item_checked"]) && <Button variant="contained" onClick={() => changeStatus("3")}>Approve</Button>}
                                     {newsletterItem["item_checked"] === "-1" && <Button variant="contained" disabled>Remove</Button>}
-                                    {newsletterItem["item_checked"] !== "-1" && <Button variant="contained" onClick={() => setOpen(true)}>Remove</Button>}
+                                    {newsletterItem["item_checked"] !== "-1" && <Button variant="contained" onClick={handleRemove}>Remove</Button>}
                                     {["0", "2", "3"].includes(newsletterItem["item_checked"]) && <Button variant="contained" component={Link} to={"/suggestChanges"} state={item.state}>Edit</Button>}
                                     {["-1", "1"].includes(newsletterItem["item_checked"]) && <Button variant="contained" disabled>Edit</Button>}
                                     <Button variant="contained" onClick={() => navigate(-1)}>Go back</Button>
@@ -332,8 +335,6 @@ const CheckItem = () => {
             </TableContainer>
         </Box>
         }
-        <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
-        <AlertDialog open={open} handleClose={handleClose} title={"Are you sure you want to remove this newsletter item?"} message={"You cannot undo this operation."} option1={"Remove the item"} option2={"Keep the item"} />
     </Box >;
 }
 

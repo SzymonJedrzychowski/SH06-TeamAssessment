@@ -20,13 +20,13 @@ export default function AlertDialog(props) {
                     {props.title}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                    {props.message}
-                    </DialogContentText>
+                <DialogContent>
+                    {props.message !== null && props.message.map((value, index)=><DialogContentText key={index}>{value}</DialogContentText>)}
+                </DialogContent>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={()=>props.handleClose(true)}>{props.option1}</Button>
-                    <Button onClick={()=>props.handleClose(false)} autoFocus>
+                    <Button value="true" onClick={props.handleClose()}>{props.option1}</Button>
+                    <Button value="false" onClick={props.handleClose()} autoFocus>
                     {props.option2}
                     </Button>
                 </DialogActions>

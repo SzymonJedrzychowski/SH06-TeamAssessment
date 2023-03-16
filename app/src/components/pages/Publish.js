@@ -15,10 +15,8 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import EditIcon from '@mui/icons-material/Edit';
-import AlertDialog from './AlertDialog';
-import InformationDialog from "./InformationDialog";
 
-const Publish = () => {
+const Publish = (props) => {
     const [files, changeFiles] = useState([]);
     const [newsletterItems, setNewsletterItems] = useState([]);
     const [paragraph, setParagraph] = useState(() => EditorState.createEmpty());
@@ -26,8 +24,9 @@ const Publish = () => {
     const [editMode, setEditMode] = React.useState(-1);
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [open, setOpen] = useState(false);
-    const [informData, setInformData] = useState([false, null, null, null]);
+
+    const setInformData = props.dialogData.setInformData; 
+    const setAlertData = props.dialogData.setAlertData; 
 
     const navigate = useNavigate();
     const item = useLocation();
@@ -269,10 +268,14 @@ const Publish = () => {
     }
 
     const handleClose = (confirmation) => {
-        if(confirmation){
+        setAlertData([false, null, null, null, null, null]);
+        if(confirmation.target.value === "true"){
             navigate(-1);
         }
-        setOpen(false);
+    }
+
+    const handleReturn = () => {
+        setAlertData([true, (confirmation)=>handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
     }
 
     return <Box sx={boxStyling}>
@@ -306,16 +309,8 @@ const Publish = () => {
             {(item.state === null && files.length === 0) && <Button variant="contained" disabled>Submit</Button>}
             {(item.state !== null && files.length > 0) && <Button variant="contained" onClick={edit}>Confirm</Button>}
             {(item.state !== null && files.length === 0) && <Button variant="contained" disabled>Confirm</Button>}
-            <Button variant="contained" onClick={() => setOpen(true)}>Cancel</Button>
+            <Button variant="contained" onClick={handleReturn}>Cancel</Button>
         </>}
-        {(!loading && !authenticated && localStorage.getItem('token') === null) &&
-            <p>You are not logged in.</p>
-        }
-        {(!loading && !authenticated && localStorage.getItem('token') !== null) &&
-            <p>You don't have access to this page.</p>
-        }
-        <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
-        <AlertDialog open={open} handleClose={handleClose} title={"Are you sure you want to leave without submiting?"} message={"All changes will not be saved when you leave."} option1={"Leave"} option2={"Stay"} />
     </Box>;
 }
 
