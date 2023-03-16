@@ -5,8 +5,6 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { ListItem } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import AlertDialog from "./AlertDialog";
-
 
 function Login() {
   const [email, setEmail] = useState('');

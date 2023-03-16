@@ -28,9 +28,9 @@ class SendNewsletter extends Endpoint
             $emails = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
             
             $email = new \SendGrid\Mail\Mail();
-            $email->setFrom('mikolaj.furmanczak@northumbria.ac.uk', 'Newsletter');
+            $email->setFrom('', 'Newsletter');
             $email->setSubject('The IC3 Newsletter');
-            $email->addTo('mfurmanczak@gmail.com', 'Mikolaj Furmanczak');
+            $email->addTo('', ' ');
             $email->addContent("text/plain", "The Newsletter is finally out!");
 
             $sendgrid = new \SendGrid(getenv('SENDGRID_API_KEY'));
