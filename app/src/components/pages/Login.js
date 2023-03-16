@@ -3,6 +3,9 @@ import { Buffer } from 'buffer';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import { ListItem } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
+import AlertDialog from "./AlertDialog";
 
 
 function Login() {
@@ -38,9 +41,13 @@ function Login() {
       display="flex"
       flexDirection="column"
       alignItems="center"
-      width="28%"
+      width="30%"
       margin="0 auto"
+      marginTop={"10vh"}
     >
+    <ListItem style={{justifyContent: "center"}}>
+      <h1>Log in</h1>
+    </ListItem>
     <TextField
       label="Email"
       type="text"
@@ -59,7 +66,12 @@ function Login() {
       margin="normal"
       onChange={handlePassword}
     />
-    <Button type="submit" variant="outlined" color="primary">
+    <ListItem style={{fontSize: "small", justifyContent: "center"}}>
+      <p style={{color: "gray", paddingRight:"0.5%"}}>Don't have an account yet? </p> 
+      <p><RouterLink to="/createaccount">Sign up</RouterLink></p>
+    </ListItem>
+
+    <Button type="submit" variant="outlined" color="primary" style={{width: "50%"}}>
       Log in
     </Button>
     </Box>

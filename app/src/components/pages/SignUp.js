@@ -1,6 +1,7 @@
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
+import { ListItem } from "@mui/material";
 
 function SignUp() {  
     const handleSubmit = (event) => {
@@ -25,9 +26,13 @@ function SignUp() {
         display="flex"
         flexDirection="column"
         alignItems="center"
-        width="28%"
+        width="30%"
         margin="0 auto"
+        marginTop={"10vh"}
       >
+      <ListItem style={{justifyContent: "center", textAlign: "center"}}>
+        <h1>Sign up for the newsletter now!</h1>
+      </ListItem>
       <TextField
         label="Email"
         type="text"
@@ -36,8 +41,9 @@ function SignUp() {
         fullWidth
         margin="normal"
       />
-      <Button type="submit" variant="outlined" color="primary">
-        Sign Up
+      <br/>
+      <Button type="submit" variant="outlined" color="primary" style={{width: "50%"}}>
+        Join us
       </Button>
       </Box>
   </form>
