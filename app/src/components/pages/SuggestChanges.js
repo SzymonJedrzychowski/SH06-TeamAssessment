@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom"
 import ListGroup from "react-bootstrap/ListGroup";
-import { Box, Button } from "@mui/material";
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
 import TextEditor from "./TextEditor";
-import { useState } from "react";
 import { EditorState, ContentState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
 import { convertToRaw } from "draft-js";
@@ -132,9 +132,9 @@ const SuggestChanges = () => {
             )
             .then((json) => {
                 if (json.message === "Success") {
-                    setInformData([true, ()=>navigate(-1), "Success", "Suggestion was sent. You can now leave the page."])
+                    setInformData([true, () => navigate(-1), "Success", "Suggestion was sent. You can now leave the page."])
                 }
-                else{
+                else {
                     console.log(json);
                     localStorage.removeItem('token');
                     setAuthenticated(false);
@@ -148,7 +148,6 @@ const SuggestChanges = () => {
 
 
     const boxStyling = {
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         padding: 3
@@ -156,43 +155,77 @@ const SuggestChanges = () => {
 
     const handleClose = (confirmation) => {
         setOpen(false);
-        if(confirmation){
+        if (confirmation) {
             navigate(-1);
         }
     }
 
     return <Box sx={boxStyling}>
-        {(!loading && authenticated) && <ListGroup>
-            <ListGroup.Item>
-                {newsletterItem.item_title}
-            </ListGroup.Item>
-            <ListGroup.Item>
-                {newsletterItem.first_name} {newsletterItem.last_name}
-            </ListGroup.Item>
-            <ListGroup.Item>
-                {newsletterItem.organisation_name}
-            </ListGroup.Item>
-            <ListGroup.Item>
-                <h3>Content</h3>
-                <TextEditor content={contentState} setContent={setContentState} />
-            </ListGroup.Item>
-            <ListGroup.Item>
-                <h3>Comment</h3>
-                <TextEditor content={commentState} setContent={setCommentState} />
-            </ListGroup.Item>
-            <ListGroup.Item>
-                <Button variant="contained" onClick={suggestChange}>Suggest change</Button><Button variant="contained" onClick={() => setOpen(true)}>Go back</Button>
-            </ListGroup.Item>
-        </ListGroup>}
-        {(!loading && !authenticated && localStorage.getItem('token') === null) &&
+        {(!loading && authenticated) && <Box>
+            <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Suggest changes</Typography>
+            <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
+                <Table>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell width={"30%"}>
+                                Item title
+                            </TableCell>
+                            <TableCell>
+                                {newsletterItem["item_title"]}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>
+                                Item author
+                            </TableCell>
+                            <TableCell>
+                                {newsletterItem["first_name"]} {newsletterItem["last_name"]}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>
+                                Organisation name
+                            </TableCell>
+                            <TableCell>
+                                {newsletterItem["organisation_name"]}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2}>
+                                <Typography variant="h5" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Content</Typography>
+                                <TextEditor type={"content"} content={contentState} setContent={setContentState} />
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2}>
+                                <Typography variant="h5" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Comment</Typography>
+                                <TextEditor type={"comment"} content={commentState} setContent={setCommentState} />
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2}>
+                                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "25px", alignItems: "stretch", rowGap: "5px" }}>
+                                    <Button sx={{minWidth: { xs: "none", sm: "45%" }}} variant="contained" onClick={suggestChange}>Suggest change</Button>
+                                    <Button sx={{minWidth: { xs: "none", sm: "45%" }}} variant="contained" onClick={() => setOpen(true)}>Go back</Button>
+                                </Box>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+        }
+        {
+            (!loading && !authenticated && localStorage.getItem('token') === null) &&
             <p>You are not logged in.</p>
         }
-        {(!loading && !authenticated && localStorage.getItem('token') !== null) &&
+        {
+            (!loading && !authenticated && localStorage.getItem('token') !== null) &&
             <p>You don't have access to this page.</p>
         }
-        <InformationDialog open={informData[0]} handleClose={()=> informData[1]} title={informData[2]} message={informData[3]}/>
+        <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
         <AlertDialog open={open} handleClose={handleClose} title={"Are you sure you want to leave without submiting?"} message={"All changes will not be saved when you leave."} option1={"Leave"} option2={"Stay"} />
-    </Box>;
+    </Box >;
 }
 
 export default SuggestChanges;

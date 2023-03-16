@@ -20,9 +20,7 @@ export default function InformationDialog(props) {
                     {props.title}
                 </DialogTitle>
                 <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                    {props.message}
-                    </DialogContentText>
+                    {props.message !== null && props.message.map((value, index)=><DialogContentText key={index}>{value}</DialogContentText>)}
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={props.handleClose()}>Close</Button>

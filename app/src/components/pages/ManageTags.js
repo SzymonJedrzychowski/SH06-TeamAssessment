@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom"
-import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField } from "@mui/material";
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Tooltip, Typography } from "@mui/material";
 import AlertDialog from './AlertDialog';
 import TablePagination from "@mui/material/TablePagination";
 import InformationDialog from "./InformationDialog";
@@ -10,7 +10,7 @@ const ManageTags = () => {
     const [selectedItem, setSelectedItem] = useState('');
     const [editMode, setEditMode] = useState(-1);
     const [authenticated, setAuthenticated] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState([true, true]);
     const [open, setOpen] = useState(false);
     const [tagToRemove, setTagToRemove] = useState(-1);
     const [update, setUpdate] = useState(0);
@@ -21,13 +21,6 @@ const ManageTags = () => {
     const [informData, setInformData] = useState([false, null, null, null]);
 
     const navigate = useNavigate();
-
-    const boxStyling = {
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        padding: 3
-    };
 
     useEffect(() => {
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
@@ -41,16 +34,20 @@ const ManageTags = () => {
                 (json) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
+                            setLoading([false, loading[1]]);
                             setAuthenticated(true);
                         } else {
                             setAuthenticated(false);
-                            setLoading(false);
                             return;
                         }
-                    } else {
-                        localStorage.removeItem('token');
+                    } else if (json.message === "Log in session is ending.") {
+                        setInformData([true, () => { navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
                         setAuthenticated(false);
-                        setLoading(false);
+                        localStorage.removeItem("token");
+                        return;
+                    } else {
+                        setInformData([true, () => { navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
+                        setAuthenticated(false);
                         return;
                     }
                 }
@@ -69,10 +66,7 @@ const ManageTags = () => {
                 (json) => {
                     if (json.message === "Success") {
                         setTags(json.data);
-                        setLoading(false);
-                    } else {
-                        console.log(json);
-                        setLoading(false);
+                        setLoading([loading[0], false]);
                     }
                 }
             )
@@ -87,16 +81,17 @@ const ManageTags = () => {
         if (selectedItem === tagsToShow[index]["tag_name"]) {
             setEditMode(-1);
             setSelectedItem('');
-            setInformData([true, ()=>{setInformData([false, null, "Action failed", "No changes in tag name were made."])}, "Action failed", "No changes in tag name were made."])
+            setInformData([true, () => { setInformData([false, null, "Action failed", ["No changes in tag name were made."]]) }, "Action failed", ["No changes in tag name were made."]])
             return;
-        }else if(selectedItem.length === 0){
+        } else if (selectedItem.length === 0) {
             setEditMode(-1);
             setSelectedItem('');
-            setInformData([true, ()=>{setInformData([false, null, "Action failed", "Tag name must be longer than 0 letters."])}, "Action failed", "Tag name must be longer than 0 letters."])
+            setInformData([true, () => { setInformData([false, null, "Action failed", ["Tag name must be longer than 0 letters."]]) }, "Action failed", ["Tag name must be longer than 0 letters."]])
             return;
         }
+
         let formData = new FormData();
-        formData.append('tag_id', tagsToShow[editMode]["tag_id"]);
+        formData.append('tag_id', tagsToShow[index]["tag_id"]);
         formData.append('tag_name', selectedItem);
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/edittag",
             {
@@ -111,15 +106,14 @@ const ManageTags = () => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, ()=>{setInformData([false, null, "Success", "Tag name was changed."])}, "Success", "Tag name was changed."])
+                        setInformData([true, () => { setInformData([false, null, "Success", ["Tag name was changed."]]) }, "Success", ["Tag name was changed."]])
                         setUpdate(update + 1);
-                        setLoading(true);
-                    } else if(json.message.slice(0, 3) === "EM:"){
-                        setInformData([true, ()=>{setInformData([false, null, "Action failed", json.message.slice(4)])}, "Action failed", json.message.slice(4)])
+                    } else if (json.message.slice(0, 3) === "EM:") {
+                        setInformData([true, () => { setInformData([false, null, "Action failed", [json.message.slice(4)]]) }, "Action failed", [json.message.slice(4)]])
                     } else {
-                        console.log(json);
-                        setLoading(false);
+                        setInformData([true, () => { navigate("/"); setInformData([false, null, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]]) }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
                     }
+
                     setEditMode(-1);
                     setSelectedItem('');
                 }
@@ -149,11 +143,10 @@ const ManageTags = () => {
                 .then(
                     (json) => {
                         if (json.message === "Success") {
-                            setTags(json.data);
-                            setUpdate(update + 1);
+                            setUpdate(update + 1); 
+                            setInformData([true, () => { setInformData([false, null, "Success", ["Tag was removed successfully."]]) }, "Success", ["Tag was removed successfully."]])
                         } else {
-                            console.log(json);
-                            setLoading(false);
+                            setInformData([true, () => { navigate("/"); setInformData([false, null, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]]) }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
                         }
                     }
                 )
@@ -168,7 +161,7 @@ const ManageTags = () => {
 
     const addNewTag = () => {
         if (newTag.length === 0) {
-            setInformData([true, ()=>{setInformData([false, null, "Action failed", "Tag name must be longer than 0 letters."])}, "Action failed", "Tag name must be longer than 0 letters."])
+            setInformData([true, () => { setInformData([false, null, "Action failed", ["Tag name must be longer than 0 letters."]]) }, "Action failed", ["Tag name must be longer than 0 letters."]])
             return;
         }
         let formData = new FormData();
@@ -186,14 +179,12 @@ const ManageTags = () => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, ()=>{setInformData([false, null, "Success", "New tag was added."])}, "Success", "New tag was added."])
-                        setUpdate(update + 1);
-                        setLoading(true);
-                    } else if(json.message.slice(0, 3) === "EM:"){
-                        setInformData([true, ()=>{setInformData([false, null, "Action failed", json.message.slice(4)])}, "Action failed", json.message.slice(4)])
+                        setInformData([true, () => { setInformData([false, null, "Success", ["New tag was added."]]) }, "Success", ["New tag was added."]]);
+                        setUpdate(update + 1); 
+                    } else if (json.message.slice(0, 3) === "EM:") {
+                        setInformData([true, () => { setInformData([false, null, "Action failed", [json.message.slice(4)]]) }, "Action failed", [json.message.slice(4)]])
                     } else {
-                        console.log(json);
-                        setLoading(false);
+                        setInformData([true, () => { navigate("/"); setInformData([false, null, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]]) }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
                     }
                     setEditMode(-1);
                     setNewTag('');
@@ -207,21 +198,21 @@ const ManageTags = () => {
     }
 
     const filterTags = (value) => (value.tag_name.toLowerCase().includes(search.toLowerCase()));
-    
+
     let tagsToShow = null;
-    if(tags !== null){
+    if (tags !== null) {
         tagsToShow = tags.filter(filterTags);
     }
 
     const createRow = (value, index) => {
         return <TableRow key={index}>
-            <TableCell>{index+1}</TableCell>
+            <TableCell>{index + 1 + page * rows}</TableCell>
             {editMode !== index && <TableCell>{value.tag_name}</TableCell>}
             {editMode === index && <TableCell><TextField id="outlined-basic" variant="outlined" label="tag name" value={selectedItem} onChange={(event) => setSelectedItem(event.target.value)} /></TableCell>}
 
             {editMode === -1 && <TableCell><Button variant="contained" onClick={() => { setEditMode(index); setSelectedItem(value.tag_name) }}>Edit</Button></TableCell>}
             {(editMode !== -1 && editMode !== index) && <TableCell><Button variant="contained" disabled>Edit</Button></TableCell>}
-            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Button variant="contained" onClick={() => submitChange(index)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
+            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
             {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
 
             {editMode === -1 && <TableCell><Button variant="contained" onClick={() => { setOpen(true); setTagToRemove(value.tag_id) }}>Remove</Button></TableCell>}
@@ -229,11 +220,24 @@ const ManageTags = () => {
         </TableRow>;
     }
 
-    return <Box sx={boxStyling}>
-        {(!loading && authenticated && tagsToShow !== null) && <>
-            <h2 style={{textAlign: "center"}}>Edit tags</h2>
+    const pageStyling = {
+        display: "flex",
+        flexDirection: "column",
+        padding: 3,
+        "a:hover": {
+            color: "white"
+        }
+    };
+
+    return <Box sx={pageStyling}>
+        {(!loading.every(v => v === true) && authenticated && tagsToShow !== null) && <>
+            <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Edit tags</Typography>
             <Paper>
-                <TextField sx={{minWidth: "50%", float: "right"}}id="outlined-basic" variant="outlined" label="search" value={search} onChange={(event) => setSearch(event.target.value)} />
+                <Box sx={{padding: "10px !important" }}>
+                    <Tooltip title="Search by tag name.">
+                        <TextField sx={{ minWidth: "50%", float: "right" }} id="outlined-basic" variant="outlined" label="Search" value={search} onChange={(event) => setSearch(event.target.value)} />
+                    </Tooltip>
+                </Box>
                 <TableContainer component={Paper}><Table>
                     <TableHead>
                         <TableRow>
@@ -254,24 +258,21 @@ const ManageTags = () => {
                     sx={{ 'div > p': { marginBottom: "0px !important" } }}
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={tags.length}
+                    count={tagsToShow.length}
                     rowsPerPage={rows}
                     page={page}
-                    onPageChange={(event, page) => setPage(page)}
-                    onRowsPerPageChange={(event) => { setRows(parseInt(event.target.value, 10)); setPage(0) }} />
+                    onPageChange={(event, page) => { setPage(page); setEditMode(-1) }}
+                    onRowsPerPageChange={(event) => { setRows(parseInt(event.target.value, 10)); setPage(0); setEditMode(-1) }} />
             </Paper>
-            <TextField id="outlined-basic" variant="outlined" label="tag name" value={newTag} onChange={(event) => setNewTag(event.target.value)} />
-            {newTag.length > 0 && <Button variant="contained" onClick={addNewTag}>Add new tag</Button>}
-            {newTag.length === 0 && <Button variant="contained" disabled>Add new tag</Button>}
-            <Button variant="contained" onClick={() => navigate('/editorial')}>Go back</Button>
+            <Box sx={{display: "flex", flexDirection: "column", rowGap: "5px"}}>
+                <Typography variant="h6" sx={{ textAlign: "center", marginTop: "2em" }}>Add new tag</Typography>
+                <TextField id="outlined-basic" variant="outlined" label="Tag name" value={newTag} onChange={(event) => setNewTag(event.target.value)} />
+                {newTag.length > 0 && <Button variant="contained" onClick={addNewTag}>Add new tag</Button>}
+                {newTag.length === 0 && <Button variant="contained" disabled>Add new tag</Button>}
+                <Button sx={{marginTop: "2em"}}variant="contained" onClick={() => navigate('/editorial')}>Go back</Button>
+            </Box>
         </>}
-        {(!loading && !authenticated && localStorage.getItem('token') === null) &&
-            <p>You are not logged in.</p>
-        }
-        {(!loading && !authenticated && localStorage.getItem('token') !== null) &&
-            <p>You don't have access to this page.</p>
-        }
-        <InformationDialog open={informData[0]} handleClose={()=> informData[1]} title={informData[2]} message={informData[3]}/>
+        <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
         <AlertDialog open={open} handleClose={handleClose} title={"Are you sure you want to remove this tag?"} message={"Removing the tag will cause its removal from all newsletter items."} option1={"Remove the tag"} option2={"Keep the tag"} />
     </Box>;
 }

@@ -28,7 +28,7 @@ class PublishNewsletter extends Verify
         $this->validateParameters();
 
         // Validate the JWT.
-        $tokenData = parent::validateToken(false);
+        $tokenData = parent::validateToken();
 
         if(!in_array($tokenData->auth, ["2", "3"])){
             throw new BadRequest("Only editor and admin can publish a newsletter.");

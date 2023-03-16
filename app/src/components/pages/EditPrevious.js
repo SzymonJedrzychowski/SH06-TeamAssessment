@@ -8,7 +8,6 @@ const EditPrevious = () => {
     const [loading, setLoading] = useState(true);
 
     const boxStyling = {
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         rowGap: "10px",

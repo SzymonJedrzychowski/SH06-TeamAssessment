@@ -37,7 +37,6 @@ const Publish = () => {
     };
 
     const boxStyling = {
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         padding: 3
@@ -297,7 +296,7 @@ const Publish = () => {
                 <Button variant="contained" onClick={addNewsletter}>Add newsletter item</Button>
             </ListItem>
             <ListItem>
-                <TextEditor content={paragraph} setContent={setParagraph} />
+                <TextEditor type={"paragraph"}content={paragraph} setContent={setParagraph} />
                 {editMode === -1 && <Button variant="contained" onClick={addParagraph}>Add paragraph</Button>}
                 {editMode !== -1 && <Button variant="contained" onClick={editParagraph}>Save edit</Button>}
                 {editMode !== -1 && <Button variant="contained" onClick={cancelEdit}>Cancel edit</Button>}
