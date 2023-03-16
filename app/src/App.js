@@ -29,7 +29,8 @@ function App() {
   const [alertData, setAlertData] = useState([false, null, null, null, null, null])
 
   const dialogData = () => {
-    return {setInformData, setAlertData};
+    const resetInformData = () => setInformData([false, null, null, null]);
+    return {setInformData, setAlertData, resetInformData};
   }
 
   return (

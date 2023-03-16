@@ -22,11 +22,11 @@ const Publish = (props) => {
     const [paragraph, setParagraph] = useState(() => EditorState.createEmpty());
     const [selectedItem, setSelectedItem] = React.useState('');
     const [editMode, setEditMode] = React.useState(-1);
-    const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const setInformData = props.dialogData.setInformData; 
-    const setAlertData = props.dialogData.setAlertData; 
+    const setInformData = props.dialogData.setInformData;
+    const setAlertData = props.dialogData.setAlertData;
+    const resetInformData = props.dialogData.resetInformData;
 
     const navigate = useNavigate();
     const item = useLocation();
@@ -40,6 +40,33 @@ const Publish = (props) => {
         flexDirection: "column",
         padding: 3
     };
+
+    const loadData = (newsletter_id) => {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        setNewsletterItems(json.data.filter(news => (
+                            (news["item_checked"] === "3" && news["published_newsletter_id"] == null) || (newsletter_id != null && news["published_newsletter_id"] === newsletter_id))
+                        ));
+                        setLoading(false);
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+    }
 
     useEffect(() => {
         let newsletter_id = null;
@@ -60,44 +87,15 @@ const Publish = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
-                            setAuthenticated(true);
+                            loadData(newsletter_id);
                         } else {
-                            setAuthenticated(false);
-                            setLoading(false);
-                            return;
+                            setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
                         }
+                    } else if (json.message === "Log in session is ending.") {
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
+                        localStorage.removeItem("token");
                     } else {
-                        localStorage.removeItem('token');
-                        setAuthenticated(false);
-                        setLoading(false);
-                        return;
-                    }
-                }
-            )
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                }
-            )
-
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
-            {
-                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
-            })
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if (json.message === "Success") {
-                        setNewsletterItems(json.data.filter(news => (
-                            (news["item_checked"] === "3" && news["published_newsletter_id"] == null) || (newsletter_id != null && news["published_newsletter_id"] === newsletter_id))
-                        ));
-                        setLoading(false);
-                    } else {
-                        localStorage.removeItem('token');
-                        setAuthenticated(false);
-                        setLoading(false);
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
                     }
                 }
             )
@@ -220,8 +218,7 @@ const Publish = (props) => {
                     if (json.message !== "Success") {
                         console.log(json);
                         localStorage.removeItem('token');
-                        setAuthenticated(false);
-                    }
+                    } 
                 })
             .catch(
                 (e) => {
@@ -257,7 +254,8 @@ const Publish = (props) => {
                     if (json.message !== "Success") {
                         console.log(json);
                         localStorage.removeItem('token');
-                        setAuthenticated(false);
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
@@ -269,17 +267,17 @@ const Publish = (props) => {
 
     const handleClose = (confirmation) => {
         setAlertData([false, null, null, null, null, null]);
-        if(confirmation.target.value === "true"){
+        if (confirmation.target.value === "true") {
             navigate(-1);
         }
     }
 
     const handleReturn = () => {
-        setAlertData([true, (confirmation)=>handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
+        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
     }
 
     return <Box sx={boxStyling}>
-        {(!loading && authenticated) && <><List>
+        {!loading && <><List>
             {files.map((value, index) => createEntry(value, index))}
             <ListItem>
                 <Box sx={{ minWidth: 120 }}>
@@ -299,7 +297,7 @@ const Publish = (props) => {
                 <Button variant="contained" onClick={addNewsletter}>Add newsletter item</Button>
             </ListItem>
             <ListItem>
-                <TextEditor type={"paragraph"}content={paragraph} setContent={setParagraph} />
+                <TextEditor type={"paragraph"} content={paragraph} setContent={setParagraph} />
                 {editMode === -1 && <Button variant="contained" onClick={addParagraph}>Add paragraph</Button>}
                 {editMode !== -1 && <Button variant="contained" onClick={editParagraph}>Save edit</Button>}
                 {editMode !== -1 && <Button variant="contained" onClick={cancelEdit}>Cancel edit</Button>}

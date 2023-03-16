@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom"
-import { Box, Button, Chip, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography, useTheme } from "@mui/material";
+import { Box, Button, Chip, FormControl, InputLabel, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableRow, Typography, useTheme } from "@mui/material";
 import { Markup } from 'interweave';
 
 const ITEM_HEIGHT = 48;
@@ -29,13 +29,15 @@ const CheckItem = (props) => {
     const [tags, setTags] = useState([]);
     const [newTags, setNewTags] = useState([]);
     const [tagsList, setTagsList] = useState({});
-    const [loading, setLoading] = useState([true, true, true, true]);
+    const [loadingItems, setLoadingItems] = useState(true);
+    const [loadingItemTags, setLoadingItemTags] = useState(true);
+    const [loadingTags, setLoadingTags] = useState(true);
     const [newsletterItem, setNewsletterItem] = useState();
-    const [authenticated, setAuthenticated] = useState(false);
     const [update, setUpdate] = useState(0);
 
-    const setInformData = props.dialogData.setInformData; 
-    const setAlertData = props.dialogData.setAlertData; 
+    const setInformData = props.dialogData.setInformData;
+    const setAlertData = props.dialogData.setAlertData;
+    const resetInformData = props.dialogData.resetInformData;
 
     const navigate = useNavigate();
 
@@ -44,6 +46,72 @@ const CheckItem = (props) => {
         "1": "Suggestions made",
         "2": "Unchecked changes",
         "3": "Ready"
+    }
+
+    const loadData = () => {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success" && json.data.length === 1) {
+                        setNewsletterItem(json.data[0]);
+                        setLoadingItems(false);
+                    } else if (json.message === "Success" && json.data.length === 0) {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        setTags(json.data.map((value) => value.tag_id));
+                        setNewTags(json.data.map((value) => value.tag_id));
+                        setLoadingItemTags(false);
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                })
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                })
+
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        let temp = {};
+                        json.data.forEach((value) => { temp[value.tag_id] = value.tag_name })
+                        setTagsList(temp);
+                        setLoadingTags(false);
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                })
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                })
     }
 
     useEffect(() => {
@@ -63,22 +131,15 @@ const CheckItem = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
-                            setLoading([false, loading[1], loading[2], loading[3]]);
-                            setAuthenticated(true);
+                            loadData();
                         } else {
-                            setInformData([true, () => { navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
-                            setAuthenticated(false);
-                            return;
+                            setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
                         }
                     } else if (json.message === "Log in session is ending.") {
-                        setInformData([true, () => { navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
-                        setAuthenticated(false);
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
                         localStorage.removeItem("token");
-                        return;
                     } else {
-                        setInformData([true, () => { navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
-                        setAuthenticated(false);
-                        return;
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
                     }
                 }
             )
@@ -87,64 +148,6 @@ const CheckItem = (props) => {
                     console.log(e.message)
                 }
             )
-
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
-            {
-                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
-            })
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if (json.message === "Success" && json.data.length === 1) {
-                        setNewsletterItem(json.data[0]);
-                        setLoading([loading[0], false, loading[2], loading[3]]);
-                    } else if (json.message === "Success" && json.data.length === 0) {
-                        setInformData([true, () => { navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
-                    }
-                }
-            )
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                }
-            )
-
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if (json.message === "Success") {
-                        setTags(json.data.map((value) => value.tag_id));
-                        setNewTags(json.data.map((value) => value.tag_id));
-                        setLoading([loading[0], loading[1], false, loading[3]]);
-                    }
-                })
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                })
-
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if (json.message === "Success") {
-                        let temp = {};
-                        json.data.forEach((value) => { temp[value.tag_id] = value.tag_name })
-                        setTagsList(temp);
-                        setLoading([loading[0], loading[1], loading[2], false]);
-                    }
-                })
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                })
     }, [update])
 
     const changeStatus = (newStatus) => {
@@ -163,13 +166,13 @@ const CheckItem = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        if(newStatus === "-1"){
-                            setInformData([true, () => { setInformData([false, null, "Success", ["The item was removed."]]); navigate(-1); }, "Success", ["The item was removed."]])
-                        }else{
-                            setInformData([true, () => { setInformData([false, null, "Success", ["The status was changes."]]); setUpdate(update + 1); }, "Success", ["The status was changes."]])
+                        if (newStatus === "-1") {
+                            setInformData([true, () => { resetInformData(); navigate(-1); }, "Success", ["The item was removed."]])
+                        } else {
+                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["The status was changes."]])
                         }
                     } else {
-                        setInformData([true, () => { navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
@@ -194,12 +197,11 @@ const CheckItem = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, () => { setInformData([false, null, "Success", ["The tags were updated."]]) }, "Success", ["The tags were updated."]])
+                        setInformData([true, resetInformData, "Success", ["The tags were updated."]])
                         setUpdate(update + 1);
                     } else {
-                        setInformData([true, () => { navigate('/editorial') }, "Error", ["Unexpected error has occured.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate('/editorial') }, "Error", ["Unexpected error has occured.", "You will be redirected to editorial page."]])
                     }
-                    console.log(json);
                 })
             .catch(
                 (e) => {
@@ -215,7 +217,7 @@ const CheckItem = (props) => {
     }
 
     const handleRemove = () => {
-        setAlertData([true, (confirmation)=>handleClose(confirmation), "Are you sure you want to remove this newsletter item?", ["You cannot undo this operation."], "Remove the item", "Keep the item"])
+        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to remove this newsletter item?", ["You cannot undo this operation."], "Remove the item", "Keep the item"])
     }
 
     const handleChange = (event) => {
@@ -233,8 +235,10 @@ const CheckItem = (props) => {
         }
     };
 
+    const loading = loadingItems && loadingItemTags && loadingTags;
+
     return <Box sx={pageStyle}>
-        {(!loading.every(v => v === true) && authenticated && newsletterItem !== undefined) && <Box>
+        {(!loading && newsletterItem !== undefined) && <Box>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Check item</Typography>
             <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
                 <Table>
@@ -304,7 +308,7 @@ const CheckItem = (props) => {
                                             ))}
                                         </Select>
                                     </FormControl>
-                                    <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, columnGap: "25px", alignItems: "center", rowGap: "5px", minWidth: { xs: "100%", sm: "0%" }, alignItems: "stretch" }}>
+                                    <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, columnGap: "25px", rowGap: "5px", minWidth: { xs: "100%", sm: "0%" }, alignItems: "stretch" }}>
                                         {JSON.stringify(tags.sort()) !== JSON.stringify(newTags.sort()) && <>
                                             <Button sx={{ minWidth: "100px" }} variant="contained" onClick={submitTags}>Save</Button>
                                             <Button sx={{ minWidth: "100px" }} variant="contained" onClick={() => setNewTags(tags)}>Cancel</Button>

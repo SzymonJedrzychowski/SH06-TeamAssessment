@@ -1,17 +1,17 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { TablePagination, Select, Box, Table, TableBody, TableCell, TableContainer, TableHead, TextField, TableRow, Paper, Button, MenuItem, Checkbox, ListItemText, OutlinedInput, InputLabel, FormControl, Typography, Tooltip } from "@mui/material";
-import InformationDialog from "./InformationDialog";
 
-const Editorial = () => {
+const Editorial = (props) => {
     const [newsletterItems, setNewsletterItems] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [authenticated, setAuthenticated] = useState(false);
-    const [informData, setInformData] = useState([false, null, null, null]);
+    const [loading, setLoading] = useState(0);
     const [page, setPage] = useState(0);
     const [rows, setRows] = useState(5);
     const [statusSearch, setStatusSearch] = useState(["0", "1", "2", "3"]);
     const [search, setSearch] = useState('');
+
+    const setInformData = props.dialogData.setInformData;
+    const resetInformData = props.dialogData.resetInformData;
 
     const navigate = useNavigate();
 
@@ -33,44 +33,7 @@ const Editorial = () => {
         </TableRow>;
     }
 
-    useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
-            {
-                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
-            })
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if (json.message === "Success") {
-                        if (["2", "3"].includes(json.data[0]["authorisation"])) {
-                            setAuthenticated(true);
-                        } else {
-                            setInformData([true, () => { navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
-                            setAuthenticated(false);
-                            setLoading(false);
-                            return;
-                        }
-                    } else if (json.message === "Log in session is ending.") {
-                        setInformData([true, () => { navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
-                        setAuthenticated(false);
-                        localStorage.removeItem("token");
-                        return;
-                    } else {
-                        setInformData([true, () => { navigate("/login") }, "Log in", ["You are not logged in.", "You will be redicrected to login screen."]])
-                        setAuthenticated(false);
-                        setLoading(false);
-                        return;
-                    }
-                }
-            )
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                }
-            )
-
+    const loadData = () => {
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?published=false",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
@@ -83,6 +46,8 @@ const Editorial = () => {
                     if (json.message === "Success") {
                         setNewsletterItems(json.data);
                         setLoading(false);
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/home") }, "Unexpected error", ["Data couldn't be loaded.", "You will be redirected to home screen."]])
                     }
                 }
             )
@@ -91,7 +56,38 @@ const Editorial = () => {
                     console.log(e.message)
                 }
             )
-    }, [navigate]);
+    }
+
+    useEffect(() => {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        if (["2", "3"].includes(json.data[0]["authorisation"])) {
+                            loadData();
+                        } else {
+                            setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
+                        }
+                    } else if (json.message === "Log in session is ending.") {
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
+                        localStorage.removeItem("token");
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["You are not logged in.", "You will be redicrected to login screen."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+    }, []);
 
     const filterItems = (value) => (
         (value.item_title.toLowerCase().includes(search.toLowerCase()) ||
@@ -123,7 +119,7 @@ const Editorial = () => {
     };
 
     return <Box sx={pageStyle}>
-        {(!loading && authenticated) && <>
+        {!loading && <>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Editorial</Typography>
             <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "center" }}>
                 <Button variant="contained" component={Link} to={"/publish"}>Publish newsletter</Button>
@@ -183,7 +179,6 @@ const Editorial = () => {
                     onRowsPerPageChange={(event) => { setRows(parseInt(event.target.value, 10)); setPage(0) }} />
             </Paper>
         </>}
-        <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
     </Box>;
 }
 
