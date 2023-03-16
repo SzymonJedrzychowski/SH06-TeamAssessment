@@ -95,7 +95,7 @@ const EditPrevious = (props) => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {newsletters.map(
+                    {newsletters.slice(page * rows, page * rows + rows).map(
                         (value, index) => createRow(value, index)
                     )}
                 </TableBody>
