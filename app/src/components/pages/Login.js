@@ -28,8 +28,16 @@ function Login() {
     })
     .then((response) => response.json())
     .then(
-      (json) => console.log(json)
-    )
+      (json) => {
+        if (json.message === "Success") {
+          console.log("Success: ");
+          localStorage.setItem('token', json.data.token);
+        } else {
+          console.log("Not success: ");
+          localStorage.removeItem('token');
+        }
+        console.log(json);
+      })
   };
 
   return (

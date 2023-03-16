@@ -164,9 +164,13 @@ const CheckItem = () => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, () => { setInformData([false, null, "Success", ["The status was changes."]]); setUpdate(update + 1); }, "Success", ["The status was changes."]])
+                        if(newStatus === "-1"){
+                            setInformData([true, () => { setInformData([false, null, "Success", ["The item was removed."]]); navigate(-1); }, "Success", ["The item was removed."]])
+                        }else{
+                            setInformData([true, () => { setInformData([false, null, "Success", ["The status was changes."]]); setUpdate(update + 1); }, "Success", ["The status was changes."]])
+                        }
                     } else {
-                        setInformData([true, () => { navigate("/editorial") }, "Error", ["Unexpected error has occurred HERE.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
@@ -277,7 +281,6 @@ const CheckItem = () => {
                                     <FormControl sx={{ minWidth: { xs: "100%", sm: "50%" }, maxWidth: { xs: "100%", sm: "50%" } }}>
                                         <InputLabel id="demo-multiple-checkbox-label">Item tags</InputLabel>
                                         <Select
-                                            sx={{ minHeight: "65px" }}
                                             value={newTags}
                                             multiple
                                             onChange={handleChange}

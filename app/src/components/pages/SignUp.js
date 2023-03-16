@@ -9,7 +9,7 @@ function SignUp() {
       const formData = new FormData();
       formData.append("subscriber_email", event.target.subscriber_email.value);
 
-      fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/addsubscriber", {
+      fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/addsubscriber", {
         method: "POST",
         body: formData,
       })    

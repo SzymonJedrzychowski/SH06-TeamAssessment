@@ -132,7 +132,7 @@ const SuggestChanges = () => {
             )
             .then((json) => {
                 if (json.message === "Success") {
-                    setInformData([true, () => navigate(-1), "Success", "Suggestion was sent. You can now leave the page."])
+                    setInformData([true, () => navigate(-1), "Success", ["Suggestion was sent. You can now leave the page."]])
                 }
                 else {
                     console.log(json);
