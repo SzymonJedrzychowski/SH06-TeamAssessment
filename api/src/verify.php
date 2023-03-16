@@ -1,6 +1,5 @@
 <?php
 
-use FirebaseJWT\ExpiredException;
 use FirebaseJWT\JWT;
 use FirebaseJWT\Key;
 
@@ -14,6 +13,16 @@ use FirebaseJWT\Key;
  */
 class Verify extends Endpoint
 {
+    /**
+     * @var array $decoded Array containing data from JWT.
+     */
+    protected $decoded;
+
+    /**
+     * @var int $accountId value of account_id column for current user.
+     */
+    protected $userId;
+
     /**
      * Override the __construct method to match the requirements of the /verify endpoint.
      *
@@ -45,9 +54,9 @@ class Verify extends Endpoint
         $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
         $this->setData(array(
-            "length" => 0,
+            "length" => count($data),
             "message" => "Success",
-            "data" => null
+            "data" => $data
         ));
     }
 

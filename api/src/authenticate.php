@@ -15,16 +15,6 @@ use FirebaseJWT\JWT;
 class Authenticate extends Endpoint
 {
     /**
-     * @var array $decoded Array containing data from JWT.
-     */
-    protected $decoded;
-
-    /**
-     * @var int $accountId value of account_id column for current user.
-     */
-    protected $userId;
-
-    /**
      * Override the __construct method to match the requirements of the /authenticate endpoint.
      *
      * @throws BadRequest               If request method is incorrect.
@@ -52,9 +42,9 @@ class Authenticate extends Endpoint
         $data['token'] = $this->createJWT($queryResult);
 
         $this->setData(array(
-            "length" => 0,
+            "length" => count($data),
             "message" => "Success",
-            "data" => null
+            "data" => $data
         ));
     }
 
