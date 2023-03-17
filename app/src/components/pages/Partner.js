@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {Markup} from 'interweave';
 import {Link, useNavigate} from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import {Button} from '@mui/material';
 
 /**

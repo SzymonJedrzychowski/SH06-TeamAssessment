@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import {Button} from '@mui/material';
