@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Markup} from 'interweave';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import {Button} from '@mui/material';
@@ -13,7 +13,7 @@ import {Button} from '@mui/material';
  * @author Matthew Cartwright
  */
 
-const Partner = () => {
+const Partner = (props) => {
 
     // State variable hooks
     const [loadingReviewItems, setLoadingReviewItems] = useState(true);
@@ -28,7 +28,6 @@ const Partner = () => {
 
     // On render hook
     useEffect(() => {
-        //WIP
         fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
@@ -51,6 +50,7 @@ const Partner = () => {
                         localStorage.removeItem('token');
                         setAuthenticated(false);
                         setLoading(false);
+                        setInformData([true, () => {resetInformData(); navigate("/login")}, "Authentication failed.", ["You must be logged in to contribute.", "Please log in."]]);
                         return;
                     }
                 }
@@ -104,6 +104,10 @@ const Partner = () => {
         "3"  : "In review"
     }
 
+    const setInformData = props.dialogData.setInformData;
+    const setAlertData = props.dialogData.setAlertData;
+    const resetInformData = props.dialogData.resetInformData;
+
 
     // Functions
         // -Navigation
@@ -125,7 +129,14 @@ const Partner = () => {
             setShowPublished(true);
             }
     
-    
+        const navigate = useNavigate();
+
+        const handleClose = (confirmation) => {
+            setAlertData([false, null, null, null, null, null]);
+            if (confirmation.target.value === "true") {
+                uploadItem();
+            }
+        }
     
         // -Other
         const uploadItem = () => {
@@ -167,7 +178,7 @@ const Partner = () => {
                 editorClassName="editorClassName"
             />
         </div>
-        <button onClick = {uploadItem}>Upload</button>
+        <button onClick = {setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Option 1", "Option 2"])}>Upload</button>
         </div>;
         
 
@@ -234,7 +245,7 @@ const Partner = () => {
                 </div>
             </div>}
             
-            {(!loading && !authenticated && localStorage.getItem('token') === undefined) && 
+            {/* {(!loading && !authenticated && localStorage.getItem('token') === undefined) && 
                 <div className = 'PartnerNonAuthenticated'>
                     <h1>Please log in or sign up to contribute</h1>
                 </div>}
@@ -242,7 +253,7 @@ const Partner = () => {
             {(!loading && !authenticated) && 
                 <div className = 'PartnerNonAuthenticated2'>
                     <h1>Please log in or sign up to contribute</h1>
-                </div>}
+                </div>} */}
         </div>
         
     )

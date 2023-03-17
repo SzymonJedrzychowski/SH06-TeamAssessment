@@ -39,8 +39,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Homepage/>}/>
 
-          <Route path="/partner" element={<Partner/>}/>
-          <Route path="/partnerEditItem" element={<PartnerEditItem/>}/>
+          <Route path="/partner" element={<Partner dialogData={dialogData()}/>}/>
+          <Route path="/partnerEditItem" element={<PartnerEditItem dialogData={dialogData()}/>}/>
 
           <Route path="/editorial" element={<Editorial dialogData={dialogData()}/>}/>
           <Route path="/checkItem" element={<CheckItem dialogData={dialogData()}/>}/>
