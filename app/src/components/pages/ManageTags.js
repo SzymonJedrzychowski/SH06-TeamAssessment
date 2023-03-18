@@ -102,12 +102,11 @@ const ManageTags = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, () => { setInformData([false, null, "Success", ["Tag name was changed."]]) }, "Success", ["Tag name was changed."]])
-                        setUpdate(update + 1);
+                        setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Tag name was changed."]])
                     } else if (json.message.slice(0, 3) === "EM:") {
-                        setInformData([true, () => { setInformData([false, null, "Action failed", [json.message.slice(4)]]) }, "Action failed", [json.message.slice(4)]])
+                        setInformData([true, resetInformData, "Action failed", [json.message.slice(4)]])
                     } else {
-                        setInformData([true, () => { navigate("/"); setInformData([false, null, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]]) }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
                     }
 
                     setEditMode(-1);
@@ -139,10 +138,9 @@ const ManageTags = (props) => {
                 .then(
                     (json) => {
                         if (json.message === "Success") {
-                            setUpdate(update + 1);
-                            setInformData([true, resetInformData, "Success", ["Tag was removed successfully."]])
+                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Tag was removed successfully."]])
                         } else {
-                            setInformData([true, () => { navigate("/"); resetInformData() }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
+                            setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
                         }
                     }
                 )
@@ -160,7 +158,7 @@ const ManageTags = (props) => {
 
     const addNewTag = () => {
         if (newTag.length === 0) {
-            setInformData([true, () => { setInformData([false, null, "Action failed", ["Tag name must be longer than 0 letters."]]) }, "Action failed", ["Tag name must be longer than 0 letters."]])
+            setInformData([true, resetInformData, "Action failed", ["Tag name must be longer than 0 letters."]])
             return;
         }
         let formData = new FormData();
@@ -178,12 +176,11 @@ const ManageTags = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, () => { setInformData([false, null, "Success", ["New tag was added."]]) }, "Success", ["New tag was added."]]);
-                        setUpdate(update + 1);
+                        setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["New tag was added."]]);
                     } else if (json.message.slice(0, 3) === "EM:") {
-                        setInformData([true, () => { setInformData([false, null, "Action failed", [json.message.slice(4)]]) }, "Action failed", [json.message.slice(4)]])
+                        setInformData([true, resetInformData, "Action failed", [json.message.slice(4)]])
                     } else {
-                        setInformData([true, () => { navigate("/"); setInformData([false, null, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]]) }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
                     }
                     setEditMode(-1);
                     setNewTag('');

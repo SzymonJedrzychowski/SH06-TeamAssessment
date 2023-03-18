@@ -4,7 +4,7 @@ import { TablePagination, Select, Box, Table, TableBody, TableCell, TableContain
 
 const Editorial = (props) => {
     const [newsletterItems, setNewsletterItems] = useState([]);
-    const [loading, setLoading] = useState(0);
+    const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(0);
     const [rows, setRows] = useState(5);
     const [statusSearch, setStatusSearch] = useState(["0", "1", "2", "3"]);

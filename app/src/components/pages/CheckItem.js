@@ -197,8 +197,7 @@ const CheckItem = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, resetInformData, "Success", ["The tags were updated."]])
-                        setUpdate(update + 1);
+                        setInformData([true, () => { resetInformData(); setUpdate(update + 1) }, "Success", ["The tags were updated."]])
                     } else {
                         setInformData([true, () => { resetInformData(); navigate('/editorial') }, "Error", ["Unexpected error has occured.", "You will be redirected to editorial page."]])
                     }
@@ -323,7 +322,7 @@ const CheckItem = (props) => {
                         </TableRow>
                         <TableRow>
                             <TableCell colSpan={2}>
-                                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "10px", rowGap: "5px", "a, button": {minWidth: "20%" } }}>
+                                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "10px", rowGap: "5px", "a, button": { minWidth: "20%" } }}>
                                     {["-1", "1", "3"].includes(newsletterItem["item_checked"]) && <Button variant="contained" disabled>Approve</Button>}
                                     {["0", "2"].includes(newsletterItem["item_checked"]) && <Button variant="contained" onClick={() => changeStatus("3")}>Approve</Button>}
                                     {newsletterItem["item_checked"] === "-1" && <Button variant="contained" disabled>Remove</Button>}
