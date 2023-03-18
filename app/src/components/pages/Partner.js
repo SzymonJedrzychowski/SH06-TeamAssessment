@@ -189,6 +189,11 @@ const Partner = (props) => {
         
             // --Items
             const createItemBox = (value) => {
+                let suggestionMade = false;
+                if (value.item_checked == "1"){
+                    suggestionMade = true;
+                }
+                console.log(suggestionMade);
                 const itemContent = <Markup content={value.content}/>
                 return(
                     <div key = {value.item_id}>
@@ -196,6 +201,7 @@ const Partner = (props) => {
                         <div>{checkValues[value.item_checked]}</div>
                         <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
                         <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>
+                        {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {value.item_id}>See suggestion</Button></div>}
                     </div>); 
             }
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Markup} from 'interweave';
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useNavigate, useLocation} from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
 import {Button} from '@mui/material';
 
@@ -13,6 +13,9 @@ import {Button} from '@mui/material';
  */
 
 const PartnerReviewChange = (props) => {
+
+    // Get the relevant newsletter item details
+    const item = useLocation();
 
     // State variable hooks
     //const [loadingReviewItems, setLoadingReviewItems] = useState(true);
