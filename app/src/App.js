@@ -36,7 +36,7 @@ function App() {
           <Route path="/editPrevious" element={<EditPrevious/>}/>
           <Route path="/createAccount" element={<CreateAccount/>}/>
           <Route path="/manageTags" element={<ManageTags/>}/>
-          <Route path="/login" element={<Login/>}/>
+          <Route path="/login" element={<Login dialogData={dialogData()}/>}/>
           <Route path="/signUp" element={<SignUp/>}/>
           <Route path="*" element={<p>Not found</p>} />
         </Routes>

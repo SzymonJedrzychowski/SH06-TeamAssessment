@@ -5,10 +5,17 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { ListItem } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import { useNavigate } from "react-router-dom"
+import AlertDialog from './AlertDialog';
 
-function Login() {
+
+function Login(props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+
+  const setInformData = props.dialogData.setInformData;
+  // const setAlertData = props.dialogData.setAlertData;
+  const resetInformData = props.dialogData.resetInformData;
 
   // Handler for username value.
   const handleEmail = (event) => {
@@ -19,11 +26,12 @@ function Login() {
   const handlePassword = (event) => {
     setPassword(event.target.value);
   }
+  const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
     const encodedString = Buffer.from(email + ":" + password).toString('base64');
-    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/authenticate", {
+    fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/authenticate", {
       method: "POST",
       headers: new Headers({ "Authorization": "Basic " + encodedString })
     })
@@ -31,6 +39,8 @@ function Login() {
     .then(
       (json) => console.log(json)
     )
+    dialogData.setInformData([true, () => {resetInformData(); navigate("/homepage")}, "Success", 
+    ["You have successfully logged in! You will be redirected to the homepage."]]);
   };
 
   return (
