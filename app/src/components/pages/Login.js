@@ -5,8 +5,7 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { ListItem } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom"
-import AlertDialog from './AlertDialog';
+import { useNavigate } from "react-router-dom";
 
 
 function Login(props) {
@@ -39,7 +38,7 @@ function Login(props) {
     .then(
       (json) => console.log(json)
     )
-    dialogData.setInformData([true, () => {resetInformData(); navigate("/homepage")}, "Success", 
+    setInformData([true, () => {resetInformData(); navigate("/homepage")}, "Success", 
     ["You have successfully logged in! You will be redirected to the homepage."]]);
   };
 
