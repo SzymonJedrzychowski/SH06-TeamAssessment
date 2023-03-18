@@ -92,7 +92,7 @@ const Partner = (props) => {
         )
 
         console.log("Render complete")
-    }, [])
+    }, []);
 
     // Other variables
     const checkValues = {
@@ -138,6 +138,10 @@ const Partner = (props) => {
         }
     
         // -Other
+        const uploadConfirm = () => {
+            setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, uplaod now.", "No, do not upload."]);
+        }
+
         const uploadItem = () => {
             console.log("Upload");
         }
@@ -177,7 +181,7 @@ const Partner = (props) => {
                 editorClassName="editorClassName"
             />
         </div>
-        <button onClick = {setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Option 1", "Option 2"])}>Upload</button>
+        {<button onClick = {uploadConfirm}>Upload</button>}
         </div>;
         
 
