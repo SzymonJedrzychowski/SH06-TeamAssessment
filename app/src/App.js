@@ -5,6 +5,7 @@ import './styles/App.css'
 import Homepage from "./components/pages/Homepage";
 import Partner from "./components/pages/Partner";
 import PartnerEditItem from "./components/pages/PartnerEditItem";
+import PartnerReviewChange from "./components/pages/PartnerReviewChange";
 import Layout from "./components/layout/Layout";
 import Editorial from "./components/pages/Editorial";
 import CheckItem from "./components/pages/CheckItem";
@@ -41,6 +42,7 @@ function App() {
 
           <Route path="/partner" element={<Partner dialogData={dialogData()}/>}/>
           <Route path="/partnerEditItem" element={<PartnerEditItem dialogData={dialogData()}/>}/>
+          <Route path="/partnerReviewChange" element={<PartnerReviewChange dialogData={dialogData()}/>}/>
 
           <Route path="/editorial" element={<Editorial dialogData={dialogData()}/>}/>
           <Route path="/checkItem" element={<CheckItem dialogData={dialogData()}/>}/>
