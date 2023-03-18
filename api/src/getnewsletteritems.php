@@ -43,7 +43,7 @@ class GetNewsletterItems extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        if ($tokenData->auth == "1") {
+        if ($_GET['partner_access'] == "true") {
             $sql .= " AND newsletter_item.user_id = :user_id";
             $params["user_id"] = $tokenData->sub;
         }
@@ -61,7 +61,8 @@ class GetNewsletterItems extends Verify
     {
         return [
             'published' => 'boolean',
-            'item_id' => 'int'
+            'item_id' => 'int',
+            'partner_access' => 'boolean'
         ];
     }
 }

@@ -60,7 +60,7 @@ const Partner = (props) => {
                 }
             )
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
