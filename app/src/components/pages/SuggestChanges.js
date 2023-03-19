@@ -127,7 +127,7 @@ const SuggestChanges = (props) => {
     }
 
     const handleReturn = () => {
-        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
+        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to leave without submitting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
     }
 
     return <Box sx={boxStyling}>
