@@ -31,6 +31,8 @@ class RemoveTag extends Verify
 
         // Validate the JWT.
         $tokenData = parent::validateToken();
+
+        // Throw exception if user is not editor or admin.
         if(!in_array($tokenData->auth, ["2", "3"])){
             throw new BadRequest("Only editor and admin can remove tags.");
         }
@@ -39,6 +41,7 @@ class RemoveTag extends Verify
         $db->beginTransaction();
 
         try {
+            // Step 1. Delete the tag from item_tag.
             $sql = "DELETE FROM item_tag WHERE tag_id = :tag_id";
 
             $this->setSQLCommand($sql);
@@ -48,11 +51,16 @@ class RemoveTag extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
+            // End step 1.
+
+            // Step 2. Delete the tag.
             $sql = "DELETE FROM tag WHERE tag_id = :tag_id";
 
             $this->setSQLCommand($sql);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();

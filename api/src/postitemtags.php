@@ -13,7 +13,8 @@ class PostItemTags extends Verify
     /**
      * Override the __construct method to match the requirements of the /postitemtags endpoint.
      *
-     * @throws BadRequest           If request method is incorrect.
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     public  function __construct()
     {
@@ -30,6 +31,7 @@ class PostItemTags extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
+        // Throw exception if user is not editor or admin.
         if(!in_array($tokenData->auth, ["2", "3"])){
             throw new BadRequest("Only editor and admin can submit tags for newsletter_item.");
         }
@@ -38,8 +40,7 @@ class PostItemTags extends Verify
         $db->beginTransaction();
 
         try {
-            
-            // Initialise the SQL command and parameters to insert new data to database.
+            // Step 1. Remove previous tags.
             $sql = "DELETE FROM item_tag WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
@@ -49,7 +50,9 @@ class PostItemTags extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // Initialise the SQL command and parameters to modify data of newsletter items.
+            // End step 1.
+
+            // Step 2. Insert new tags.
             $array = json_decode($_POST["item_tags"]);
 
             if($array == null){
@@ -70,6 +73,8 @@ class PostItemTags extends Verify
             );
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();
