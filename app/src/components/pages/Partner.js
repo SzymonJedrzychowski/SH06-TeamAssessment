@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Markup } from 'interweave';
 import { Link, useNavigate } from 'react-router-dom';
-import { Editor } from 'react-draft-wysiwyg';
 import TextEditor from "./TextEditor";
 import { Button } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
@@ -175,7 +174,7 @@ const Partner = (props) => {
                         }
                         else if (json.message === "Success"){
                             console.log("Success")
-                            setInformData([true, () => {resetInformData()}, "Upload Successful.", []]);
+                            setInformData([true, () => {resetInformData(); navigate('/')}, "Upload Successful.", []]);
                         }
                     })
                 .catch(
