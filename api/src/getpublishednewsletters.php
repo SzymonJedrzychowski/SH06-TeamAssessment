@@ -20,7 +20,7 @@ class GetPublishedNewsletters extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("GET");
 
-        // Create SQL command to get newsleter items.
+        // Create SQL command to get published newsletters.
         $sql = "SELECT newsletter_id, newsletter_content, date_published, first_name, last_name FROM published_newsletter JOIN user ON published_newsletter.user_id = user.user_id";
         $params = array();
 

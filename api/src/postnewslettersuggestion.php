@@ -13,7 +13,8 @@ class PostNewsletterSuggestion extends Verify
     /**
      * Override the __construct method to match the requirements of the /postnewslettersuggestion endpoint.
      *
-     * @throws BadRequest           If request method is incorrect.
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     public  function __construct()
     {
@@ -30,6 +31,7 @@ class PostNewsletterSuggestion extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
+        // Throw exception if user is not editor or admin.
         if (!in_array($tokenData->auth, ["2", "3"])) {
             throw new BadRequest("Only editor and admin can publish a newsletter suggestion.");
         }
@@ -38,6 +40,7 @@ class PostNewsletterSuggestion extends Verify
         $db->beginTransaction();
 
         try {
+            // Step 1. Insert the newsletter suggestion.
             $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
                 VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
 
@@ -51,6 +54,9 @@ class PostNewsletterSuggestion extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
+            // End step 1.
+
+            // Step 2. Update the status of the newsletter_item.
             $sql = "UPDATE newsletter_item SET item_checked = :item_checked WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
@@ -59,7 +65,14 @@ class PostNewsletterSuggestion extends Verify
                 'item_checked' => "1"
             ]);
 
-            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
+            
+            // Throw exception if no newsletter_item was updated.
+            if($data == 0){
+                throw new ClientErrorException("Problem with finding item_id occured.");
+            }
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();

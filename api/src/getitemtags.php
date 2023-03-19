@@ -13,14 +13,14 @@ class GetItemTags extends Endpoint
     /**
      * Override parent method to prepare SQL command and variables to get the tags of newsletter item from database.
      *
-     * @throws BadRequest If incorrect request method was used or incorrect parameter was provided.
+     * @throws BadRequest If incorrect request method was used.
      */
     protected function initialiseSQL()
     {
         // Check if correct request method was used.
         $this->validateRequestMethod("GET");
 
-        // Create SQL command to get tags of newsleter item.
+        // Create SQL command to get tags of newsletter item.
         $sql = "SELECT tag.tag_id, tag_name FROM item_tag JOIN tag ON item_tag.tag_id = tag.tag_id WHERE item_id = :item_id";
 
         // Check if correct params were provided.

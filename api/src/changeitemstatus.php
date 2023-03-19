@@ -13,7 +13,8 @@ class ChangeItemStatus extends Verify
     /**
      * Override the __construct method to match the requirements of the /changeitemstatus endpoint.
      *
-     * @throws BadRequest           If request method is incorrect.
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     public  function __construct()
     {
@@ -34,6 +35,7 @@ class ChangeItemStatus extends Verify
         $db->beginTransaction();
 
         try {
+            // Step 1. Get user_id of author of the newsletter_item.
             $sql = "SELECT item_id, user_id FROM newsletter_item WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
@@ -43,12 +45,16 @@ class ChangeItemStatus extends Verify
 
             $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
+            // Allow partners to only change their items and check if item was found in db.
             if (count($data) == 0) {
-                throw new BadRequest("Problem with getting newsletter_item occured.");
-            } else if ($data[0]["user_id"] != $tokenData->sub and $tokenData->auth == "1") {
+                throw new ClientErrorException("Problem with getting newsletter_item occured.");
+            } else if ($data[0]["user_id"] != $tokenData->sub and $_POST["partner_access"] == "true") {
                 throw new BadRequest("Editors can only edit their own items.");
             }
 
+            // End step 1.
+
+            // Step 2. Update the item_checked of newsletter_item.
             $sql = "UPDATE newsletter_item SET item_checked = :item_checked WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
@@ -58,6 +64,8 @@ class ChangeItemStatus extends Verify
             ]);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();
@@ -93,7 +101,8 @@ class ChangeItemStatus extends Verify
     {
         return [
             'item_id' => "int",
-            'item_checked' => "int"
+            'item_checked' => "int",
+            'partner_access' => "boolean"
         ];
     }
 }

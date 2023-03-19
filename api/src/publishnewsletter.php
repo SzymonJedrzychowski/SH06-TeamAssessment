@@ -13,7 +13,8 @@ class PublishNewsletter extends Verify
     /**
      * Override the __construct method to match the requirements of the /publishnewsletter endpoint.
      *
-     * @throws BadRequest           If request method is incorrect.
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     public  function __construct()
     {
@@ -30,6 +31,7 @@ class PublishNewsletter extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
+        // Throw exception if user is not editor or admin.
         if(!in_array($tokenData->auth, ["2", "3"])){
             throw new BadRequest("Only editor and admin can publish a newsletter.");
         }
@@ -38,8 +40,7 @@ class PublishNewsletter extends Verify
         $db->beginTransaction();
 
         try {
-
-            // Initialise the SQL command and parameters to insert new data to database.
+            // Step 1. Insert new published newsletter.
             $sql = "INSERT INTO published_newsletter (newsletter_content, date_published, user_id) 
             VALUES (:newsletter_content, :date_published, :user_id)";
 
@@ -51,13 +52,17 @@ class PublishNewsletter extends Verify
             ]);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Get id of last inserted item.
             $last_id = $db->getLastId();
 
-            // Initialise the SQL command and parameters to modify data of newsletter items.
+            // End step 1.
+            
+            // Step 2. Update published_newsletter_id for newsletter_items that were in the published newsletter.
             $array = json_decode($_POST["newsletter_items"]);
 
             if($array == null){
-                throw new BadRequest("Incorrect format of newsletter_items array.");
+                throw new ClientErrorException("Incorrect format of newsletter_items array.");
             }
 
             $in = join(',', array_fill(0, count($array), '?'));
@@ -68,7 +73,16 @@ class PublishNewsletter extends Verify
                 array_merge(array($last_id), $array)
             );
 
-            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw exception if there is a difference in updated items and length of array with items to update.
+            if($data != count($array)){
+                if(count($array) == 1 and $data[0] != null){
+                    throw new ClientErrorException("Problem with updating newsletter_item occured.");
+                }
+            }
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();

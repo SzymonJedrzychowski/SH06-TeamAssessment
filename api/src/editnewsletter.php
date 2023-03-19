@@ -13,7 +13,8 @@ class EditNewsletter extends Verify
     /**
      * Override the __construct method to match the requirements of the /editnewsletter endpoint.
      *
-     * @throws BadRequest           If request method is incorrect.
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     public  function __construct()
     {
@@ -30,6 +31,7 @@ class EditNewsletter extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
+        // Throw exception if user is not editor or admin.
         if(!in_array($tokenData->auth, ["2", "3"])){
             throw new BadRequest("Only editor and admin can modify the newsletter.");
         }
@@ -38,8 +40,7 @@ class EditNewsletter extends Verify
         $db->beginTransaction();
 
         try {
-
-            // Initialise the SQL command and parameters to insert new data to database.
+            // Step 1. Update the content of the published newsletter.
             $sql = "UPDATE published_newsletter SET newsletter_content = :newsletter_content WHERE newsletter_id = :newsletter_id";
 
             $this->setSQLCommand($sql);
@@ -48,9 +49,16 @@ class EditNewsletter extends Verify
                 'newsletter_content' => $_POST['newsletter_content']
             ]);
 
-            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // Initialise the SQL command and parameters to insert new data to database.
+            // Check if row with given newsletter_id was found.
+            if($data == 0){
+                throw new ClientErrorException("Problem with getting published_newsletter occured.");
+            }
+
+            // End step 1.
+
+            // Step 2. Update values of published_newsletter_id for newsletter_items that were included in the newsletter before.
             $sql = "UPDATE newsletter_item SET published_newsletter_id = :value WHERE published_newsletter_id = :newsletter_id";
 
             $this->setSQLCommand($sql);
@@ -61,7 +69,9 @@ class EditNewsletter extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // Initialise the SQL command and parameters to modify data of newsletter items.
+            // End step 2.
+
+            // Step 3. Update values of published_newsletter_id for newsletter_items that are included in the newsletter now.
             $array = json_decode($_POST["newsletter_items"]);
 
             if ($array == null) {
@@ -76,7 +86,16 @@ class EditNewsletter extends Verify
                 array_merge(array($_POST['newsletter_id']), $array)
             );
 
-            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw exception if there is a difference in updated items and length of array with items to update.
+            if($data != count($array)){
+                if(count($array) == 1 and $data[0] != null){
+                    throw new ClientErrorException("Problem with updating newsletter_item occured.");
+                }
+            }
+
+            // End step 3.
 
             // Commit the transaction.
             $db->commitTransaction();

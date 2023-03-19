@@ -32,6 +32,7 @@ class AddTag extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
+        // Throw exception if user is not editor or admin.
         if (!in_array($tokenData->auth, ["2", "3"])) {
             throw new BadRequest("Only editor and admin can edit tags.");
         }
@@ -40,6 +41,7 @@ class AddTag extends Verify
         $db->beginTransaction();
 
         try {
+            // Step 1. Check if tag with given name already exists.
             $sql = "SELECT * FROM tag WHERE tag_name = :tag_name";
 
             $this->setSQLCommand($sql);
@@ -49,10 +51,14 @@ class AddTag extends Verify
 
             $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
+            // Throw exception if tag with given name exists.
             if (count($data) > 0) {
-                throw new Exception("EM: Tag with given name already exists");
+                throw new BadRequest("EM: Tag with given name already exists");
             }
 
+            // End step 1.
+
+            // Step 2. Insert new tag.
             $sql = "INSERT INTO tag (tag_name) VALUES (:tag_name)";
 
             $this->setSQLCommand($sql);
@@ -61,6 +67,7 @@ class AddTag extends Verify
             ]);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();
@@ -82,9 +89,13 @@ class AddTag extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('tag_name');
         $this->checkRequiredParameters($requiredParameters);
+
+        if(strlen($_POST['tag_name']) == 0){
+            throw new ClientErrorException("tag_name must be longer than 0 characters.");
+        }
     }
 
     /**

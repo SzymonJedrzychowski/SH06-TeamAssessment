@@ -10,6 +10,7 @@ use FirebaseJWT\Key;
  *  and returning name of current user.
  *
  * @author Mikolaj Furmanczak
+ * @author Szymon Jedrzychowski
  */
 class Verify extends Endpoint
 {

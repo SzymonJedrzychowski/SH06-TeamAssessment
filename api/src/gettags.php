@@ -20,7 +20,7 @@ class GetTags extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("GET");
 
-        // Create SQL command to get newsleter items.
+        // Create SQL command to get tags.
         $sql = "SELECT tag_id, tag_name FROM tag";
         $params = array();
 
