@@ -287,7 +287,7 @@ const ManageTags = (props) => {
                     <TableHead>
                         <TableRow>
                             <TableCell>#</TableCell>
-                            <TableCell>Tag name</TableCell>
+                            <TableCell width="80%">Tag name</TableCell>
                             <TableCell></TableCell>
                             <TableCell></TableCell>
                         </TableRow>
