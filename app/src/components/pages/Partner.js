@@ -190,7 +190,7 @@ const Partner = (props) => {
             // --Items
             const createItemBox = (value) => {
                 let suggestionMade = false;
-                if (value.item_checked == "1"){
+                if (value.item_checked === "1"){
                     suggestionMade = true;
                 }
                 console.log(suggestionMade);
