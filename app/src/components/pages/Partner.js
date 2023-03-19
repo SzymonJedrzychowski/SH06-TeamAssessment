@@ -139,7 +139,7 @@ const Partner = (props) => {
     
         // -Other
         const uploadConfirm = () => {
-            setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, uplaod now.", "No, do not upload."]);
+            setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, upload now.", "No, do not upload."]);
         }
 
         const uploadItem = () => {
@@ -166,9 +166,11 @@ const Partner = (props) => {
                     (json) => {
                         if (json.message !== "Success") {
                             console.log(json);
+                            setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
                         }
                         else if (json.message === "Success"){
-                            console.log("Success, pop up here") //TODO
+                            console.log("Success") //TODO popups
+                            setInformData([true, () => {resetInformData()}, "Upload Successful.", []]);
                         }
                     })
                 .catch(
