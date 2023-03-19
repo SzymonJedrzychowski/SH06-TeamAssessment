@@ -39,17 +39,15 @@ function App() {
 
           <Route path="/partner" element={<Partner/>}/>
           <Route path="/partnerEditItem" element={<PartnerEditItem/>}/>
-
           <Route path="/editorial" element={<Editorial dialogData={dialogData()}/>}/>
           <Route path="/checkItem" element={<CheckItem dialogData={dialogData()}/>}/>
           <Route path="/suggestChanges" element={<SuggestChanges dialogData={dialogData()}/>}/>
           <Route path="/publish" element={<Publish dialogData={dialogData()}/>}/>
           <Route path="/editPrevious" element={<EditPrevious dialogData={dialogData()}/>}/>
           <Route path="/manageTags" element={<ManageTags dialogData={dialogData()}/>}/>
-
-          <Route path="/createAccount" element={<CreateAccount/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/signUp" element={<SignUp/>}/>
+          <Route path="/createAccount" element={<CreateAccount dialogData={dialogData()}/>}/>
+          <Route path="/login" element={<Login dialogData={dialogData()}/>}/>
+          <Route path="/signUp" element={<SignUp dialogData={dialogData()}/>}/>
           
           <Route path="*" element={<p>Not found</p>} />
         </Routes>
