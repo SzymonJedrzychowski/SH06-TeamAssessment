@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {Markup} from 'interweave';
-import {Link, useNavigate} from 'react-router-dom';
+import { Markup } from 'interweave';
+import { Link, useNavigate } from 'react-router-dom';
 import { Editor } from 'react-draft-wysiwyg';
-import {Button} from '@mui/material';
+import TextEditor from "./TextEditor";
+import { Button } from '@mui/material';
+import draftToHtml from 'draftjs-to-html';
+import { convertToRaw } from 'draft-js';
 
 /**
  * Partner page
@@ -21,6 +24,8 @@ const Partner = (props) => {
     const [showPublished, setShowPublished] = useState(false);
     const [itemsInReview, setItemsInReview] = useState([]);
     const [itemsFilter, setItemsFilter] = useState([null]);
+    const [editorContent, setEditorContent] = useState(null);
+    const [editorTitle, setEditorTitle] = useState("Title goes here!")
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -149,9 +154,9 @@ const Partner = (props) => {
             const offset = yourDate.getTimezoneOffset();
             yourDate = new Date(yourDate.getTime() - (offset * 60 * 1000));
 
-            formData.append('content', 'Example Text Content');//JSON.stringify(files)); //TODO draftToHtml(convertToRaw(contentState.getCurrentContent()
-            formData.append('date_uploaded', 'Example date'); //yourDate.toISOString().split('T')[0]);
-            formData.append('item_title', 'Example title'); //TODO
+            formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
+            formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
+            formData.append('item_title', editorTitle); //TODO
             console.log(formData);
             fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
@@ -169,7 +174,7 @@ const Partner = (props) => {
                             setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
                         }
                         else if (json.message === "Success"){
-                            console.log("Success") //TODO popups
+                            console.log("Success")
                             setInformData([true, () => {resetInformData()}, "Upload Successful.", []]);
                         }
                     })
@@ -205,13 +210,20 @@ const Partner = (props) => {
 
         // -Contribute
         const contributeSection = <div className = 'PartnerContribute'>
-        <h2 className = 'PartnerContributeTitle'>Your item</h2>
+        <div className = 'PartnerContributeTitle'>Contribute an item
+        <input 
+            type = 'title'
+            content = {editorTitle}
+            setContent = {setEditorTitle}
+            />
+        </div>
+        
         <div className = 'PartnerContributeBox'>
             Box goes here.
-            <Editor
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-                editorClassName="editorClassName"
+            <TextEditor
+                type = 'content'
+                content = {editorContent}
+                setContent = {setEditorContent}
             />
         </div>
         {<button onClick = {uploadConfirm}>Upload</button>}
@@ -286,15 +298,7 @@ const Partner = (props) => {
                 </div>
             </div>}
             
-            {/* {(!loading && !authenticated && localStorage.getItem('token') === undefined) && 
-                <div className = 'PartnerNonAuthenticated'>
-                    <h1>Please log in or sign up to contribute</h1>
-                </div>}
 
-            {(!loading && !authenticated) && 
-                <div className = 'PartnerNonAuthenticated2'>
-                    <h1>Please log in or sign up to contribute</h1>
-                </div>} */}
         </div>
         
     )
