@@ -23,7 +23,7 @@ const Partner = (props) => {
     const [showReview, setShowReview] = useState(false);
     const [showPublished, setShowPublished] = useState(false);
     const [itemsInReview, setItemsInReview] = useState([]);
-    const [itemsFilter, setItemsFilter] = useState([null]);
+    const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
     const [editorContent, setEditorContent] = useState(null);
     const [editorTitle, setEditorTitle] = useState("Title goes here!")
 
@@ -101,11 +101,11 @@ const Partner = (props) => {
 
     // Other variables
     const checkValues = {
-        "-1" : "Rejected",
+        "-1" : "Removed",
         "0"  : "In review",
-        "1"  : "Edit requested!",
+        "1"  : "Edit requested!", //TODO Update
         "2"  : "In review",
-        "3"  : "In review"
+        "3"  : "Approved"
     }
 
     const setInformData = props.dialogData.setInformData;
@@ -252,10 +252,10 @@ const Partner = (props) => {
         const reviewSection = <div className = 'PartnerReview'>
         <div className = 'PartnerReviewFilters'>
             <ul>
-                <button onClick = {()=>setItemsFilter([null])}>All</button>
-                <button onClick = {()=>setItemsFilter(["3"])}>Accepted</button>
                 <button onClick = {()=>setItemsFilter(["0", "1", "2"])}>Pending</button>
-                <button onClick = {()=>setItemsFilter(["-1"])}>Rejected</button>
+                <button onClick = {()=>setItemsFilter(["3"])}>Accepted</button>
+                <button onClick = {()=>setItemsFilter(["-1"])}>Removed</button>
+                <button onClick = {()=>setItemsFilter([null])}>All</button>
             </ul>
         </div>
         <div className = 'PartnerReviewLoading'>
