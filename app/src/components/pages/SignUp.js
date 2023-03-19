@@ -2,23 +2,43 @@ import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { ListItem } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-function SignUp() {  
-    const handleSubmit = (event) => {
-      event.preventDefault();  
+const SignUp = (props) => {  
+  const setInformData = props.dialogData.setInformData;
+  const resetInformData = props.dialogData.resetInformData;
 
-      const formData = new FormData();
-      formData.append("subscriber_email", event.target.subscriber_email.value);
+  const navigate = useNavigate();
 
-      fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/addsubscriber", {
-        method: "POST",
-        body: formData,
-      })    
-      .then((response) => response.json())
-      .then(
-        (json) => console.log(json)
-      )
-      };     
+  const handleSubmit = (event) => {
+    event.preventDefault();  
+
+    const formData = new FormData();
+    formData.append("subscriber_email", event.target.subscriber_email.value);
+
+    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/addsubscriber", {
+      method: "POST",
+      body: formData,
+    })    
+    .then((response) => response.json())
+    .then(
+      (json) => {
+        if (json.message === "Success") {
+          console.log("Success: ");
+          setInformData([true, () => {resetInformData(); navigate("/homepage")}, "Success", 
+          ["You have successfully subscribed to the newsletter!"]]);
+        } else {
+          console.log("Not success: ");
+          // Make dialog boxes appear with the error message
+        }
+      }
+    )
+    .catch(
+      (e) => {
+          console.log(e.message)
+      }
+    )
+  };     
   
     return (
       <form onSubmit={handleSubmit} alignItems="center">

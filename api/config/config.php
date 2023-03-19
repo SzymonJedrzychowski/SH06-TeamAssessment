@@ -19,3 +19,5 @@ set_error_handler('errorHandler');
 
 include 'autoloader.php';
 spl_autoload_register('autoloader');
+
+define('API_KEY', "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");

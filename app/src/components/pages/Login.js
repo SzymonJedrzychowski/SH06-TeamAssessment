@@ -8,25 +8,23 @@ import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 
-function Login(props) {
+const Login = (props) =>  {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const setInformData = props.dialogData.setInformData;
-  // const setAlertData = props.dialogData.setAlertData;
   const resetInformData = props.dialogData.resetInformData;
 
-  // Handler for username value.
+  const navigate = useNavigate();
+
   const handleEmail = (event) => {
     setEmail(event.target.value);
   }
 
-  // Handler for password value.
   const handlePassword = (event) => {
     setPassword(event.target.value);
   }
-  const navigate = useNavigate();
-
+  
   const handleSubmit = (event) => {
     event.preventDefault();
     const encodedString = Buffer.from(email + ":" + password).toString('base64');
@@ -40,13 +38,20 @@ function Login(props) {
         if (json.message === "Success") {
           console.log("Success: ");
           localStorage.setItem('token', json.data.token);
+          setInformData([true, () => {resetInformData(); navigate("/homepage")}, "Success", 
+          ["You have successfully logged in! You will be redirected to the homepage."]]);
         } else {
           console.log("Not success: ");
           localStorage.removeItem('token');
+          // Make dialog boxes appear with the error message
         }
-        console.log(json);
       })
-  };
+      .catch(
+        (e) => {
+            console.log(e.message)
+        }
+      )
+    };     
 
   return (
     <form onSubmit={handleSubmit} alignItems="center">

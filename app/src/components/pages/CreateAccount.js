@@ -3,8 +3,14 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import { ListItem } from "@mui/material";
 import { Grid } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-function CreateUser() {
+const CreateUser = (props) => {
+  const setInformData = props.dialogData.setInformData;
+  const resetInformData = props.dialogData.resetInformData;
+
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();  
 
@@ -21,7 +27,21 @@ function CreateUser() {
     })
     .then((response) => response.json())
     .then(
-      (json) => console.log(json)
+      (json) => {
+        if (json.message === "Success") {
+          console.log("Success: ");
+          setInformData([true, () => {resetInformData(); navigate("/login")}, "Success", 
+          ["You have successfully created your account! Now you can log in."]]);
+        } else {
+          console.log("Not success: ");
+          // Make dialog boxes appear with the error message
+        }
+      }
+    )
+    .catch(
+      (e) => {
+          console.log(e.message)
+      }
     )
   };     
 

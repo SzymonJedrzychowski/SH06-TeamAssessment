@@ -155,12 +155,6 @@ const Navbar = () => {
             </MenuItem>
             <MenuItem
               component={RouterLink}
-              to='/createAccount'
-            >
-              Create Account
-            </MenuItem>
-            <MenuItem
-              component={RouterLink}
               to='/signUp'
             >
               Sign Up For The Newsletter

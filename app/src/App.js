@@ -47,9 +47,9 @@ function App() {
           <Route path="/publish" element={<Publish dialogData={dialogData()}/>}/>
           <Route path="/editPrevious" element={<EditPrevious dialogData={dialogData()}/>}/>
           <Route path="/manageTags" element={<ManageTags dialogData={dialogData()}/>}/>
-          <Route path="/createAccount" element={<CreateAccount/>}/>
+          <Route path="/createAccount" element={<CreateAccount dialogData={dialogData()}/>}/>
           <Route path="/login" element={<Login dialogData={dialogData()}/>}/>
-          <Route path="/signUp" element={<SignUp/>}/>
+          <Route path="/signUp" element={<SignUp dialogData={dialogData()}/>}/>
           
           <Route path="*" element={<p>Not found</p>} />
         </Routes>
