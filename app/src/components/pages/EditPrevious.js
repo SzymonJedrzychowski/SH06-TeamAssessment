@@ -1,19 +1,44 @@
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, Box } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-const EditPrevious = () => {
+const EditPrevious = (props) => {
     const [newsletters, setNewsletters] = useState([]);
-    const [authenticated, setAuthenticated] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const navigate = useNavigate();
+
+    const setInformData = props.dialogData.setInformData;
+    const resetInformData = props.dialogData.resetInformData;
+
     const boxStyling = {
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         rowGap: "10px",
         padding: 3
     };
+
+    const loadData = () => {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters")
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        setNewsletters(json.data);
+                        setLoading(false);
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+    }
 
     useEffect(() => {
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
@@ -27,38 +52,15 @@ const EditPrevious = () => {
                 (json) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
-                            setAuthenticated(true);
+                            loadData();
                         } else {
-                            setAuthenticated(false);
-                            setLoading(false);
-                            return;
+                            setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
                         }
+                    } else if (json.message === "Log in session is ending.") {
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
+                        localStorage.removeItem("token");
                     } else {
-                        console.log(json);
-                        localStorage.removeItem('token');
-                        setAuthenticated(false);
-                        setLoading(false);
-                        return;
-                    }
-                }
-            )
-            .catch(
-                (e) => {
-                    console.log(e.message)
-                }
-            )
-
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters")
-            .then(
-                (response) => response.json()
-            )
-            .then(
-                (json) => {
-                    if(json.message === "Success"){
-                        setNewsletters(json.data);
-                        setLoading(false);
-                    }else{
-                        console.log(json);
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
                     }
                 }
             )
@@ -79,7 +81,7 @@ const EditPrevious = () => {
     }
 
     return <Box sx={boxStyling}>
-        {(!loading && authenticated) && <TableContainer component={Paper}><Table>
+        {!loading && <TableContainer component={Paper}><Table>
             <TableHead>
                 <TableRow>
                     <TableCell>Newsletter ID</TableCell>
@@ -94,12 +96,6 @@ const EditPrevious = () => {
                 )}
             </TableBody>
         </Table></TableContainer>}
-        {(!loading && !authenticated && localStorage.getItem('token') === undefined) &&
-            <p>You are not logged in.</p>
-        }
-        {(!loading && !authenticated && localStorage.getItem('token') !== undefined) &&
-            <p>You don't have access to this page.</p>
-        }
     </Box>;
 }
 

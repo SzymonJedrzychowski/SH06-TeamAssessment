@@ -1,83 +1,93 @@
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom"
-import ListGroup from "react-bootstrap/ListGroup";
-import { Box, Button } from "@mui/material";
-import TextEditor from "./TextEditor";
-import { useState } from "react";
-import { EditorState, ContentState } from 'draft-js';
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
+import { EditorState, ContentState, convertToRaw } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
-import { convertToRaw } from "draft-js";
 import draftToHtml from 'draftjs-to-html';
 
-const SuggestChanges = () => {
+import TextEditor from "./TextEditor";
+
+const SuggestChanges = (props) => {
     const item = useLocation();
     const navigate = useNavigate();
-
-    const contentBlock = htmlToDraft(item.state.content);
-    const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-    const [contentState, setContentState] = useState(() => EditorState.createWithContent(content));
+    const [newsletterItem, setNewsletterItem] = useState(null);
+    const [contentState, setContentState] = useState(null);
     const [commentState, setCommentState] = useState(() => EditorState.createEmpty());
-    const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const suggestChange = () => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
-        {
-            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
-        })
-        .then(
-            (response) => response.json()
-        )
-        .then(
-            (json) => {
-                if (json.message === "Success") {
-                    if (["2", "3"].includes(json.data[0]["authorisation"])) {
-                        setAuthenticated(true);
-                    } else {
-                        setAuthenticated(false);
-                        setLoading(false);
-                        return;
-                    }
-                } else {
-                    console.log(json)
-                    localStorage.removeItem('token');
-                    setAuthenticated(false);
-                    setLoading(false);
-                    return;
-                }
-            }
-        )
-        .catch(
-            (e) => {
-                console.log(e.message)
-            }
-        )
+    const setInformData = props.dialogData.setInformData;
+    const setAlertData = props.dialogData.setAlertData;
+    const resetInformData = props.dialogData.resetInformData;
 
-        const formData = new FormData();
-        formData.append('item_checked', 1);
-        formData.append('item_id', item.state.item_id);
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
+    const loadData = () => {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
-                method: 'POST',
-                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
-                body: formData
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
             .then(
                 (response) => response.json()
             )
-            .then((json) => {
-                if (json.message !== "Success") {
-                    console.log(json);
-                    localStorage.removeItem('token');
-                    setAuthenticated(false);
+            .then(
+                (json) => {
+                    if (json.message === "Success" && json.data.length === 1) {
+                        setNewsletterItem(json.data[0]);
+                        const contentBlock = htmlToDraft(json.data[0]["content"]);
+                        const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+                        setContentState(EditorState.createWithContent(content));
+                        setLoading(false);
+                    } else if (json.message === "Success" && json.data.length === 0) {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
                 }
-            })
+            )
             .catch(
                 (e) => {
                     console.log(e.message)
-                })
+                }
+            )
+    }
 
+    useEffect(() => {
+        if (!item.state) {
+            navigate("/editorial");
+            return;
+        }
+
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success") {
+                        if (["2", "3"].includes(json.data[0]["authorisation"])) {
+                            loadData();
+                        } else {
+                            setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
+                        }
+                    } else if (json.message === "Log in session is ending.") {
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["Authentication session has ended.", "You will be redirected to login screen."]])
+                        localStorage.removeItem("token");
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/login") }, "Log in", ["You are not logged in.", "You will be redirected to login screen."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+    }, []);
+
+    const suggestChange = () => {
         const changeData = new FormData();
-        changeData.append('item_id', item.state.item_id);
+        changeData.append('item_id', item.state);
         changeData.append('suggestion_content', draftToHtml(convertToRaw(contentState.getCurrentContent())));
         changeData.append('suggestion_comment', draftToHtml(convertToRaw(commentState.getCurrentContent())));
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewslettersuggestion",
@@ -90,58 +100,92 @@ const SuggestChanges = () => {
                 (response) => response.json()
             )
             .then((json) => {
-                if (json.message !== "Success") {
-                    console.log(json);
-                    localStorage.removeItem('token');
-                    setAuthenticated(false);
+                if (json.message === "Success") {
+                    setInformData([true, () => { resetInformData(); navigate(-1) }, "Success", ["Suggestion was sent. You can now leave the page."]])
+                } else {
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                 }
             })
             .catch(
                 (e) => {
                     console.log(e.message)
                 })
-
-        navigate(-1);
     }
 
 
     const boxStyling = {
-        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
         padding: 3
     };
 
+    const handleClose = (confirmation) => {
+        setAlertData([false, null, null, null, null, null]);
+        if (confirmation.target.value === "true") {
+            navigate(-1);
+        }
+    }
+
+    const handleReturn = () => {
+        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to leave without submiting?", ["All changes will be lost when you leave."], "Leave", "Stay"])
+    }
+
     return <Box sx={boxStyling}>
-        {(!loading && authenticated) && <ListGroup>
-            <ListGroup.Item>
-                {item.state.item_title}
-            </ListGroup.Item>
-            <ListGroup.Item>
-                {item.state.first_name} {item.state.last_name}
-            </ListGroup.Item>
-            <ListGroup.Item>
-                {item.state.organisation_name}
-            </ListGroup.Item>
-            <ListGroup.Item>
-                <h3>Content</h3>
-                <TextEditor content={contentState} setContent={setContentState} />
-            </ListGroup.Item>
-            <ListGroup.Item>
-                <h3>Comment</h3>
-                <TextEditor content={commentState} setContent={setCommentState} />
-            </ListGroup.Item>
-            <ListGroup.Item>
-                <Button variant="contained" onClick={suggestChange}>Suggest change</Button><Button variant="contained" onClick={() => navigate(-1)}>Go back</Button>
-            </ListGroup.Item>
-        </ListGroup>}
-        {(!loading && !authenticated && localStorage.getItem('token') === undefined) &&
-            <p>You are not logged in.</p>
+        {!loading && <Box>
+            <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Suggest changes</Typography>
+            <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
+                <Table>
+                    <TableBody>
+                        <TableRow>
+                            <TableCell width={"30%"}>
+                                Item title
+                            </TableCell>
+                            <TableCell>
+                                {newsletterItem["item_title"]}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>
+                                Item author
+                            </TableCell>
+                            <TableCell>
+                                {newsletterItem["first_name"]} {newsletterItem["last_name"]}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell>
+                                Organisation name
+                            </TableCell>
+                            <TableCell>
+                                {newsletterItem["organisation_name"]}
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2}>
+                                <Typography variant="h5" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Content</Typography>
+                                <TextEditor type={"content"} content={contentState} setContent={setContentState} />
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2}>
+                                <Typography variant="h5" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Comment</Typography>
+                                <TextEditor type={"comment"} content={commentState} setContent={setCommentState} />
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell colSpan={2}>
+                                <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "25px", alignItems: "stretch", rowGap: "5px" }}>
+                                    <Button sx={{ minWidth: { xs: "none", sm: "45%" } }} variant="contained" onClick={suggestChange}>Suggest change</Button>
+                                    <Button sx={{ minWidth: { xs: "none", sm: "45%" } }} variant="contained" onClick={handleReturn}>Go back</Button>
+                                </Box>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
         }
-        {(!loading && !authenticated && localStorage.getItem('token') !== undefined) &&
-            <p>You don't have access to this page.</p>
-        }
-    </Box>;
+    </Box >;
 }
 
 export default SuggestChanges;

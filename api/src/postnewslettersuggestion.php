@@ -30,30 +30,49 @@ class PostNewsletterSuggestion extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        if(!in_array($tokenData->auth, ["2", "3"])){
+        if (!in_array($tokenData->auth, ["2", "3"])) {
             throw new BadRequest("Only editor and admin can publish a newsletter suggestion.");
         }
 
-        // Initialise the SQL command and parameters to insert new data to database.
-        $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
-        VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
+        // Start the transaction.
+        $db->beginTransaction();
 
-        $this->setSQLCommand($sql);
-        $this->setSQLParams([
-            'item_id' => $_POST['item_id'],
-            'suggestion_content' => $_POST['suggestion_content'],
-            'suggestion_comment' => $_POST['suggestion_comment'],
-            'user_id' => $tokenData->sub
-        ]);
+        try {
+            $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
+                VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
 
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'item_id' => $_POST['item_id'],
+                'suggestion_content' => $_POST['suggestion_content'],
+                'suggestion_comment' => $_POST['suggestion_comment'],
+                'user_id' => $tokenData->sub
+            ]);
 
-        $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-        $this->setData(array(
-            "length" => 0,
-            "message" => "Success",
-            "data" => null
-        ));
+            $sql = "UPDATE newsletter_item SET item_checked = :item_checked WHERE item_id = :item_id";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'item_id' => $_POST['item_id'],
+                'item_checked' => "1"
+            ]);
+
+            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Commit the transaction.
+            $db->commitTransaction();
+
+            $this->setData(array(
+                "length" => 0,
+                "message" => "Success",
+                "data" => null
+            ));
+        } catch (Exception $e) {
+            $db->rollbackTransaction();
+            throw $e;
+        }
     }
 
     /**
@@ -62,7 +81,7 @@ class PostNewsletterSuggestion extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('item_id', 'suggestion_content', 'suggestion_comment');
         $this->checkRequiredParameters($requiredParameters);
     }

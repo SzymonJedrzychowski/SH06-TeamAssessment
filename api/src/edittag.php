@@ -50,7 +50,7 @@ class EditTag extends Verify
             $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
             if (count($data) > 0) {
-                throw new Exception("Tag with given name already exists.");
+                throw new Exception("EM: Tag with given name already exists");
             }
 
             $sql = "UPDATE tag SET tag_name = :tag_name WHERE tag_id = :tag_id";
