@@ -143,7 +143,38 @@ const Partner = (props) => {
         }
 
         const uploadItem = () => {
-            console.log("Upload");
+            const formData = new FormData();
+
+            let yourDate = new Date();
+            const offset = yourDate.getTimezoneOffset();
+            yourDate = new Date(yourDate.getTime() - (offset * 60 * 1000));
+
+            formData.append('content', 'Example Text Content');//JSON.stringify(files)); //TODO draftToHtml(convertToRaw(contentState.getCurrentContent()
+            formData.append('date_uploaded', 'Example date'); //yourDate.toISOString().split('T')[0]);
+            formData.append('item_title', 'Example title'); //TODO
+            console.log(formData);
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
+                {
+                    method: 'POST',
+                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                    body: formData
+                })
+                .then(
+                    (response) => response.json()
+                )
+                .then(
+                    (json) => {
+                        if (json.message !== "Success") {
+                            console.log(json);
+                        }
+                        else if (json.message === "Success"){
+                            console.log("Success, pop up here") //TODO
+                        }
+                    })
+                .catch(
+                    (e) => {
+                        console.log(e.message)
+                    })
         }
 
         const truncateText = (text) => {
@@ -193,7 +224,6 @@ const Partner = (props) => {
                 if (value.item_checked === "1"){
                     suggestionMade = true;
                 }
-                console.log(suggestionMade);
                 const itemContent = <Markup content={value.content}/>
                 return(
                     <div key = {value.item_id}>

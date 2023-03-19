@@ -72,6 +72,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/addsubscriber':
                 $endpoint = new AddSubscriber();
                 break;
+            case '/postnewsletteritem':
+                $endpoint = new PostNewsletterItem();
+                break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);
                 break;
