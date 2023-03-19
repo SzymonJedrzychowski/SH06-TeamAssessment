@@ -10,5 +10,9 @@ export const pages =[
   {
     label : "Editorial",
     path  : "/editorial"
+  },
+  {
+    label : "Join Us",
+    path  : "/signUp"
   }
 ];
