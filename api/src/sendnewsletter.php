@@ -42,7 +42,7 @@ class SendNewsletter extends Endpoint
 
 
         // $sendgrid = new SendGrid(API_KEY);
-        $sendgrid = new SendGrid("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");
+        $sendgrid = new SendGrid("");
         try {
             $response = $sendgrid->send($email);
             print $response->statusCode() . "\n";

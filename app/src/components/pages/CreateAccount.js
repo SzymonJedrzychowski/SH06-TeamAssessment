@@ -21,7 +21,7 @@ const CreateUser = (props) => {
     formData.append("password", event.target.password.value);
     formData.append("confirmPassword", event.target.confirmPassword.value);
 
-    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/adduser", {
+    fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/adduser", {
       method: "POST",
       body : formData,
     })
