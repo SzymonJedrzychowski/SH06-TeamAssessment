@@ -29,7 +29,14 @@ const SignUp = (props) => {
           ["You have successfully subscribed to the newsletter!"]]);
         } else {
           console.log("Not success: ");
-          // Make dialog boxes appear with the error message
+          if(json.message === "Email already exists") {
+            setInformData([true, () => {resetInformData(); navigate("/signup")}, "Error",
+            ["Email already signed up.", "Please try again."]]);
+          }
+          else  {
+            setInformData([true, () => {resetInformData(); navigate("/signup")}, "Error",
+            ["The email is not valid.", "Please try again."]]);
+          }
         }
       }
     )

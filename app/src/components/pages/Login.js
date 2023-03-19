@@ -9,13 +9,13 @@ import { useNavigate } from "react-router-dom";
 
 
 const Login = (props) =>  {
+  const setInformData = props.dialogData.setInformData;
+  const resetInformData = props.dialogData.resetInformData;
+  const navigate = useNavigate();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const setInformData = props.dialogData.setInformData;
-  const resetInformData = props.dialogData.resetInformData;
-
-  const navigate = useNavigate();
 
   const handleEmail = (event) => {
     setEmail(event.target.value);
