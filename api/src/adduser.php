@@ -86,7 +86,7 @@ class AddUser extends Endpoint
     private function validateParameters()
     {   
         // Check if required parameters are present.
-        $requiredParameters = array("email", "first_name","last_name","password","confirmPassword");
+        $requiredParameters = array("email", "first_name","last_name","password","confirm_password");
         foreach ($requiredParameters as &$value) {
             if (!filter_has_var(INPUT_POST, $value) || empty($_POST[$value]) ) {
                 throw new ClientErrorException($value . " parameter required", 400);
@@ -101,7 +101,7 @@ class AddUser extends Endpoint
             throw new ClientErrorException("Password must be at least 8 characters long", 400);
         }
         // Check if password and confirmed password match.
-        if ($_POST["password"] != $_POST["confirmPassword"]) {
+        if ($_POST["password"] != $_POST["confirm_password"]) {
             throw new ClientErrorException("Passwords do not match", 400);
         }
     }

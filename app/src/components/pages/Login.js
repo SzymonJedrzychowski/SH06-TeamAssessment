@@ -38,12 +38,15 @@ const Login = (props) =>  {
         if (json.message === "Success") {
           console.log("Success: ");
           localStorage.setItem('token', json.data.token);
-          setInformData([true, () => {resetInformData(); navigate("/homepage")}, "Success", 
-          ["You have successfully logged in! You will be redirected to the homepage."]]);
+          setInformData([true, () => {resetInformData(); navigate("/partner")}, "Success", 
+          ["You have successfully logged in!", "You will be redirected to the partner page."]]);
         } else {
           console.log("Not success: ");
           localStorage.removeItem('token');
-          // Make dialog boxes appear with the error message
+          if (json.message === "Incorrect credentials.") {
+            setInformData([true, () => {resetInformData(); navigate("/login")}, "Error",
+            ["Incorrect credentials.", "Please try again."]]);           
+          }
         }
       })
       .catch(

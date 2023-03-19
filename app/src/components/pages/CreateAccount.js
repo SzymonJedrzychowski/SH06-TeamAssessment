@@ -8,7 +8,6 @@ import { useNavigate } from "react-router-dom";
 const CreateUser = (props) => {
   const setInformData = props.dialogData.setInformData;
   const resetInformData = props.dialogData.resetInformData;
-
   const navigate = useNavigate();
 
   const handleSubmit = (event) => {
@@ -19,7 +18,7 @@ const CreateUser = (props) => {
     formData.append("first_name", event.target.first_name.value);
     formData.append("last_name", event.target.last_name.value);
     formData.append("password", event.target.password.value);
-    formData.append("confirmPassword", event.target.confirmPassword.value);
+    formData.append("confirm_password", event.target.confirm_password.value);
 
     fetch("http://unn-w20027449.newnumyspace.co.uk/teamAssessment/api/adduser", {
       method: "POST",
@@ -31,12 +30,51 @@ const CreateUser = (props) => {
         if (json.message === "Success") {
           console.log("Success: ");
           setInformData([true, () => {resetInformData(); navigate("/login")}, "Success", 
-          ["You have successfully created your account! Now you can log in."]]);
+          ["You have successfully created your account!", "Now you can log in."]]);
         } else {
           console.log("Not success: ");
-          // Make dialog boxes appear with the error message
-        }
+           if (json.message === "email parameter required") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["The email is required.", "Please try again."]]);
+          }
+          else if (json.message === "Email already exists") {
+            setInformData([true, () => {resetInformData(); navigate("/login")}, "Error", 
+            ["This email is already in use.", "Try logging in."]]);
+          }
+          else if (json.message === "Email is not valid") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["This email is not valid.", "Please enter a valid email."]]);
+          }
+          else if (json.message === "Domain does not exist") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error", 
+            ["You are not allowed to create an account using this domain.", "Please use different one."]]);
+          }
+          else if (json.message === "first_name parameter required") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["The first name is required.", "Please try again."]]);
+          }
+          else if (json.message === "last_name parameter required") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["The last name is required.", "Please try again."]]);
+          }
+          else if (json.message === "password parameter required") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["The password is required.", "Please try again."]]);
+          }
+          else if (json.message === "Password must be at least 8 characters long") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["The password must be at least 8 characters long.", "Please try again."]]);
+          }
+          else if (json.message === "confirm_password parameter required") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["The password confirmation is required.", "Please try again."]]);
+          }
+          else if (json.message === "Passwords do not match") {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error", 
+            ["The passwords do not match.", "Please try again."]]);
+          }
       }
+    }
     )
     .catch(
       (e) => {
@@ -48,10 +86,10 @@ const CreateUser = (props) => {
   return (
     
 
-    <form onSubmit={handleSubmit} alignItems="center">
+    <form onSubmit={handleSubmit}>
       <Box
         display="grid"
-        width="50%"
+        width="45%"
         margin="0 auto"
         marginTop={"8vh"}
       >
@@ -98,7 +136,7 @@ const CreateUser = (props) => {
               name="password"
               variant="outlined"
               fullWidth
-              margin="0"
+              margin="none"
             />
           </Grid>
     
@@ -106,10 +144,10 @@ const CreateUser = (props) => {
             <TextField
               label="Confirm Password"
               type="password"
-              name="confirmPassword"
+              name="confirm_password"
               variant="outlined"
               fullWidth
-              margin="0"
+              margin="none"
             />
           </Grid>
         </Grid>
