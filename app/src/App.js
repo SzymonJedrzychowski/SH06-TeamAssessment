@@ -1,7 +1,6 @@
 import { Routes, Route } from "react-router-dom";
+import { useState } from "react";
 
-// Import styling.
-import './styles/App.css'
 import Homepage from "./components/pages/Homepage";
 import Partner from "./components/pages/Partner";
 import PartnerEditItem from "./components/pages/PartnerEditItem";
@@ -16,7 +15,6 @@ import CreateAccount from "./components/pages/CreateAccount";
 import Login from "./components/pages/Login";
 import SignUp from "./components/pages/SignUp";
 import ManageTags from "./components/pages/ManageTags";
-import { useState } from "react";
 import InformationDialog from "./components/pages/InformationDialog";
 import AlertDialog from "./components/pages/AlertDialog";
 
@@ -50,10 +48,9 @@ function App() {
           <Route path="/publish" element={<Publish dialogData={dialogData()}/>}/>
           <Route path="/editPrevious" element={<EditPrevious dialogData={dialogData()}/>}/>
           <Route path="/manageTags" element={<ManageTags dialogData={dialogData()}/>}/>
-
-          <Route path="/createAccount" element={<CreateAccount/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/signUp" element={<SignUp/>}/>
+          <Route path="/createAccount" element={<CreateAccount dialogData={dialogData()}/>}/>
+          <Route path="/login" element={<Login dialogData={dialogData()}/>}/>
+          <Route path="/signUp" element={<SignUp dialogData={dialogData()}/>}/>
           
           <Route path="*" element={<p>Not found</p>} />
         </Routes>

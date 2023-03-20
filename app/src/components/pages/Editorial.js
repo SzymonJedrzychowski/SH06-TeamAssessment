@@ -1,20 +1,47 @@
-import { useState, useEffect } from 'react';
+import { Box, Button, Checkbox, FormControl, InputLabel, ListItemText, MenuItem, OutlinedInput, Paper, Select, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, TextField, Tooltip, Typography } from "@mui/material";
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from "react-router-dom";
-import { TablePagination, Select, Box, Table, TableBody, TableCell, TableContainer, TableHead, TextField, TableRow, Paper, Button, MenuItem, Checkbox, ListItemText, OutlinedInput, InputLabel, FormControl, Typography, Tooltip } from "@mui/material";
 
+/**
+ * Editorial
+ * 
+ * Responsible for displaying page /editorial.
+ * /editorial is a main page for editor role. It allows the editor to go to pages to publish or edit newsletter or edit tags.
+ * On /editorial page, newsletter items are displayed with their status and button to redirect the editor to /checkItem.
+ * 
+ * @author Szymon Jedrzychowski
+ * Code for Multiple select option (displayed and function handleChange) based on the example code from https://mui.com/material-ui/react-select/ (Access date: 14/03/2023)
+ * Code for TablePagination based on https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14/03/2023)
+ * 
+ * @param {*} props
+ *                  dialogData  data and handlers for managing the information and alert dialogs.
+ */
 const Editorial = (props) => {
+    //Hook to hold data of all newsletter items
     const [newsletterItems, setNewsletterItems] = useState([]);
-    const [loading, setLoading] = useState(0);
+
+    //Hook to hold authorisation level
+    const [authorisation, setAuthorisation] = useState(null);
+
+    //Hook to determine if page fully loaded the data
+    const [loading, setLoading] = useState(true);
+
+    //Hooks to use for Pagination (page - current page, rows - number of items on page)
     const [page, setPage] = useState(0);
     const [rows, setRows] = useState(5);
+
+    //Hooks for data filtering (statusSearch - status filter, search - text filter)
     const [statusSearch, setStatusSearch] = useState(["0", "1", "2", "3"]);
     const [search, setSearch] = useState('');
 
+    //Hook to navigate between pages
+    const navigate = useNavigate();
+
+    //Handlers for the information dialog
     const setInformData = props.dialogData.setInformData;
     const resetInformData = props.dialogData.resetInformData;
 
-    const navigate = useNavigate();
-
+    //Text to displayed based on the status of the item
     const checkValues = {
         "0": "Unchecked",
         "1": "Suggestions made",
@@ -22,18 +49,9 @@ const Editorial = (props) => {
         "3": "Ready"
     }
 
-    const createRow = (value) => {
-        return <TableRow key={value.item_id}>
-            <TableCell>{value.item_title}</TableCell>
-            <TableCell>{value.first_name} {value.last_name}</TableCell>
-            <TableCell>{value.organisation_name}</TableCell>
-            <TableCell>{value.date_uploaded}</TableCell>
-            <TableCell>{checkValues[value.item_checked]}</TableCell>
-            <TableCell><Button variant="contained" component={Link} to={"/checkItem"} state={value.item_id}>View</Button></TableCell>
-        </TableRow>;
-    }
-
+    //Function that loads all data for the page
     const loadData = () => {
+        //Loading all unpublished newsletter items
         fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?published=false",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
@@ -58,7 +76,9 @@ const Editorial = (props) => {
             )
     }
 
+    //Hook used to load the data and verify if user can see the page on renders
     useEffect(() => {
+        //Verifying the privileges of the logged user (only Editor and Admin can access the page)
         fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
@@ -71,6 +91,7 @@ const Editorial = (props) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
                             loadData();
+                            setAuthorisation(json.data[0]["authorisation"]);
                         } else {
                             setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
                         }
@@ -89,6 +110,7 @@ const Editorial = (props) => {
             )
     }, []);
 
+    //Function used to filter the displayed newsletter items based on the 2 filters
     const filterItems = (value) => (
         (value.item_title.toLowerCase().includes(search.toLowerCase()) ||
             value.first_name.toLowerCase().includes(search.toLowerCase()) ||
@@ -97,35 +119,49 @@ const Editorial = (props) => {
             value.organisation_name.toLowerCase().includes(search.toLowerCase())) &&
         statusSearch.includes(value.item_checked));
 
+    //Function necessary for the multiple select component (that changes the statusSearch variable based on currently selected options)
     const handleChange = (event) => {
         setStatusSearch(
             typeof event.target.value === 'string' ? event.target.value.split(',') : event.target.value,
         );
     };
 
+    //Variable to hold the filtered newsletter items 
     let itemsToShow = null;
     if (newsletterItems !== null) {
         itemsToShow = newsletterItems.filter(filterItems);
     }
 
+    //Style for the page
     const pageStyle = {
         display: "flex",
         flexDirection: "column",
-        rowGap: "10px",
         padding: 3,
         "a:hover": {
             color: "white"
         }
     };
 
+    //Function to create a row for the table with newsletter items
+    const createRow = (value) => {
+        return <TableRow key={value.item_id}>
+            <TableCell>{value.item_title}</TableCell>
+            <TableCell>{value.first_name} {value.last_name}</TableCell>
+            <TableCell>{value.organisation_name}</TableCell>
+            <TableCell>{value.date_uploaded}</TableCell>
+            <TableCell>{checkValues[value.item_checked]}</TableCell>
+            <TableCell><Button variant="contained" component={Link} to={"/checkItem"} state={value.item_id}>View</Button></TableCell>
+        </TableRow>;
+    }
+
     return <Box sx={pageStyle}>
         {!loading && <>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Editorial</Typography>
-            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "center" }}>
+            {authorisation === "3" && <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "center" }}>
                 <Button variant="contained" component={Link} to={"/publish"}>Publish newsletter</Button>
                 <Button variant="contained" component={Link} to={"/editPrevious"}>Edit previous newsletters</Button>
                 <Button variant="contained" component={Link} to={"/manageTags"}>Edit tags</Button>
-            </Box>
+            </Box>}
             <Paper sx={{ marginTop: "2em" }}>
                 <Typography variant="h5" sx={{ padding: "10px" }}>Submited newsletter items</Typography>
                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", padding: "10px" }}>

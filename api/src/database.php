@@ -56,6 +56,24 @@ class Database
     }
 
     /**
+     * Method responsible for executing the SQL query and returning number of affected rows.
+     *
+     * @param string    $sql    SQL command.
+     * @param array     $params Parameters for the SQL query.
+     *
+     * @return int Number of affected rows.
+     */
+    public function executeCountedSQL($sql, $params)
+    {
+        // Prepare the SQL query and then execute it.
+        $stmt = $this->dbConnection->prepare($sql);
+        $stmt->execute($params);
+
+        // Return the number of affected rows.
+        return $stmt->rowCount();
+    }
+
+    /**
      * Method responsible for starting a transaction.
      *
      * @return bool Success of transaction start.

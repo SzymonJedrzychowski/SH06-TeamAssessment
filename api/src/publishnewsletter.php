@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /publishnewsletter endpoint.
  *
- * This class reads and validates received parameters
- * and adds posts newsletter to public.
+ * This class is used to publish newsletters.
  *
  * @author Szymon Jedrzychowski
  */
@@ -13,7 +12,8 @@ class PublishNewsletter extends Verify
     /**
      * Override the __construct method to match the requirements of the /publishnewsletter endpoint.
      *
-     * @throws BadRequest           If request method is incorrect.
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     public  function __construct()
     {
@@ -30,16 +30,16 @@ class PublishNewsletter extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        if(!in_array($tokenData->auth, ["2", "3"])){
-            throw new BadRequest("Only editor and admin can publish a newsletter.");
+        // Throw exception if user is not admin.
+        if ($tokenData->auth != "3") {
+            throw new BadRequest("Only admin can publish a newsletter.");
         }
 
         // Start the transaction.
         $db->beginTransaction();
 
         try {
-
-            // Initialise the SQL command and parameters to insert new data to database.
+            // Step 1. Insert new published newsletter.
             $sql = "INSERT INTO published_newsletter (newsletter_content, date_published, user_id) 
             VALUES (:newsletter_content, :date_published, :user_id)";
 
@@ -51,24 +51,37 @@ class PublishNewsletter extends Verify
             ]);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Get id of last inserted item.
             $last_id = $db->getLastId();
 
-            // Initialise the SQL command and parameters to modify data of newsletter items.
+            // End step 1.
+
+            // Step 2. Update published_newsletter_id for newsletter_items that were in the published newsletter.
             $array = json_decode($_POST["newsletter_items"]);
 
-            if($array == null){
-                throw new BadRequest("Incorrect format of newsletter_items array.");
+            if ($array === null) {
+                throw new ClientErrorException("Incorrect format of newsletter_items array.");
             }
 
             $in = join(',', array_fill(0, count($array), '?'));
-            $sql = "UPDATE newsletter_item SET published_newsletter_id = ? WHERE item_id IN (" . $in . ")";
+            $sql = "UPDATE newsletter_item SET published_newsletter_id = ?, item_checked = 3 WHERE item_id IN (" . $in . ")";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams(
                 array_merge(array($last_id), $array)
             );
 
-            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw exception if there is a difference in updated items and length of array with items to update.
+            if ($data != count($array)) {
+                if (count($array) == 1 and $data[0] != null) {
+                    throw new ClientErrorException("Problem with updating newsletter_item occured.");
+                }
+            }
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();
@@ -90,7 +103,7 @@ class PublishNewsletter extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('newsletter_content', 'date_published', 'newsletter_items');
         $this->checkRequiredParameters($requiredParameters);
     }

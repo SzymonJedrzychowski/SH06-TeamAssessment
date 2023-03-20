@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /postitemtags endpoint.
  *
- * This class reads and validates received parameters
- * and changes tags on newsletter item.
+ * This class is used to change tags of newsletter item.
  *
  * @author Szymon Jedrzychowski
  */
@@ -13,7 +12,8 @@ class PostItemTags extends Verify
     /**
      * Override the __construct method to match the requirements of the /postitemtags endpoint.
      *
-     * @throws BadRequest           If request method is incorrect.
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     public  function __construct()
     {
@@ -30,7 +30,8 @@ class PostItemTags extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        if(!in_array($tokenData->auth, ["2", "3"])){
+        // Throw exception if user is not editor or admin.
+        if (!in_array($tokenData->auth, ["2", "3"])) {
             throw new BadRequest("Only editor and admin can submit tags for newsletter_item.");
         }
 
@@ -38,8 +39,7 @@ class PostItemTags extends Verify
         $db->beginTransaction();
 
         try {
-            
-            // Initialise the SQL command and parameters to insert new data to database.
+            // Step 1. Remove previous tags.
             $sql = "DELETE FROM item_tag WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
@@ -49,19 +49,21 @@ class PostItemTags extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // Initialise the SQL command and parameters to modify data of newsletter items.
+            // End step 1.
+
+            // Step 2. Insert new tags.
             $array = json_decode($_POST["item_tags"]);
 
-            if($array == null){
+            if ($array === null) {
                 throw new BadRequest("Incorrect format of newsletter_items array.");
             }
 
             $in = join(',', array_fill(0, count($array), '(?, ?)'));
-            $sql = "INSERT INTO item_tag (item_id, tag_id) VALUES ". $in;
+            $sql = "INSERT INTO item_tag (item_id, tag_id) VALUES " . $in;
 
             $this->setSQLCommand($sql);
             $temp = array();
-            foreach($array as &$item){
+            foreach ($array as &$item) {
                 array_push($temp, $_POST['item_id']);
                 array_push($temp, $item);
             }
@@ -70,6 +72,8 @@ class PostItemTags extends Verify
             );
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();
@@ -91,7 +95,7 @@ class PostItemTags extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('item_id', 'item_tags');
         $this->checkRequiredParameters($requiredParameters);
     }

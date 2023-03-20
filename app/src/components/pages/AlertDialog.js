@@ -1,6 +1,21 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 
-//Code based on the example dialog from https://mui.com/material-ui/react-dialog/ (Access date: 14/03/2023)
+/**
+ * AlertDialog
+ * 
+ * Responsible for displaying dialogs that have 2 options to select from.
+ * 
+ * @author Szymon Jedrzychowski
+ * Code based on the example dialog from https://mui.com/material-ui/react-dialog/ (Access date: 14/03/2023)
+ * 
+ * @param {*} props
+ *                  open        if alert dialog should be displayed (boolean)
+ *                  title       title of the alert box
+ *                  message     array of text to display
+ *                  option1     left option to display
+ *                  option2     right option to display
+ *                  handleClose function called after alert box is closed
+ */
 export default function AlertDialog(props) {
     return (props.open === true &&
         <div>
