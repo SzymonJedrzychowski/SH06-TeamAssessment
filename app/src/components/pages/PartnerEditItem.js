@@ -79,7 +79,6 @@ const PartnerEditItem = (props) => {
                     const contentBlock = htmlToDraft(json.data[0]["content"]);    //WIP
                     const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
                     setEditorContent(EditorState.createWithContent(content));
-                    console.log(content);
                     setLoading(false);
                 }
             )
@@ -104,7 +103,7 @@ const PartnerEditItem = (props) => {
         const formData = new FormData();
         formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
         formData.append('item_id', item.state);
-        formData.append('item_checked', itemToEdit.item_checked);//WIP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        formData.append('item_checked', itemToEdit['item_checked']);
         fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
                 {
                     method: 'POST',
@@ -139,7 +138,7 @@ const PartnerEditItem = (props) => {
     }
 
     const uploadConfirm = () => {
-        setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, uplaod now.", "No, do not upload."]);
+        setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, upload now.", "No, do not upload."]);
     }
     
     //OUTPUT
@@ -152,7 +151,7 @@ const PartnerEditItem = (props) => {
                     Box goes here.
                     <TextEditor
                         type={"content"} content={editorContent} setContent={setEditorContent}
-                        defaultContentState = {itemToEdit.content}
+                        defaultContentState = {itemToEdit['content']}
                     />
                 </div>
             <button onClick = {uploadConfirm}>Upload</button>

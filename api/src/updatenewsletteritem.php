@@ -86,7 +86,7 @@ class UpdateNewsletterItem extends Verify
      */
     private function validateParameters()
     {   
-        $requiredParameters = array('content', 'item_id');
+        $requiredParameters = array('content', 'item_id', 'item_checked');
         $this->checkRequiredParameters($requiredParameters);
     }
 
@@ -99,7 +99,8 @@ class UpdateNewsletterItem extends Verify
     {
         return [
             'content' => 'string',
-            'item_id' => 'string'
+            'item_id' => 'string',
+            'item_checked' => 'string'
         ];
     }
 }
