@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /editnewsletter endpoint.
  *
- * This class reads and validates received parameters
- * and adds changes the published newsletter.
+ * This class is used to edit data of published newsletter.
  *
  * @author Szymon Jedrzychowski
  */

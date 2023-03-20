@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /addtag endpoint.
  *
- * This class reads and validates received parameters
- * and adds new tag to the database.
+ * This class is used to add new tags.
  *
  * @author Szymon Jedrzychowski
  */

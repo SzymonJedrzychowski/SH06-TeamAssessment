@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /edittag endpoint.
  *
- * This class reads and validates received parameters
- * and changes name of tag in database.
+ * This class is used to edit the name of tag.
  *
  * @author Szymon Jedrzychowski
  */

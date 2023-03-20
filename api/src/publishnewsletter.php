@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /publishnewsletter endpoint.
  *
- * This class reads and validates received parameters
- * and adds posts newsletter to public.
+ * This class is used to publish newsletters.
  *
  * @author Szymon Jedrzychowski
  */

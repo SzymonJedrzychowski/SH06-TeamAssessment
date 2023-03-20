@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /gettags endpoint.
  *
- * This class reads and validates received parameters
- * and returns the tags from the database.
+ * This class is used to get available tags.
  *
  * @author Szymon Jedrzychowski
  */

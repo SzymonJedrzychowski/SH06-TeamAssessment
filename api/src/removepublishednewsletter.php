@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Responsible for handling /postnewslettersuggestion endpoint.
+ * Responsible for handling /removepublishednewsletter endpoint.
  *
- * This class is used to post newsletter suggestion.
+ * This class is used to remove published newsletters.
  *
  * @author Szymon Jedrzychowski
  */
-class PostNewsletterSuggestion extends Verify
+class RemovePublishedNewsletter extends Verify
 {
     /**
-     * Override the __construct method to match the requirements of the /postnewslettersuggestion endpoint.
+     * Override the __construct method to match the requirements of the /removepublishednewsletter endpoint.
      *
      * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
      * @throws ClientErrorException If incorrect parameters were used.
@@ -31,45 +31,42 @@ class PostNewsletterSuggestion extends Verify
         $tokenData = parent::validateToken();
 
         // Throw exception if user is not editor or admin.
-        if (!in_array($tokenData->auth, ["2", "3"])) {
-            throw new BadRequest("Only editor and admin can publish a newsletter suggestion.");
+        if(!in_array($tokenData->auth, ["3"])){
+            throw new BadRequest("Only admin can remove a newsletter.");
         }
 
         // Start the transaction.
         $db->beginTransaction();
 
         try {
-            // Step 1. Insert the newsletter suggestion.
-            $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
-                VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
+            // Step 1. Delete from published_newsletter table.
+            $sql = "DELETE FROM published_newsletter WHERE newsletter_id = :newsletter_id";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-                'item_id' => $_POST['item_id'],
-                'suggestion_content' => $_POST['suggestion_content'],
-                'suggestion_comment' => $_POST['suggestion_comment'],
-                'user_id' => $tokenData->sub
-            ]);
-
-            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-
-            // End step 1.
-
-            // Step 2. Update the status of the newsletter_item.
-            $sql = "UPDATE newsletter_item SET item_checked = :item_checked WHERE item_id = :item_id";
-
-            $this->setSQLCommand($sql);
-            $this->setSQLParams([
-                'item_id' => $_POST['item_id'],
-                'item_checked' => "1"
+                'newsletter_id' => $_POST['newsletter_id'],
             ]);
 
             $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
-            
-            // Throw exception if no newsletter_item was updated.
+
+            // Throw an exception if no data was removed.
             if($data == 0){
-                throw new ClientErrorException("Problem with finding item_id occured.");
+                throw new ClientErrorException("published_newsletter with given newsletter_id could not be found.");
             }
+
+            // End step 1.
+            
+            // Step 2. Update published_newsletter_id for newsletter_items that were in the published newsletter.
+
+
+            $sql = "UPDATE newsletter_item SET published_newsletter_id = null WHERE published_newsletter_id = :newsletter_id";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                ":newsletter_id" => $_POST["newsletter_id"]
+            ]);
+
+            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
             // End step 2.
 
@@ -93,22 +90,20 @@ class PostNewsletterSuggestion extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {
-        $requiredParameters = array('item_id', 'suggestion_content', 'suggestion_comment');
+    {   
+        $requiredParameters = array('newsletter_id');
         $this->checkRequiredParameters($requiredParameters);
     }
 
     /**
-     * Set the array of available parameters for /postnewslettersuggestion endpoint.
+     * Set the array of available parameters for /removepublishednewsletter endpoint.
      *
      * @return string[] Array of available params.
      */
     protected function getAvailableParams()
     {
         return [
-            'item_id' => 'int',
-            'suggestion_content' => 'string',
-            'suggestion_comment' => 'string'
+            'newsletter_id' => 'int'
         ];
     }
 }

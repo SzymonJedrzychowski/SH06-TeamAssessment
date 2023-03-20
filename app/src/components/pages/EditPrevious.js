@@ -25,12 +25,16 @@ const EditPrevious = (props) => {
     const [page, setPage] = useState(0);
     const [rows, setRows] = useState(5);
 
+    //Hook responsible for re-rendering the page after removing a published newsletter
+    const [update, setUpdate] = useState(0);
+
     //Hook to navigate between pages
     const navigate = useNavigate();
 
     //Handlers for the information dialog
     const setInformData = props.dialogData.setInformData;
     const resetInformData = props.dialogData.resetInformData;
+    const setAlertData = props.dialogData.setAlertData;
 
     //Function that loads all data for the page
     const loadData = () => {
@@ -68,7 +72,7 @@ const EditPrevious = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        if (["2", "3"].includes(json.data[0]["authorisation"])) {
+                        if (json.data[0]["authorisation"] === "3") {
                             loadData();
                         } else {
                             setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
@@ -86,23 +90,65 @@ const EditPrevious = (props) => {
                     console.log(e.message)
                 }
             )
-    }, []);
-    
+    }, [update]);
+
+    //Function used as handleClose when alert dialog is displayed (for removeing published newsletter)
+    const handleClose = (confirmation, newsletterToRemove) => {
+        setAlertData([false, null, null, null, null, null]);
+        let formData = new FormData();
+        formData.append('newsletter_id', newsletterToRemove);
+
+        if (confirmation.target.value === "true") {
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removepublishednewsletter",
+                {
+                    method: 'POST',
+                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                    body: formData
+                })
+                .then(
+                    (response) => response.json()
+                )
+                .then(
+                    (json) => {
+                        if (json.message === "Success") {
+                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Newsletter was removed successfully."]])
+                        } else {
+                            setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to editorial page."]])
+                        }
+                    }
+                )
+                .catch(
+                    (e) => {
+                        console.log(e.message)
+                    }
+                )
+        }
+    }
+
+    //Function used to change the data displayed in the alert dialog
+    const handleRemove = (event) => {
+        setAlertData([true, (confirmation) => handleClose(confirmation, event.target.value), "Are you sure you want to remove this newsletter?", ["You cannot undo this action."], "Remove", "Keep"])
+    }
+
     //Style for the page
     const pageStyle = {
         display: "flex",
         flexDirection: "column",
         rowGap: "10px",
-        padding: 3
+        padding: 3,
+        "a:hover": {
+            color: "white"
+        }
     };
 
     //Function to create a row for the table with published newsletters
     const createRow = (value, index) => {
         return <TableRow key={index}>
-            <TableCell>{value.newsletter_id}</TableCell>
+            <TableCell>{index + 1 + page * rows}</TableCell>
             <TableCell>{value.first_name} {value.last_name}</TableCell>
             <TableCell>{value.date_published}</TableCell>
             <TableCell><Button variant="contained" component={Link} to={"/publish"} state={value}>Edit</Button></TableCell>
+            <TableCell><Button variant="contained" onClick={handleRemove} value={value.newsletter_id}>Remove</Button></TableCell>
         </TableRow>;
     }
 
@@ -112,10 +158,11 @@ const EditPrevious = (props) => {
             <TableContainer component={Paper}><Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Newsletter ID</TableCell>
-                        <TableCell>Published by</TableCell>
-                        <TableCell>Date published</TableCell>
-                        <TableCell></TableCell>
+                        <TableCell width="10%">#</TableCell>
+                        <TableCell width="35%">Published by</TableCell>
+                        <TableCell width="35%">Date published</TableCell>
+                        <TableCell width="10%"></TableCell>
+                        <TableCell width="10%"></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>

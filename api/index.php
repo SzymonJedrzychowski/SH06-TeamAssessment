@@ -51,6 +51,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/publishnewsletter':
                 $endpoint = new PublishNewsletter();
                 break;
+            case '/removepublishednewsletter':
+                $endpoint = new RemovePublishedNewsletter();
+                break;
             case '/getpublishednewsletters':
                 $endpoint = new GetPublishedNewsletters();
                 break;

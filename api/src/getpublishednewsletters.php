@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /getpublishednewsletters endpoint.
  *
- * This class reads and validates received parameters
- * and returns the published newsletters.
+ * This class is used to get the data of published newsletters.
  *
  * @author Szymon Jedrzychowski
  */

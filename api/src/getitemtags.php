@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /getitemtags endpoint.
  *
- * This class reads and validates received parameters
- * and returns the tags of newsletter item from the database.
+ * This class is used to get the tags of newsletter item.
  *
  * @author Szymon Jedrzychowski
  */

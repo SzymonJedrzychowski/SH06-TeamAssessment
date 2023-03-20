@@ -20,6 +20,9 @@ const Editorial = (props) => {
     //Hook to hold data of all newsletter items
     const [newsletterItems, setNewsletterItems] = useState([]);
 
+    //Hook to hold authorisation level
+    const [authorisation, setAuthorisation] = useState(null);
+
     //Hook to determine if page fully loaded the data
     const [loading, setLoading] = useState(true);
 
@@ -33,7 +36,7 @@ const Editorial = (props) => {
 
     //Hook to navigate between pages
     const navigate = useNavigate();
-    
+
     //Handlers for the information dialog
     const setInformData = props.dialogData.setInformData;
     const resetInformData = props.dialogData.resetInformData;
@@ -88,6 +91,7 @@ const Editorial = (props) => {
                     if (json.message === "Success") {
                         if (["2", "3"].includes(json.data[0]["authorisation"])) {
                             loadData();
+                            setAuthorisation(json.data[0]["authorisation"]);
                         } else {
                             setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])
                         }
@@ -114,7 +118,7 @@ const Editorial = (props) => {
             (value.first_name + " " + value.last_name.toLowerCase()).toLowerCase().includes(search.toLowerCase()) ||
             value.organisation_name.toLowerCase().includes(search.toLowerCase())) &&
         statusSearch.includes(value.item_checked));
-    
+
     //Function necessary for the multiple select component (that changes the statusSearch variable based on currently selected options)
     const handleChange = (event) => {
         setStatusSearch(
@@ -155,7 +159,7 @@ const Editorial = (props) => {
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Editorial</Typography>
             <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "center" }}>
                 <Button variant="contained" component={Link} to={"/publish"}>Publish newsletter</Button>
-                <Button variant="contained" component={Link} to={"/editPrevious"}>Edit previous newsletters</Button>
+                {authorisation === "3" && <Button variant="contained" component={Link} to={"/editPrevious"}>Edit previous newsletters</Button>}
                 <Button variant="contained" component={Link} to={"/manageTags"}>Edit tags</Button>
             </Box>
             <Paper sx={{ marginTop: "2em" }}>

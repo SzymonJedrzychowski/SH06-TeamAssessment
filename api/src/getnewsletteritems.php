@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /getnewsletteritems endpoint.
  *
- * This class reads and validates received parameters
- * and returns the newsletter items from the database.
+ * This class is used to get the data of newsletter items.
  *
  * @author Szymon Jedrzychowski
  */

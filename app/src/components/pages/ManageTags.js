@@ -169,8 +169,7 @@ const ManageTags = (props) => {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
                     body: formData
-                }
-            )
+                })
                 .then(
                     (response) => response.json()
                 )

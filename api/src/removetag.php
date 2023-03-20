@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /removetag endpoint.
  *
- * This class reads and validates received parameters
- * and removes tag from database and newsletter items.
+ * This class is used to remove a tag.
  *
  * @author Szymon Jedrzychowski
  */

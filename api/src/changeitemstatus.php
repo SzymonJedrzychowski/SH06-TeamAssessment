@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /changeitemstatus endpoint.
  *
- * This class reads and validates received parameters
- * and modifies status of newsletter item
+ * This class is used to change item_checked status of newsletter_item.
  *
  * @author Szymon Jedrzychowski
  */

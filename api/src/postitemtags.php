@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /postitemtags endpoint.
  *
- * This class reads and validates received parameters
- * and changes tags on newsletter item.
+ * This class is used to change tags of newsletter item.
  *
  * @author Szymon Jedrzychowski
  */
