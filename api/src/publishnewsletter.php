@@ -30,9 +30,9 @@ class PublishNewsletter extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        // Throw exception if user is not editor or admin.
-        if(!in_array($tokenData->auth, ["2", "3"])){
-            throw new BadRequest("Only editor and admin can publish a newsletter.");
+        // Throw exception if user is not admin.
+        if ($tokenData->auth != "3") {
+            throw new BadRequest("Only admin can publish a newsletter.");
         }
 
         // Start the transaction.
@@ -56,16 +56,16 @@ class PublishNewsletter extends Verify
             $last_id = $db->getLastId();
 
             // End step 1.
-            
+
             // Step 2. Update published_newsletter_id for newsletter_items that were in the published newsletter.
             $array = json_decode($_POST["newsletter_items"]);
 
-            if($array == null){
+            if ($array === null) {
                 throw new ClientErrorException("Incorrect format of newsletter_items array.");
             }
 
             $in = join(',', array_fill(0, count($array), '?'));
-            $sql = "UPDATE newsletter_item SET published_newsletter_id = ? WHERE item_id IN (" . $in . ")";
+            $sql = "UPDATE newsletter_item SET published_newsletter_id = ?, item_checked = 3 WHERE item_id IN (" . $in . ")";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams(
@@ -75,8 +75,8 @@ class PublishNewsletter extends Verify
             $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
 
             // Throw exception if there is a difference in updated items and length of array with items to update.
-            if($data != count($array)){
-                if(count($array) == 1 and $data[0] != null){
+            if ($data != count($array)) {
+                if (count($array) == 1 and $data[0] != null) {
                     throw new ClientErrorException("Problem with updating newsletter_item occured.");
                 }
             }
@@ -103,7 +103,7 @@ class PublishNewsletter extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('newsletter_content', 'date_published', 'newsletter_items');
         $this->checkRequiredParameters($requiredParameters);
     }

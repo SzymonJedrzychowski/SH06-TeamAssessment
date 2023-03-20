@@ -39,7 +39,41 @@ class PostNewsletterSuggestion extends Verify
         $db->beginTransaction();
 
         try {
-            // Step 1. Insert the newsletter suggestion.
+            // Step 1. Check if there is unresolved suggestion for the newsletter_item.
+            $sql = "SELECT * FROM item_suggestion WHERE item_id = :item_id AND approved IS NULL";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'item_id' => $_POST['item_id']
+            ]);
+
+            $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw an exception if there is unresolved suggestion.
+            if (count($data) > 0) {
+                throw new ClientErrorException("EM: There is an unresolved suggestion for this item.");
+            }
+
+            // End step 1.
+
+            // Step 2. Check if the newsletter_item is already published.
+            $sql = "SELECT * FROM newsletter_item WHERE item_id = :item_id AND published_newsletter_id IS NOT NULL";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'item_id' => $_POST['item_id']
+            ]);
+
+            $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw an exception if the newsletter_item is already ready.
+            if (count($data) > 0) {
+                throw new ClientErrorException("EM: This item is already published.");
+            }
+
+            // End step 2.
+
+            // Step 3. Insert the newsletter suggestion.
             $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
                 VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
 
@@ -53,25 +87,24 @@ class PostNewsletterSuggestion extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // End step 1.
+            // End step 3.
 
-            // Step 2. Update the status of the newsletter_item.
-            $sql = "UPDATE newsletter_item SET item_checked = :item_checked WHERE item_id = :item_id";
+            // Step 4. Update the status of the newsletter_item.
+            $sql = "UPDATE newsletter_item SET item_checked = 1 WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-                'item_id' => $_POST['item_id'],
-                'item_checked' => "1"
+                'item_id' => $_POST['item_id']
             ]);
 
             $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
-            
+
             // Throw exception if no newsletter_item was updated.
-            if($data == 0){
+            if ($data == 0) {
                 throw new ClientErrorException("Problem with finding item_id occured.");
             }
 
-            // End step 2.
+            // End step 4.
 
             // Commit the transaction.
             $db->commitTransaction();

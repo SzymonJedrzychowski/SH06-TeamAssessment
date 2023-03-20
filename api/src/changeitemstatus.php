@@ -35,7 +35,7 @@ class ChangeItemStatus extends Verify
 
         try {
             // Step 1. Get user_id of author of the newsletter_item.
-            $sql = "SELECT item_id, user_id FROM newsletter_item WHERE item_id = :item_id";
+            $sql = "SELECT item_id, user_id FROM newsletter_item WHERE item_id = :item_id AND published_newsletter_id IS NULL";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([

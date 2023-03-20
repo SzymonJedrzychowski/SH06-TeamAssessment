@@ -130,6 +130,8 @@ const SuggestChanges = (props) => {
             .then((json) => {
                 if (json.message === "Success") {
                     setInformData([true, () => { resetInformData(); navigate(-1) }, "Success", ["Suggestion was sent. You can now leave the page."]])
+                } else if (json.message.slice(0, 3) === "EM:") {
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", [json.message.slice(4), "You will be redirected to editorial page."]])
                 } else {
                     setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                 }

@@ -36,7 +36,7 @@ class GetNewsletterItems extends Verify
         }
 
         // Get only one item with given item_id.
-        if(filter_has_var(INPUT_GET, 'item_id')){
+        if (filter_has_var(INPUT_GET, 'item_id')) {
             $sql .= " AND item_id == :item_id";
             $params["item_id"] = $_GET['item_id'];
         }

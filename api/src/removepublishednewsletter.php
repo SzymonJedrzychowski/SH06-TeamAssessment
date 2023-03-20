@@ -31,7 +31,7 @@ class RemovePublishedNewsletter extends Verify
         $tokenData = parent::validateToken();
 
         // Throw exception if user is not editor or admin.
-        if(!in_array($tokenData->auth, ["3"])){
+        if ($tokenData->auth != "3") {
             throw new BadRequest("Only admin can remove a newsletter.");
         }
 
@@ -50,16 +50,14 @@ class RemovePublishedNewsletter extends Verify
             $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
 
             // Throw an exception if no data was removed.
-            if($data == 0){
+            if ($data == 0) {
                 throw new ClientErrorException("published_newsletter with given newsletter_id could not be found.");
             }
 
             // End step 1.
-            
+
             // Step 2. Update published_newsletter_id for newsletter_items that were in the published newsletter.
-
-
-            $sql = "UPDATE newsletter_item SET published_newsletter_id = null WHERE published_newsletter_id = :newsletter_id";
+            $sql = "UPDATE newsletter_item SET published_newsletter_id = NULL WHERE published_newsletter_id = :newsletter_id";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
@@ -90,7 +88,7 @@ class RemovePublishedNewsletter extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('newsletter_id');
         $this->checkRequiredParameters($requiredParameters);
     }

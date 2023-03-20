@@ -32,8 +32,9 @@ class EditTag extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        if (!in_array($tokenData->auth, ["2", "3"])) {
-            throw new BadRequest("Only editor and admin can edit tags.");
+        // Throw exception if user is not admin.
+        if ($tokenData->auth != "3") {
+            throw new BadRequest("Only admin can edit tags.");
         }
 
         // Start the transaction.
@@ -69,7 +70,7 @@ class EditTag extends Verify
             $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
 
             // Throw exception if no tags were updated.
-            if($data == 0){
+            if ($data == 0) {
                 throw new ClientErrorException("Problem with getting tag_id occurred.");
             }
 

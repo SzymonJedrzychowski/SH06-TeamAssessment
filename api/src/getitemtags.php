@@ -26,7 +26,7 @@ class GetItemTags extends Endpoint
         $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
 
-        $params = array(":item_id"=>$_GET['item_id']);
+        $params = array(":item_id" => $_GET['item_id']);
 
         $this->setSQLCommand($sql);
         $this->setSQLParams($params);

@@ -85,7 +85,7 @@ const ManageTags = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        if (["2", "3"].includes(json.data[0]["authorisation"])) {
+                        if (json.data[0]["authorisation"] === "3") {
                             loadData();
                         } else {
                             setInformData([true, () => { resetInformData(); navigate("/") }, "Not authorised", ["You are not authorised to access this page.", "You will be redirected to home page."]])

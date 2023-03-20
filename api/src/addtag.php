@@ -31,9 +31,9 @@ class AddTag extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        // Throw exception if user is not editor or admin.
-        if (!in_array($tokenData->auth, ["2", "3"])) {
-            throw new BadRequest("Only editor and admin can edit tags.");
+        // Throw exception if user is not admin.
+        if ($tokenData->auth != "3") {
+            throw new BadRequest("Only and admin can add tags.");
         }
 
         // Start the transaction.
@@ -92,7 +92,7 @@ class AddTag extends Verify
         $requiredParameters = array('tag_name');
         $this->checkRequiredParameters($requiredParameters);
 
-        if(strlen($_POST['tag_name']) == 0){
+        if (strlen($_POST['tag_name']) == 0) {
             throw new ClientErrorException("tag_name must be longer than 0 characters.");
         }
     }

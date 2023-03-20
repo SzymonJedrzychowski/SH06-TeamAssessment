@@ -31,7 +31,7 @@ class PostItemTags extends Verify
         $tokenData = parent::validateToken();
 
         // Throw exception if user is not editor or admin.
-        if(!in_array($tokenData->auth, ["2", "3"])){
+        if (!in_array($tokenData->auth, ["2", "3"])) {
             throw new BadRequest("Only editor and admin can submit tags for newsletter_item.");
         }
 
@@ -54,16 +54,16 @@ class PostItemTags extends Verify
             // Step 2. Insert new tags.
             $array = json_decode($_POST["item_tags"]);
 
-            if($array == null){
+            if ($array === null) {
                 throw new BadRequest("Incorrect format of newsletter_items array.");
             }
 
             $in = join(',', array_fill(0, count($array), '(?, ?)'));
-            $sql = "INSERT INTO item_tag (item_id, tag_id) VALUES ". $in;
+            $sql = "INSERT INTO item_tag (item_id, tag_id) VALUES " . $in;
 
             $this->setSQLCommand($sql);
             $temp = array();
-            foreach($array as &$item){
+            foreach ($array as &$item) {
                 array_push($temp, $_POST['item_id']);
                 array_push($temp, $item);
             }
@@ -95,7 +95,7 @@ class PostItemTags extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('item_id', 'item_tags');
         $this->checkRequiredParameters($requiredParameters);
     }

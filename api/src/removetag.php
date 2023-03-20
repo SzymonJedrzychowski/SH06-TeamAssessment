@@ -31,9 +31,9 @@ class RemoveTag extends Verify
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        // Throw exception if user is not editor or admin.
-        if(!in_array($tokenData->auth, ["2", "3"])){
-            throw new BadRequest("Only editor and admin can remove tags.");
+        // Throw exception if user is not admin.
+        if ($tokenData->auth != "3") {
+            throw new BadRequest("Only admin can remove tags.");
         }
 
         // Start the transaction.
@@ -81,7 +81,7 @@ class RemoveTag extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('tag_id');
         $this->checkRequiredParameters($requiredParameters);
     }

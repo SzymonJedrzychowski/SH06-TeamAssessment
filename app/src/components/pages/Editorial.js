@@ -157,11 +157,11 @@ const Editorial = (props) => {
     return <Box sx={pageStyle}>
         {!loading && <>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Editorial</Typography>
-            <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "center" }}>
+            {authorisation === "3" && <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "center" }}>
                 <Button variant="contained" component={Link} to={"/publish"}>Publish newsletter</Button>
-                {authorisation === "3" && <Button variant="contained" component={Link} to={"/editPrevious"}>Edit previous newsletters</Button>}
+                <Button variant="contained" component={Link} to={"/editPrevious"}>Edit previous newsletters</Button>
                 <Button variant="contained" component={Link} to={"/manageTags"}>Edit tags</Button>
-            </Box>
+            </Box>}
             <Paper sx={{ marginTop: "2em" }}>
                 <Typography variant="h5" sx={{ padding: "10px" }}>Submited newsletter items</Typography>
                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", padding: "10px" }}>
