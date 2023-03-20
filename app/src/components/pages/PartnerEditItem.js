@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TextEditor from './TextEditor';
 import { Editor } from 'react-draft-wysiwyg';
 import { useLocation } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
@@ -74,13 +75,11 @@ const PartnerEditItem = (props) => {
             )
             .then(
                 (json) => {
-                    console.log("Data "+ json.data);
                     setItemToEdit(json.data);
-                    console.log("Item, 0 " +itemToEdit[0]);
-                    console.log("Item and content, 0 " +itemToEdit[0]["content"]); 
-                    const contentBlock = htmlToDraft(itemToEdit[0]["content"]);    //WIP
+                    const contentBlock = htmlToDraft(json.data[0]["content"]);    //WIP
                     const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
                     setEditorContent(EditorState.createWithContent(content));
+                    console.log(content);
                     setLoading(false);
                 }
             )
@@ -151,7 +150,7 @@ const PartnerEditItem = (props) => {
                 <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
                 <div className = 'PartnerContributeBox'>
                     Box goes here.
-                    <Editor
+                    <TextEditor
                         type={"content"} content={editorContent} setContent={setEditorContent}
                         defaultContentState = {itemToEdit.content}
                     />
