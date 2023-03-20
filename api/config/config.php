@@ -6,8 +6,8 @@
  * @author Szymon Jedrzychowski
  */
 
-define('SECRET', "");
-define('API_KEY', "");
+define('SECRET', "F-JaNdRgUjXn2r5u8x/A?D(G+KbPeShV");
+define('API_KEY', "r4u7x!A%D*G-KaPdSgVkXp2s5v8y/B?E");
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

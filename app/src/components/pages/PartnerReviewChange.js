@@ -4,6 +4,7 @@ import {Button} from '@mui/material';
 import { EditorState, ContentState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
 import TextEditorView from "./TextEditorView";
+import TextEditor from './TextEditorView';
 
 /**
  * PartnerReviewChange page
@@ -61,7 +62,7 @@ const PartnerReviewChange = (props) => {
                 }
             )
 
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state,
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state,
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -136,8 +137,13 @@ const PartnerReviewChange = (props) => {
         }
 
         const acceptSuggestion = () => {
+
             console.log("Upload Accept");
             navigate("/partner");
+        }
+
+        const updateItemSuggestion = (status) => {
+
         }
 
 
@@ -148,7 +154,9 @@ const PartnerReviewChange = (props) => {
                 <div className = 'PartnerReviewChangeHeader'>
                     <h1>Review item 'name'</h1>
                 </div>
+                <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
                 <div className = 'PartnerBody'>
+                    <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
                     <TextEditorView
                     type={"content"} content={contentState} setContent={setContentState}
                     defaultContentState = {itemSuggestion.suggestion_content}
@@ -163,6 +171,7 @@ const PartnerReviewChange = (props) => {
                     <Button onClick = {acceptConfirm}>Accept</Button>
                     <Button onClick={rejectConfirm}>Reject</Button>
                     <p>Comments to editor</p>
+                    <input/>
                 </div>
             </div>}
             

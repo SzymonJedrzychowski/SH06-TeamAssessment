@@ -24,7 +24,7 @@ const Partner = (props) => {
     const [itemsInReview, setItemsInReview] = useState([]);
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
     const [editorContent, setEditorContent] = useState(null);
-    const [editorTitle, setEditorTitle] = useState()
+    const [editorTitle, setEditorTitle] = useState("Placeholder")
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -154,7 +154,7 @@ const Partner = (props) => {
             formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
             formData.append('item_title', editorTitle); //TODO FIX
-            console.log(formData);
+            //console.log(formData);
             fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
                     method: 'POST',

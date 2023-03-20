@@ -3,6 +3,9 @@ import { Editor } from 'react-draft-wysiwyg';
 import { useLocation } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import {Button} from '@mui/material';
+import draftToHtml from 'draftjs-to-html';
+import { ContentState, convertToRaw, EditorState } from 'draft-js';
+import htmlToDraft from 'html-to-draftjs';
 
 /**
  * PartnerEditItem page
@@ -18,6 +21,9 @@ const PartnerEditItem = (props) => {
     const item = useLocation();
 
     // State variable hooks
+    const [itemToEdit, setItemToEdit] = useState(null);
+    const [editorContent, setEditorContent] = useState(null);
+
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
     
@@ -36,10 +42,8 @@ const PartnerEditItem = (props) => {
                     if (json.message === "Success") {
                         if (["1", "2", "3"].includes(json.data[0]["authorisation"])) {
                             setAuthenticated(true);
-                            setLoading(false);
                         } else {
                             setAuthenticated(false);
-                            setLoading(false);
                             return;
                         }
                     } else {
@@ -50,6 +54,39 @@ const PartnerEditItem = (props) => {
                         setInformData([true, () => {resetInformData(); navigate("/login")}, "Authentication failed.", ["You must be logged in to contribute.", "Please log in."]]);
                         return;
                     }
+                }
+            )
+
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                //Process response into JSON
+                function(response){
+                    if (response.status === 200){
+                        return response.json();
+                    }
+                    else {
+                        console.log(response.json);
+                    }
+                }
+            )
+            .then(
+                (json) => {
+                    console.log("Data "+ json.data);
+                    setItemToEdit(json.data);
+                    console.log("Item, 0 " +itemToEdit[0]);
+                    console.log("Item and content, 0 " +itemToEdit[0]["content"]); 
+                    const contentBlock = htmlToDraft(itemToEdit[0]["content"]);    //WIP
+                    const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+                    setEditorContent(EditorState.createWithContent(content));
+                    setLoading(false);
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log("The following error occurred: ", e);
                 }
             )
 
@@ -64,8 +101,35 @@ const PartnerEditItem = (props) => {
     const navigate = useNavigate();
 
     const uploadItem = () => {
-        console.log("Upload");
-        console.log(item.state);
+
+        const formData = new FormData();
+        formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
+        formData.append('item_id', item.state);
+        formData.append('item_checked', itemToEdit.item_checked);//WIP!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+                {
+                    method: 'POST',
+                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                    body: formData
+                })
+                .then(
+                    (response) => response.json()
+                )
+                .then(
+                    (json) => {
+                        if (json.message !== "Success") {
+                            console.log(json);
+                            setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
+                        }
+                        else if (json.message === "Success"){
+                            console.log("Success")
+                            setInformData([true, () => {resetInformData(); navigate('/partner')}, "Upload Successful.", []]);
+                        }
+                    })
+                .catch(
+                    (e) => {
+                        console.log(e.message)
+                    })
     }
 
     const handleClose = (confirmation) => {
@@ -88,23 +152,12 @@ const PartnerEditItem = (props) => {
                 <div className = 'PartnerContributeBox'>
                     Box goes here.
                     <Editor
-                        toolbarClassName="toolbarClassName"
-                        wrapperClassName="wrapperClassName"
-                        editorClassName="editorClassName"
+                        type={"content"} content={editorContent} setContent={setEditorContent}
+                        defaultContentState = {itemToEdit.content}
                     />
                 </div>
             <button onClick = {uploadConfirm}>Upload</button>
             </div>}
-
-            {/*{(!loading && !authenticated && localStorage.getItem('token') === undefined) && 
-                <div className = 'PartnerNonAuthenticated'>
-                    <h1>Please log in or sign up to contribute</h1>
-                </div>}
-
-            {(!loading && !authenticated) && 
-                <div className = 'PartnerNonAuthenticated2'>
-                    <h1>Please log in or sign up to contribute</h1>
-            </div>}*/}
         </div>
     )
 }
