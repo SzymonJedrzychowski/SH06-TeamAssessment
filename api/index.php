@@ -78,6 +78,12 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/sendnewsletter':
                 $endpoint = new SendNewsletter();
                 break;
+            case '/getlastpublishednewsletter':
+                $endpoint = new GetLastPublishedNewsletter();
+                break;
+            case '/getallpublishednewsletters':
+                $endpoint = new GetAllPublishedNewsletter();
+                break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);
                 break;
