@@ -16,6 +16,7 @@ import SignUp from "./components/pages/SignUp";
 import ManageTags from "./components/pages/ManageTags";
 import InformationDialog from "./components/pages/InformationDialog";
 import AlertDialog from "./components/pages/AlertDialog";
+import Archive from "./components/pages/Archive";
 
 /**
  * App is responsible for loading data and routing to other pages.
@@ -36,7 +37,7 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Homepage/>}/>
-
+          <Route path="/archive" element={<Archive/>}/>
           <Route path="/partner" element={<Partner/>}/>
           <Route path="/partnerEditItem" element={<PartnerEditItem/>}/>
           <Route path="/editorial" element={<Editorial dialogData={dialogData()}/>}/>
