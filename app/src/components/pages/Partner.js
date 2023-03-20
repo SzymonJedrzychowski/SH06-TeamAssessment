@@ -24,7 +24,7 @@ const Partner = (props) => {
     const [itemsInReview, setItemsInReview] = useState([]);
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
     const [editorContent, setEditorContent] = useState(null);
-    const [editorTitle, setEditorTitle] = useState("Title goes here!")
+    const [editorTitle, setEditorTitle] = useState()
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -71,14 +71,12 @@ const Partner = (props) => {
         .then(
             //Process response into JSON
             function(response){
-                setLoading(false);
                 if (response.status === 200){
+                    setLoading(false);
                     return response.json();
                 }
                 else {
                     console.log(response.json);
-                    localStorage.removeItem('token');
-                    setAuthenticated(false);
                     setLoading(false);
                 }
             }
@@ -102,7 +100,7 @@ const Partner = (props) => {
     const checkValues = {
         "-1" : "Removed",
         "0"  : "In review",
-        "1"  : "Edit requested!", //TODO Update
+        "1"  : "Edit requested!", 
         "2"  : "In review",
         "3"  : "Approved"
     }
@@ -218,7 +216,6 @@ const Partner = (props) => {
         </div>
         
         <div className = 'PartnerContributeBox'>
-            Box goes here.
             <TextEditor
                 type = 'content'
                 content = {editorContent}

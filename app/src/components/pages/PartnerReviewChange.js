@@ -16,10 +16,10 @@ const PartnerReviewChange = (props) => {
 
     // Get the relevant newsletter item details
     const item = useLocation();
+    //const itemID = item.
 
     // State variable hooks
-    //const [loadingReviewItems, setLoadingReviewItems] = useState(true);
-
+    const [itemSuggestion, setItemSuggestion] = useState();
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -38,7 +38,6 @@ const PartnerReviewChange = (props) => {
                     if (json.message === "Success") {
                         if (["1", "2", "3"].includes(json.data[0]["authorisation"])) {
                             setAuthenticated(true);
-                            setLoading(false); //TODO: Remove
                         } else {
                             setAuthenticated(false);
                             setLoading(false);
@@ -59,7 +58,34 @@ const PartnerReviewChange = (props) => {
                     console.log(e.message)
                 }
             )
-            console.log("Render complete Review")
+
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state,
+        {
+            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+        })
+        .then(
+            //Process response into JSON
+            function(response){
+                console.log(item);
+                if (response.status === 200){
+                    return response.json();
+                }
+                else {
+                    console.log(response.json);
+                }
+            }
+        )
+        .then(
+            (json) => {
+                setItemSuggestion(json.data);
+                setLoading(false);
+            }
+        )
+        .catch(
+            (e) => {
+                console.log("The following error occurred: ", e);
+            }
+        )
     }, []);
 
     // Other variables
@@ -111,7 +137,7 @@ const PartnerReviewChange = (props) => {
     return(
         <div className = 'PartnerReviewChange'>
             {(!loading && authenticated) && <div className = 'PartnerReviewChangeAuthenticated'>
-                <div className = 'PartnerHeader'>
+                <div className = 'PartnerReviewChangeHeader'>
                     <h1>Review item 'name'</h1>
                 </div>
                 <div className = 'PartnerBody'>

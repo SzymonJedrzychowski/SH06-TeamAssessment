@@ -94,7 +94,7 @@ class PostNewsletterItem extends Verify
     }
 
     /**
-     * Set the array of available parameters for /publishnewsletter endpoint.
+     * Set the array of available parameters for /postnewsletteritem endpoint.
      *
      * @return string[] Array of available params.
      */
