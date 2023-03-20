@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {Markup} from 'interweave';
 import {Link, useNavigate, useLocation} from 'react-router-dom';
-import { Editor } from 'react-draft-wysiwyg';
 import {Button} from '@mui/material';
+import { EditorState, ContentState } from 'draft-js';
+import htmlToDraft from 'html-to-draftjs';
+import TextEditorView from "./TextEditorView";
 
 /**
  * PartnerReviewChange page
@@ -20,6 +21,8 @@ const PartnerReviewChange = (props) => {
 
     // State variable hooks
     const [itemSuggestion, setItemSuggestion] = useState();
+    const [contentState, setContentState] = useState(null);
+    const [commentState, setCommentState] = useState(null);
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -78,6 +81,12 @@ const PartnerReviewChange = (props) => {
         .then(
             (json) => {
                 setItemSuggestion(json.data);
+                const contentBlock = htmlToDraft(json.data[0]["suggestion_content"]);
+                const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+                setContentState(EditorState.createWithContent(content));
+                const commentBlock = htmlToDraft(json.data[0]["suggestion_comment"]);
+                const comment = ContentState.createFromBlockArray(commentBlock.contentBlocks);
+                setCommentState(EditorState.createWithContent(comment));
                 setLoading(false);
             }
         )
@@ -141,8 +150,17 @@ const PartnerReviewChange = (props) => {
                     <h1>Review item 'name'</h1>
                 </div>
                 <div className = 'PartnerBody'>
-                    <p> Item with changes</p>
-                    <p>Comments</p>
+                    <TextEditorView
+                    type={"content"} content={contentState} setContent={setContentState}
+                    defaultContentState = {itemSuggestion.suggestion_content}
+                    toolbarHidden = {true} //TODO FIX - might because editor instead of text-editor
+                    />
+                    <h2>Comments</h2>
+                    <TextEditorView
+                    type={"comment"} content={commentState} setContent={setCommentState}
+                    defaultContentState = {itemSuggestion.suggestion_comment}
+                    toolbarHidden = {true} //TODO FIX
+                    />
                     <Button onClick = {acceptConfirm}>Accept</Button>
                     <Button onClick={rejectConfirm}>Reject</Button>
                     <p>Comments to editor</p>

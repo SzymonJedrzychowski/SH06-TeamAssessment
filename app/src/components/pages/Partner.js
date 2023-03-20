@@ -153,7 +153,7 @@ const Partner = (props) => {
 
             formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
-            formData.append('item_title', editorTitle); //TODO
+            formData.append('item_title', editorTitle); //TODO FIX
             console.log(formData);
             fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
