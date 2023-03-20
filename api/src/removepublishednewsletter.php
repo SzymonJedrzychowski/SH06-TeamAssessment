@@ -1,16 +1,16 @@
 <?php
 
 /**
- * Responsible for handling /edittag endpoint.
+ * Responsible for handling /removepublishednewsletter endpoint.
  *
- * This class is used to edit the name of tag.
+ * This class is used to remove published newsletters.
  *
  * @author Szymon Jedrzychowski
  */
-class EditTag extends Verify
+class RemovePublishedNewsletter extends Verify
 {
     /**
-     * Override the __construct method to match the requirements of the /edittag endpoint.
+     * Override the __construct method to match the requirements of the /removepublishednewsletter endpoint.
      *
      * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
      * @throws ClientErrorException If incorrect parameters were used.
@@ -25,54 +25,46 @@ class EditTag extends Verify
 
         // Check if correct params were provided.
         $this->checkAvailableParams($this->getAvailableParams());
-
-        // Validate the update parameters.
         $this->validateParameters();
 
         // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        // Throw exception if user is not admin.
+        // Throw exception if user is not editor or admin.
         if ($tokenData->auth != "3") {
-            throw new BadRequest("Only admin can edit tags.");
+            throw new BadRequest("Only admin can remove a newsletter.");
         }
 
         // Start the transaction.
         $db->beginTransaction();
 
         try {
-            // Step 1. Check if tag with given name already exists.
-            $sql = "SELECT * FROM tag WHERE tag_name = :tag_name";
+            // Step 1. Delete from published_newsletter table.
+            $sql = "DELETE FROM published_newsletter WHERE newsletter_id = :newsletter_id";
 
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-                'tag_name' => $_POST['tag_name']
-            ]);
-
-            $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-
-            // Throw exception if tag with given name exists.
-            if (count($data) > 0) {
-                throw new Exception("EM: Tag with given name already exists");
-            }
-
-            // End step 1.
-
-            // Step 2. Update the tag_name.
-            $sql = "UPDATE tag SET tag_name = :tag_name WHERE tag_id = :tag_id";
-
-            $this->setSQLCommand($sql);
-            $this->setSQLParams([
-                'tag_name' => $_POST['tag_name'],
-                'tag_id' => $_POST['tag_id']
+                'newsletter_id' => $_POST['newsletter_id'],
             ]);
 
             $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // Throw exception if no tags were updated.
+            // Throw an exception if no data was removed.
             if ($data == 0) {
-                throw new ClientErrorException("Problem with getting tag_id occurred.");
+                throw new ClientErrorException("published_newsletter with given newsletter_id could not be found.");
             }
+
+            // End step 1.
+
+            // Step 2. Update published_newsletter_id for newsletter_items that were in the published newsletter.
+            $sql = "UPDATE newsletter_item SET published_newsletter_id = NULL WHERE published_newsletter_id = :newsletter_id";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                ":newsletter_id" => $_POST["newsletter_id"]
+            ]);
+
+            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
             // End step 2.
 
@@ -97,20 +89,19 @@ class EditTag extends Verify
      */
     private function validateParameters()
     {
-        $requiredParameters = array('tag_id', 'tag_name');
+        $requiredParameters = array('newsletter_id');
         $this->checkRequiredParameters($requiredParameters);
     }
 
     /**
-     * Set the array of available parameters for /edittag endpoint.
+     * Set the array of available parameters for /removepublishednewsletter endpoint.
      *
      * @return string[] Array of available params.
      */
     protected function getAvailableParams()
     {
         return [
-            'tag_id' => 'int',
-            'tag_name' => 'string'
+            'newsletter_id' => 'int'
         ];
     }
 }

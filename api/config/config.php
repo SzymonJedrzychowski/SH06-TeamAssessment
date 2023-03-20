@@ -6,7 +6,9 @@
  * @author Szymon Jedrzychowski
  */
 
-define('SECRET', "69q/hn?T{Mc>`7&y?W3D@LB?M8s9h=");
+define('SECRET', "");
+define('API_KEY', "");
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);

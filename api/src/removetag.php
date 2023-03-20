@@ -3,8 +3,7 @@
 /**
  * Responsible for handling /removetag endpoint.
  *
- * This class reads and validates received parameters
- * and removes tag from database and newsletter items.
+ * This class is used to remove a tag.
  *
  * @author Szymon Jedrzychowski
  */
@@ -31,14 +30,17 @@ class RemoveTag extends Verify
 
         // Validate the JWT.
         $tokenData = parent::validateToken();
-        if(!in_array($tokenData->auth, ["2", "3"])){
-            throw new BadRequest("Only editor and admin can remove tags.");
+
+        // Throw exception if user is not admin.
+        if ($tokenData->auth != "3") {
+            throw new BadRequest("Only admin can remove tags.");
         }
 
         // Start the transaction.
         $db->beginTransaction();
 
         try {
+            // Step 1. Delete the tag from item_tag.
             $sql = "DELETE FROM item_tag WHERE tag_id = :tag_id";
 
             $this->setSQLCommand($sql);
@@ -48,11 +50,16 @@ class RemoveTag extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
+            // End step 1.
+
+            // Step 2. Delete the tag.
             $sql = "DELETE FROM tag WHERE tag_id = :tag_id";
 
             $this->setSQLCommand($sql);
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // End step 2.
 
             // Commit the transaction.
             $db->commitTransaction();
@@ -74,7 +81,7 @@ class RemoveTag extends Verify
      * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('tag_id');
         $this->checkRequiredParameters($requiredParameters);
     }
