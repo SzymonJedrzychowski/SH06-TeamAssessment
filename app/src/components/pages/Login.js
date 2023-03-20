@@ -24,7 +24,7 @@ const Login = (props) =>  {
   const handlePassword = (event) => {
     setPassword(event.target.value);
   }
-  
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const encodedString = Buffer.from(email + ":" + password).toString('base64');
@@ -57,7 +57,7 @@ const Login = (props) =>  {
     };     
 
   return (
-    <form onSubmit={handleSubmit} alignItems="center">
+    <form onSubmit={handleSubmit} >
     <Box
       display="flex"
       flexDirection="column"

@@ -5,32 +5,31 @@ import {
   Menu,
   MenuItem,
   Toolbar,
-  Tooltip,
   Typography,
   Link
 } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-// import { Box, Container } from "@mui/system";
-import { Box} from "@mui/system";
+import { Box } from "@mui/system";
 import React, { useState } from "react";
 import { pages } from "../../data/Pages";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import MenuIcon from "@mui/icons-material/Menu";
+import ManageAccountsOutlinedIcon from '@mui/icons-material/ManageAccountsOutlined';
+import PeopleAltOutlinedIcon from '@mui/icons-material/PeopleAltOutlined';
 
 /**
  * 
  * @returns responsive nabar 
- * @author Noorullah Niamatullah
+ * @author Noorullah Niamatullah and Mikolaj Furmanczak
  */
 
 const Navbar = () => {
   const [anchorNav, setAnchorNav] = useState(null);
   const [anchorAccount, setAnchorAccount] = useState(null);
+
   const boxMDScreen = {
     flexGrow: 1,
     display: { xs: "none", md: "flex" },
   };
-
   const btnMDScreen = {
     my: 2,
     color: "white",
@@ -61,12 +60,18 @@ const Navbar = () => {
   const handleCloseNavMenu = () => {
     setAnchorNav(null);
   };
-  const handleOpenAccount = (event) => {
-    setAnchorAccount(event.currentTarget);
-  };
   const handleCloseAccount = () => {
     setAnchorAccount(null);
   };
+  const handleOpenAccount = (event) => {
+    setAnchorAccount(event.currentTarget);
+  };
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.reload();
+  };
+
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -128,10 +133,10 @@ const Navbar = () => {
             </Link>
           ))}
         </Box>
+
         <Box>
-          <Tooltip title="Account ">
-            <AccountCircleIcon onClick={handleOpenAccount} fontSize="large" />
-          </Tooltip>
+          {localStorage.getItem("token") === null &&  <PeopleAltOutlinedIcon onClick={handleOpenAccount} fontSize="large"/>}
+          {localStorage.getItem("token") !== null &&  <ManageAccountsOutlinedIcon onClick={handleOpenAccount} fontSize="large"/>}
           <Menu
             sx={{ mt: "45px" }}
             anchorEl={anchorAccount}
@@ -147,17 +152,15 @@ const Navbar = () => {
             open={Boolean(anchorAccount)}
             onClose={handleCloseAccount}
           >
-            <MenuItem
-              component={RouterLink} 
-              to='/login'
-              >
-              Login
-            </MenuItem>
+
+        {localStorage.getItem("token") === null && <Button variant="standard" component={RouterLink} to={"/login"} color="primary">Log In</Button>}
+        {localStorage.getItem("token") !== null && <Button variant="standard" onClick={handleLogout}>Log out</Button>}
+
+              
           </Menu>
         </Box>
       </Toolbar>
     </AppBar>
   );
 };
-
 export default Navbar;

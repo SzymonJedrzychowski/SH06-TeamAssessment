@@ -33,20 +33,20 @@ const CreateUser = (props) => {
           ["You have successfully created your account!", "Now you can log in."]]);
         } else {
           console.log("Not success: ");
-           if (json.message === "email parameter required") {
+          if (json.message === "email parameter required") {
             setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
             ["The email is required.", "Please try again."]]);
           }
           else if (json.message === "Email already exists") {
-            setInformData([true, () => {resetInformData(); navigate("/login")}, "Error", 
+            setInformData([true, () => {resetInformData(); navigate("/login")}, "Error",
             ["This email is already in use.", "Try logging in."]]);
           }
-          else if (json.message === "Email is not valid") {
+          else if (json.message === "Invalid email") {
             setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
             ["This email is not valid.", "Please enter a valid email."]]);
           }
           else if (json.message === "Domain does not exist") {
-            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error", 
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
             ["You are not allowed to create an account using this domain.", "Please use different one."]]);
           }
           else if (json.message === "first_name parameter required") {
@@ -70,10 +70,14 @@ const CreateUser = (props) => {
             ["The password confirmation is required.", "Please try again."]]);
           }
           else if (json.message === "Passwords do not match") {
-            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error", 
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
             ["The passwords do not match.", "Please try again."]]);
           }
-      }
+          else {
+            setInformData([true, () => {resetInformData(); navigate("/createaccount")}, "Error",
+            ["Something went wrong.", "Please try again."]]);
+          }
+        }
     }
     )
     .catch(
