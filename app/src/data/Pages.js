@@ -4,6 +4,10 @@ export const pages =[
     path  : "/"
   },
   {
+    label: "Archive",
+    path : "/archive"
+  },
+  {
     label : "Partner",
     path : "/partner"
   },
@@ -14,9 +18,5 @@ export const pages =[
   {
     label : "Join Us",
     path  : "/signUp"
-  },
-  {
-    label: "Archive",
-    path : "/archive"
   }
 ];

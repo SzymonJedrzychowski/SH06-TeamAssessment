@@ -15,13 +15,13 @@ const Archive = () => {
   const [rows, setRows] = useState(5);
 
   /**
-   * makes request to the getallpublished newsletter
+   * makes request to the getpublished newsletter
    * get the response and parsed it as json
    * set the data as the parsed responses
    */
   useEffect(() => {
     fetch(
-      "http://unn-W18002720.newnumyspace.co.uk/teamAssessment/api/getallpublishednewsletters"
+      "http://unn-W18002720.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters"
     )
       .then((response) => response.json())
       .then((res) => setdata(res.data));

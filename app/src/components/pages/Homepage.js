@@ -68,7 +68,6 @@ const Homepage = () => {
     }
   }
   const boxStyling = {
-    minHeight: "100vh",
     display: "flex",
     flexDirection: "column",
     padding: 3,
