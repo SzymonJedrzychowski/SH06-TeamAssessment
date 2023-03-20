@@ -99,7 +99,7 @@ const EditPrevious = (props) => {
         formData.append('newsletter_id', newsletterToRemove);
 
         if (confirmation.target.value === "true") {
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removepublishednewsletter",
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removepublishednewsletter",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

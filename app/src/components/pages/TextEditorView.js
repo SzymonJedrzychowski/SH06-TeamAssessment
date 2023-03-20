@@ -1,6 +1,7 @@
 import { Editor } from 'react-draft-wysiwyg';
 /**
- * 
+ * A text editor for display purposes only
+ *   
  * @param {*} props 
  * @returns A view-only editor
  */

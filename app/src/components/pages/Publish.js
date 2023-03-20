@@ -55,7 +55,7 @@ const Publish = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all newsletter items
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })

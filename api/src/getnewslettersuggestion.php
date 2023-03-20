@@ -30,7 +30,7 @@ class GetNewsletterSuggestion extends Verify
         // Ensure the correct parameters were provided
         $this->checkAvailableParams($this->getAvailableParams());
 
-        $params[":item_id"] = $_GET["item_id"]; // TODO check if : needed
+        $params[":item_id"] = $_GET["item_id"];
 
         $this->setSQLCommand($sql);
         $this->setSQLParams($params);

@@ -17,7 +17,6 @@ const PartnerReviewChange = (props) => {
 
     // Get the relevant newsletter item details
     const item = useLocation();
-    //const itemID = item.
 
     // State variable hooks
     const [itemSuggestion, setItemSuggestion] = useState();
