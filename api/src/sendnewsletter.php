@@ -1,12 +1,15 @@
 <?php
 use SendGrid\Mail\Mail;
 use SendGrid\Sendgrid;
+use SendGrid\Mail\Personalization;
+use SendGrid\Mail\To;
+
 /**
  * Responsible for handling /sendnewsletter endpoint.
  *
  * @author Mikolaj Furmanczak
  */
-class SendNewsletter extends Endpoint
+class SendNewsletter extends Verify
 {
     /**
      * Override the __construct method to match the requirements of the /sendnewsletter endpoint.
@@ -22,6 +25,11 @@ class SendNewsletter extends Endpoint
         // Check if correct request method was used.
         $this->validateRequestMethod("POST");
 
+        // Validate the JWT.
+        $tokenData = parent::validateToken();
+        if(!in_array($tokenData->auth, ["2", "3"])){
+            throw new BadRequest("Only editor and admin can send out the newsletter.");
+            }
         // Initialise the SQL command and parameters to get email list from database.
         $sql = "SELECT subscriber_email FROM newsletter_subscriber;";
         $this->setSQLCommand($sql);
@@ -31,9 +39,10 @@ class SendNewsletter extends Endpoint
         $email_list = array("dummy@email.domain"=>"email");
 
         for($i = 0; $i < count($db_email); $i++){
-            $email_list[$db_email[$i]['subscriber_email']] = $db_email[$i]['subscriber_email'];
+            $personalization[$i] = new Personalization();
+            $personalization[$i]->addTo(new To($db_email[$i]['subscriber_email']));
+            $email->addPersonalization($personalization[$i]);
         } 
-        $email->addTos($email_list);
         $email->setSubject("New Newsletter is here!");
         $email->addHeader("IC3Newsletter");
         $email->setFrom("mikolaj.furmanczak@northumbria.ac.uk", "IC3 Newsletter");
