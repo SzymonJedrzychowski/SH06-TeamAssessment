@@ -240,7 +240,7 @@ const Partner = (props) => {
                         <div>{value.item_title}</div>
                         <div>{checkValues[value.item_checked]}</div>
                         <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
-                        <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>
+                        {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
                         {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {value.item_id}>See suggestion</Button></div>}
                     </div>); 
             }

@@ -156,7 +156,6 @@ const PartnerReviewChange = (props) => {
                 </div>
                 <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
                 <div className = 'PartnerBody'>
-                    <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
                     <TextEditorView
                     type={"content"} content={contentState} setContent={setContentState}
                     defaultContentState = {itemSuggestion.suggestion_content}

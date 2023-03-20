@@ -14,6 +14,7 @@ const TextEditor = (props) => {
     }
     return (
         <Editor
+            readOnly={true}
             toolbarHidden={true}
             editorState={props.content}
             onEditorStateChange={props.setContent}
