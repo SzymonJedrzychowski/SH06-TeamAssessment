@@ -416,7 +416,7 @@ const CheckItem = (props) => {
                                 Suggestion response
                             </TableCell>
                             <TableCell>
-                                {suggestion["suggestion_response"]}
+                                {<Box sx={{wordBreak: "break-all"}}>{suggestion["suggestion_response"]}</Box>}
                             </TableCell>
                         </TableRow>}
                         <TableRow>
