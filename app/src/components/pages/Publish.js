@@ -55,7 +55,7 @@ const Publish = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all newsletter items
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -96,7 +96,7 @@ const Publish = (props) => {
         }
 
         //Verifying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -194,7 +194,7 @@ const Publish = (props) => {
 
     //Function used to send newsletter
     const sendNewsletter = () => {
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/sendnewsletter",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/sendnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -238,7 +238,7 @@ const Publish = (props) => {
         formData.append('newsletter_items', JSON.stringify(temp));
 
         //Publish the newsletter
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -282,7 +282,7 @@ const Publish = (props) => {
         formData.append('newsletter_items', JSON.stringify(temp));
 
         //Edit the newsletter
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

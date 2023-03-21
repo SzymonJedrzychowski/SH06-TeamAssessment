@@ -30,6 +30,9 @@ const CheckItem = (props) => {
     //Hook to hold the data of the newsletter item
     const [newsletterItem, setNewsletterItem] = useState();
 
+    //Hook to hold the data of the item suggestion
+    const [suggestion, setSuggestion] = useState(null);
+
     //Hook to hold the data of all available tags
     const [tagsList, setTagsList] = useState({});
 
@@ -37,6 +40,7 @@ const CheckItem = (props) => {
     const [loadingItems, setLoadingItems] = useState(true);
     const [loadingItemTags, setLoadingItemTags] = useState(true);
     const [loadingTags, setLoadingTags] = useState(true);
+    const [loadingItemState, setLoadingItemState] = useState(true);
 
     //Hook responsible for re-rendering the page after changes were made to the newsletter item
     const [update, setUpdate] = useState(0);
@@ -86,10 +90,39 @@ const CheckItem = (props) => {
         );
     };
 
+    //Function that loads data of newsletter suggestion if there is one.
+    const loadItemState = () => {
+        //Loading the newsletter item
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?item_id=" + item.state,
+            {
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+            })
+            .then(
+                (response) => response.json()
+            )
+            .then(
+                (json) => {
+                    if (json.message === "Success" && json.data.length === 1) {
+                        setSuggestion(json.data[0]);
+                        setLoadingItemState(false);
+                    } else if (json.message === "Success" && json.data.length === 0) {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    } else {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    }
+                }
+            )
+            .catch(
+                (e) => {
+                    console.log(e.message)
+                }
+            )
+    }
+
     //Function that loads all data for the page
     const loadData = () => {
         //Loading the newsletter item
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -101,6 +134,11 @@ const CheckItem = (props) => {
                     if (json.message === "Success" && json.data.length === 1) {
                         setNewsletterItem(json.data[0]);
                         setLoadingItems(false);
+                        if (["1", "2"].includes(json.data[0]["item_checked"])) {
+                            loadItemState();
+                        } else {
+                            setLoadingItemState(false);
+                        }
                     } else if (json.message === "Success" && json.data.length === 0) {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                     } else {
@@ -115,7 +153,7 @@ const CheckItem = (props) => {
             )
 
         //Loading the tags of the newsletter item
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
             .then(
                 (response) => response.json()
             )
@@ -135,7 +173,7 @@ const CheckItem = (props) => {
                 })
 
         //Loading all available tags
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/gettags")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
             .then(
                 (response) => response.json()
             )
@@ -165,7 +203,7 @@ const CheckItem = (props) => {
         }
 
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -201,7 +239,7 @@ const CheckItem = (props) => {
         formData.append('item_checked', newStatus);
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -234,7 +272,7 @@ const CheckItem = (props) => {
         formData.append('item_tags', newTags.length > 0 ? JSON.stringify(newTags) : JSON.stringify([null]));
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postitemtags",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postitemtags",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -272,7 +310,7 @@ const CheckItem = (props) => {
     }
 
     //Variable used to determine if website can be displayed (all data needs to be loaded)
-    const loading = loadingItems && loadingItemTags && loadingTags;
+    const loading = !loadingItems && !loadingItemTags && !loadingTags && !loadingItemState;
 
     //Style for the page
     const pageStyle = {
@@ -326,7 +364,7 @@ const CheckItem = (props) => {
     }
 
     return <Box sx={pageStyle}>
-        {(!loading && newsletterItem !== undefined) && <Box>
+        {(loading && newsletterItem !== undefined) && <Box>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Check item</Typography>
             <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
                 <Table>
@@ -363,6 +401,24 @@ const CheckItem = (props) => {
                                 {checkValues[newsletterItem["item_checked"]]}
                             </TableCell>
                         </TableRow>
+                        {["1", "2"].includes(newsletterItem["item_checked"]) && <TableRow>
+                            <TableCell>
+                                Suggestion status
+                            </TableCell>
+                            <TableCell>
+                                {suggestion["approved"] === null && "Unchecked"}
+                                {suggestion["approved"] === "0" && "Rejected"}
+                                {suggestion["approved"] === "1" && "Approved"}
+                            </TableCell>
+                        </TableRow>}
+                        {["2"].includes(newsletterItem["item_checked"]) && <TableRow>
+                            <TableCell>
+                                Suggestion response
+                            </TableCell>
+                            <TableCell>
+                                {<Box sx={{wordBreak: "break-all"}}>{suggestion["suggestion_response"]}</Box>}
+                            </TableCell>
+                        </TableRow>}
                         <TableRow>
                             <TableCell colSpan={2}>
                                 <Box sx={{ minHeight: "200px" }}>
