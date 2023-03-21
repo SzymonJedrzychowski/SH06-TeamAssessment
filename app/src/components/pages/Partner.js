@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import {Markup} from 'interweave';
-import {Link} from 'react-router-dom';
-import { Editor } from 'react-draft-wysiwyg';
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import {Button} from '@mui/material';
+import { Markup } from 'interweave';
+import { Link, useNavigate } from 'react-router-dom';
+import TextEditor from "./TextEditor";
+import { Button } from '@mui/material';
+import draftToHtml from 'draftjs-to-html';
+import { convertToRaw } from 'draft-js';
 
 /**
  * Partner page
@@ -13,7 +14,7 @@ import {Button} from '@mui/material';
  * @author Matthew Cartwright
  */
 
-const Partner = () => {
+const Partner = (props) => {
 
     // State variable hooks
     const [loadingReviewItems, setLoadingReviewItems] = useState(true);
@@ -21,15 +22,16 @@ const Partner = () => {
     const [showReview, setShowReview] = useState(false);
     const [showPublished, setShowPublished] = useState(false);
     const [itemsInReview, setItemsInReview] = useState([]);
-    const [itemsFilter, setItemsFilter] = useState([null]);
+    const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
+    const [editorContent, setEditorContent] = useState(null);
+    const [editorTitle, setEditorTitle] = useState("Placeholder")
 
-    const [authenticated, setAuthenticated] = useState(false); //TODO: apply
-    const [loading, setLoading] = useState(true); //TODO: apply
+    const [authenticated, setAuthenticated] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     // On render hook
     useEffect(() => {
-        //WIP
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -51,6 +53,7 @@ const Partner = () => {
                         localStorage.removeItem('token');
                         setAuthenticated(false);
                         setLoading(false);
+                        setInformData([true, () => {resetInformData(); navigate("/login")}, "Authentication failed.", ["You must be logged in to contribute.", "Please log in."]]);
                         return;
                     }
                 }
@@ -61,21 +64,19 @@ const Partner = () => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
         .then(
             //Process response into JSON
             function(response){
-                setLoading(false);
                 if (response.status === 200){
+                    setLoading(false);
                     return response.json();
                 }
                 else {
                     console.log(response.json);
-                    localStorage.removeItem('token');
-                    setAuthenticated(false);
                     setLoading(false);
                 }
             }
@@ -93,16 +94,20 @@ const Partner = () => {
         )
 
         console.log("Render complete")
-    }, [])
+    }, []);
 
     // Other variables
     const checkValues = {
-        "-1" : "Rejected",
+        "-1" : "Removed",
         "0"  : "In review",
-        "1"  : "Edit requested!",
+        "1"  : "Edit requested!", 
         "2"  : "In review",
-        "3"  : "In review"
+        "3"  : "Approved"
     }
+
+    const setInformData = props.dialogData.setInformData;
+    const setAlertData = props.dialogData.setAlertData;
+    const resetInformData = props.dialogData.resetInformData;
 
 
     // Functions
@@ -125,11 +130,92 @@ const Partner = () => {
             setShowPublished(true);
             }
     
-    
+        const navigate = useNavigate();
     
         // -Other
+        const uploadConfirm = () => {
+            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, upload now.", "No, do not upload."]);
+        }
+
+        const handleUploadClose = (confirmation) => {
+            setAlertData([false, null, null, null, null, null]);
+            if (confirmation.target.value === "true") {
+                uploadItem();
+            }
+        }
+
         const uploadItem = () => {
-            console.log("Upload");
+            const formData = new FormData();
+
+            let yourDate = new Date();
+            const offset = yourDate.getTimezoneOffset();
+            yourDate = new Date(yourDate.getTime() - (offset * 60 * 1000));
+
+            formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
+            formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
+            formData.append('item_title', editorTitle); //TODO FIX
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
+                {
+                    method: 'POST',
+                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                    body: formData
+                })
+                .then(
+                    (response) => response.json()
+                )
+                .then(
+                    (json) => {
+                        if (json.message !== "Success") {
+                            console.log(json);
+                            setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
+                        }
+                        else if (json.message === "Success"){
+                            console.log("Success")
+                            setInformData([true, () => {resetInformData(); navigate('/')}, "Upload Successful.", []]);
+                        }
+                    })
+                .catch(
+                    (e) => {
+                        console.log(e.message)
+                    })
+        }
+
+        const deleteConfirm = (value) => {
+            setAlertData([true, (confirmation) => handleDeleteClose(confirmation, value), "Confirm Deletion", ["Are you sure you want to delete this item?", "This is permanent!"], "Yes, delete.", "No, do not delete."]);
+        }
+
+        const handleDeleteClose = (confirmation, value) => {
+            setAlertData([false, null, null, null, null, null]);
+            if (confirmation.target.value === "true") {
+                deleteNewsletterItem(value);
+            }
+        }
+
+        const deleteNewsletterItem = (value) => {
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem?item_id=" + value,
+                {
+                    method: 'POST',
+                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                })
+                .then(
+                    (response) => response.json()
+                )
+                .then(
+                    (json) => {
+                        console.log("ID: " + value);
+                        if (json.message !== "Success") {
+                            console.log(json);
+                            setInformData([true, () => {resetInformData()}, "Deletion Failed.", ['Check the console for details.']]);
+                        }
+                        else if (json.message === "Success"){
+                            console.log("Success")
+                            setInformData([true, () => {resetInformData(); navigate('/')}, "Deletion Successful.", []]);
+                        }
+                    })
+                .catch(
+                    (e) => {
+                        console.log(e.message)
+                    })
         }
 
         const truncateText = (text) => {
@@ -158,16 +244,22 @@ const Partner = () => {
 
         // -Contribute
         const contributeSection = <div className = 'PartnerContribute'>
-        <h2 className = 'PartnerContributeTitle'>Your item</h2>
-        <div className = 'PartnerContributeBox'>
-            Box goes here.
-            <Editor
-                toolbarClassName="toolbarClassName"
-                wrapperClassName="wrapperClassName"
-                editorClassName="editorClassName"
+        <div className = 'PartnerContributeTitle'>Contribute an item
+        <input 
+            type = 'title'
+            content = {editorTitle}
+            setContent = {setEditorTitle}
             />
         </div>
-        <button onClick = {uploadItem}>Upload</button>
+        
+        <div className = 'PartnerContributeBox'>
+            <TextEditor
+                type = 'content'
+                content = {editorContent}
+                setContent = {setEditorContent}
+            />
+        </div>
+        {<button onClick = {uploadConfirm}>Upload</button>}
         </div>;
         
 
@@ -175,23 +267,33 @@ const Partner = () => {
         
             // --Items
             const createItemBox = (value) => {
+                let suggestionMade = false;
+                if (value.item_checked === "1"){
+                    suggestionMade = true;
+                }
+                let deletable = false;
+                if (value.item_checked === "-1" || value.item_checked === "0"){
+                    deletable = true;
+                }
                 const itemContent = <Markup content={value.content}/>
                 return(
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>
                         <div>{checkValues[value.item_checked]}</div>
                         <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
-                        <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>
+                        {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
+                        {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
+                        {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {value.item_id}>See suggestion</Button></div>}
                     </div>); 
             }
 
         const reviewSection = <div className = 'PartnerReview'>
         <div className = 'PartnerReviewFilters'>
             <ul>
-                <button onClick = {()=>setItemsFilter([null])}>All</button>
-                <button onClick = {()=>setItemsFilter(["3"])}>Accepted</button>
                 <button onClick = {()=>setItemsFilter(["0", "1", "2"])}>Pending</button>
-                <button onClick = {()=>setItemsFilter(["-1"])}>Rejected</button>
+                <button onClick = {()=>setItemsFilter(["3"])}>Accepted</button>
+                <button onClick = {()=>setItemsFilter(["-1"])}>Removed</button>
+                <button onClick = {()=>setItemsFilter([null])}>All</button>
             </ul>
         </div>
         <div className = 'PartnerReviewLoading'>
@@ -234,15 +336,7 @@ const Partner = () => {
                 </div>
             </div>}
             
-            {(!loading && !authenticated && localStorage.getItem('token') === undefined) && 
-                <div className = 'PartnerNonAuthenticated'>
-                    <h1>Please log in or sign up to contribute</h1>
-                </div>}
 
-            {(!loading && !authenticated) && 
-                <div className = 'PartnerNonAuthenticated2'>
-                    <h1>Please log in or sign up to contribute</h1>
-                </div>}
         </div>
         
     )

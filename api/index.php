@@ -75,6 +75,18 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/addsubscriber':
                 $endpoint = new AddSubscriber();
                 break;
+            case '/postnewsletteritem':
+                $endpoint = new PostNewsletterItem();
+                break;
+            case '/removenewsletteritem':
+                $endpoint = new RemoveNewsletterItem();
+                break;
+            case '/updatenewsletteritem':
+                $endpoint = new UpdateNewsletterItem();
+                break;
+            case '/getnewslettersuggestion':
+                $endpoint = new GetNewsletterSuggestion();
+                break;
             case '/sendnewsletter':
                 $endpoint = new SendNewsletter();
                 break;
