@@ -24,7 +24,7 @@ const Partner = (props) => {
     const [itemsInReview, setItemsInReview] = useState([]);
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
     const [editorContent, setEditorContent] = useState(null);
-    const [editorTitle, setEditorTitle] = useState("Placeholder")
+    const [editorTitle, setEditorTitle] = useState("Placeholder");
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -221,6 +221,10 @@ const Partner = (props) => {
                     })
         }
 
+        const getItemTitle = (title) => {
+            setEditorTitle(title.target.value)
+        }
+
         const truncateText = (text) => {
             // Credit: https://stackoverflow.com/a/1199420
             return(
@@ -251,7 +255,7 @@ const Partner = (props) => {
         <input 
             type = 'title'
             content = {editorTitle}
-            setContent = {setEditorTitle}
+            onChange = {getItemTitle}
             />
         </div>
         
