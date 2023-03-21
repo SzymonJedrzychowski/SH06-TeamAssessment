@@ -20,7 +20,7 @@ const PartnerReviewChange = (props) => {
     const item = useLocation();
 
     // State variable hooks
-    const [itemSuggestion, setItemSuggestion] = useState();
+    const [itemSuggestion, setItemSuggestion] = useState(null);
     const [contentState, setContentState] = useState(null);
     const [commentState, setCommentState] = useState(null);
     const [response, setResponse] = useState(null);
