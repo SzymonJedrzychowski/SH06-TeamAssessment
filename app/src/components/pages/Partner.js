@@ -380,7 +380,7 @@ const Partner = (props) => {
 
             // --Items
             const createPublishedItemBox = (value) => {
-                const itemContent = <Markup content={value.content}/>
+                const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
                 return(
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>
