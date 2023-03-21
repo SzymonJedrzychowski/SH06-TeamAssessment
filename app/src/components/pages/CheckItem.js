@@ -2,6 +2,9 @@ import { Box, Button, Chip, FormControl, InputLabel, MenuItem, OutlinedInput, Pa
 import { Markup } from 'interweave';
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Parser } from 'html-to-react';
+import { convertFromRaw } from 'draft-js';
+import draftToHtml from 'draftjs-to-html';
 
 /**
  * CheckItem
@@ -93,7 +96,7 @@ const CheckItem = (props) => {
     //Function that loads data of newsletter suggestion if there is one.
     const loadItemState = () => {
         //Loading the newsletter item
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?item_id=" + item.state,
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -122,7 +125,7 @@ const CheckItem = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading the newsletter item
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -153,7 +156,7 @@ const CheckItem = (props) => {
             )
 
         //Loading the tags of the newsletter item
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
             .then(
                 (response) => response.json()
             )
@@ -173,7 +176,7 @@ const CheckItem = (props) => {
                 })
 
         //Loading all available tags
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/gettags")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
             .then(
                 (response) => response.json()
             )
@@ -203,7 +206,7 @@ const CheckItem = (props) => {
         }
 
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -239,7 +242,7 @@ const CheckItem = (props) => {
         formData.append('item_checked', newStatus);
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -272,7 +275,7 @@ const CheckItem = (props) => {
         formData.append('item_tags', newTags.length > 0 ? JSON.stringify(newTags) : JSON.stringify([null]));
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postitemtags",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postitemtags",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -295,7 +298,7 @@ const CheckItem = (props) => {
                 })
     }
 
-    //Function used as handleClose when alert dialog is displayed (for removing the item)
+    //Function used as handleClose when alert dialog is displayed (for rejecting the item)
     const handleClose = (confirmation) => {
         setAlertData([false, null, null, null, null, null]);
 
@@ -305,8 +308,8 @@ const CheckItem = (props) => {
     }
 
     //Function used to change the data displayed in the alert dialog
-    const handleRemove = () => {
-        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to remove this newsletter item?", ["You cannot undo this operation."], "Remove the item", "Keep the item"])
+    const handleReject = () => {
+        setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to reject this newsletter item?", ["You cannot undo this operation."], "Reject the item", "Keep the item"])
     }
 
     //Variable used to determine if website can be displayed (all data needs to be loaded)
@@ -363,6 +366,8 @@ const CheckItem = (props) => {
         </TableCell>
     }
 
+    const p = new Parser();
+
     return <Box sx={pageStyle}>
         {(loading && newsletterItem !== undefined) && <Box>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Check item</Typography>
@@ -416,13 +421,13 @@ const CheckItem = (props) => {
                                 Suggestion response
                             </TableCell>
                             <TableCell>
-                                {<Box sx={{wordBreak: "break-all"}}>{suggestion["suggestion_response"]}</Box>}
+                                {<Box sx={{ wordBreak: "break-all" }}>{suggestion["suggestion_response"]}</Box>}
                             </TableCell>
                         </TableRow>}
                         <TableRow>
                             <TableCell colSpan={2}>
                                 <Box sx={{ minHeight: "200px" }}>
-                                    <Markup content={newsletterItem["content"]} />
+                                    <Markup content={draftToHtml(JSON.parse(newsletterItem["content"]))} />
                                 </Box>
                             </TableCell>
                         </TableRow>
@@ -434,8 +439,8 @@ const CheckItem = (props) => {
                                 <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "center", columnGap: "10px", rowGap: "5px", "a, button": { minWidth: "20%" } }}>
                                     {["-1", "1", "3"].includes(newsletterItem["item_checked"]) && <Button variant="contained" disabled>Approve</Button>}
                                     {["0", "2"].includes(newsletterItem["item_checked"]) && <Button variant="contained" onClick={() => changeStatus("3")}>Approve</Button>}
-                                    {newsletterItem["item_checked"] === "-1" && <Button variant="contained" disabled>Remove</Button>}
-                                    {newsletterItem["item_checked"] !== "-1" && <Button variant="contained" onClick={handleRemove}>Remove</Button>}
+                                    {newsletterItem["item_checked"] === "-1" && <Button variant="contained" disabled>Reject</Button>}
+                                    {newsletterItem["item_checked"] !== "-1" && <Button variant="contained" onClick={handleReject}>Reject</Button>}
                                     {["0", "2", "3"].includes(newsletterItem["item_checked"]) && <Button variant="contained" component={Link} to={"/suggestChanges"} state={item.state}>Edit</Button>}
                                     {["-1", "1"].includes(newsletterItem["item_checked"]) && <Button variant="contained" disabled>Edit</Button>}
                                 </Box>

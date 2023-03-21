@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 import { Markup } from "interweave";
 import React, { useEffect, useState } from "react";
+import draftToHtml from 'draftjs-to-html';
 /**
  * 
  * @returns hompage whic is displaying the last published newsletter
@@ -18,7 +19,7 @@ const Homepage = () => {
   };
   useEffect(() => {
     fetch(
-      "http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getlastpublishednewsletter"
+      "http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getlastpublishednewsletter"
     )
       .then((response) => response.json())
       .then((json) => {
@@ -56,7 +57,7 @@ const Homepage = () => {
   }
   console.log(paperContent);
   const newsContentMa = (value, index) => {
-    return <Markup content={value} />;
+    return <Markup content={draftToHtml(JSON.parse(value))} />;
   };
 
   for (let val in contentProcessd.content) {

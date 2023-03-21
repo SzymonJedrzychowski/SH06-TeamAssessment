@@ -33,7 +33,7 @@ const Partner = (props) => {
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -67,7 +67,7 @@ const Partner = (props) => {
                 }
             )
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=false",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=false",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -94,7 +94,7 @@ const Partner = (props) => {
             }
         )
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=true",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=true",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -177,11 +177,10 @@ const Partner = (props) => {
             let yourDate = new Date();
             const offset = yourDate.getTimezoneOffset();
             yourDate = new Date(yourDate.getTime() - (offset * 60 * 1000));
-
-            formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
+            formData.append('content', JSON.stringify(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
             formData.append('item_title', editorTitle); //TODO FIX
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -221,7 +220,7 @@ const Partner = (props) => {
         const deleteNewsletterItem = (value) => {
             const formData = new FormData();
             formData.append('item_id', value);
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -309,7 +308,7 @@ const Partner = (props) => {
                 if (value.item_checked === "-1" || value.item_checked === "0"){
                     deletable = true;
                 }
-                const itemContent = <Markup content={value.content}/>
+                const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
                 return(
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>
