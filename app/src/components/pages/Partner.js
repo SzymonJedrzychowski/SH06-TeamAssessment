@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Markup } from 'interweave';
 import { Link, useNavigate } from 'react-router-dom';
 import TextEditor from "./TextEditor";
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
 import draftToMarkdown from 'draftjs-to-html';
 import { convertToRaw } from 'draft-js';
@@ -408,12 +408,15 @@ const Partner = (props) => {
         <Box sx = {boxStyle} className = 'Partner'>
             {(!loading && authenticated) && <div className = 'PartnerAuthenticated'>
                 <div className = 'PartnerHeader'>
-                    <h1>Partner Page Skeleton</h1> {/*Welcome name big*/}
-                    <p>Lorem Ipsum</p> {/*Selecte what you'd like to do small?*/}
-                    <button onClick = {setContribute}>Contribute item!</button> {/*Justify left*/}
-                    <button onClick = {() => confirmNavigate("Review")}>Review items!</button> {/*TODO Maybe cache box content or warn-Justify centre*/}
-                    <button onClick = {() => confirmNavigate("Published")}>See published items!</button> {/*Justify right*/}
+                    <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
+                    <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.1em", borderBottom: 3 }}>Welcome, Partner</Typography>
+                    <Box sx = {{display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "left" } }>
+                        <Button variant = "contained" onClick = {setContribute}>Contribute item!</Button>
+                        <Button variant = "contained" onClick = {() => confirmNavigate("Review")}>Review items!</Button>
+                        <Button variant = "contained" onClick = {() => confirmNavigate("Published")}>See published items!</Button>
+                    </Box>
                 </div>
+
                 <div className = 'PartnerBody'>
                 {showContribute && <div className = 'PartnerContribute'>{contributeSection}</div>}
                 {showReview && <div className = 'PartnerReview'>{reviewSection}</div>}
