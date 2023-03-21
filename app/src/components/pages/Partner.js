@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Markup } from 'interweave';
 import { Link, useNavigate } from 'react-router-dom';
 import TextEditor from "./TextEditor";
-import { Button } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
+import draftToMarkdown from 'draftjs-to-html';
 import { convertToRaw } from 'draft-js';
 
 /**
@@ -25,7 +26,7 @@ const Partner = (props) => {
     const [itemsInReview, setItemsInReview] = useState([]);
     const [publishedItems, setPublishedItems] = useState([]);
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
-    const [editorContent, setEditorContent] = useState(null);
+    const [editorContent, setEditorContent] = useState("");
     const [editorTitle, setEditorTitle] = useState("Placeholder");
 
     const [authenticated, setAuthenticated] = useState(false);
@@ -158,6 +159,32 @@ const Partner = (props) => {
             }
     
         const navigate = useNavigate();
+
+        const confirmNavigate = (where) => {
+            //if(draftToMarkdown(convertToRaw(editorContent.getCurrentContent())).trim() === "")
+            if (showContribute == true){ // && !((editorContent.getCurrentContent()).hasText())){
+                setAlertData([true, (confirmation) => handleConfirmNavigate(confirmation, where), "Confirm navigate.", ["Are you sure you wish to leave this page??", "Your progress will be lost."], "Yes, leave page.", "No, stay on page."]);
+            }
+            else {
+                navigatePartner(where);
+            }
+        }
+
+        const handleConfirmNavigate = (confirmation, where) => {
+            setAlertData([false, null, null, null, null, null]);
+            if (confirmation.target.value === "true") {
+                navigatePartner(where);
+            }
+        }
+
+        const navigatePartner = (where) => {
+            if (where == "Review") {
+                setReview();
+            }
+            else if (where == "Published") {
+                setPublished();
+            }
+        }
     
         // -Other
         const uploadConfirm = () => {
@@ -180,7 +207,7 @@ const Partner = (props) => {
 
             formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
-            formData.append('item_title', editorTitle); //TODO FIX
+            formData.append('item_title', editorTitle);
             fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
                     method: 'POST',
@@ -275,6 +302,12 @@ const Partner = (props) => {
         }
 
     // Content
+        // -Style
+        const boxStyle = {
+            display: "flex",
+            flexDirection: "column",
+            padding: 3,
+          };
 
         // -Contribute
         const contributeSection = <div className = 'PartnerContribute'>
@@ -372,16 +405,15 @@ const Partner = (props) => {
         </div>
 
     // OUTPUT
-    //TODO: Loading
     return(
-        <div className = 'Partner'>
+        <Box sx = {boxStyle} className = 'Partner'>
             {(!loading && authenticated) && <div className = 'PartnerAuthenticated'>
                 <div className = 'PartnerHeader'>
-                    <h1>Partner Page Skeleton</h1>
-                    <p>Lorem Ipsum</p>
-                    <button onClick = {setContribute}>Contribute item!</button>
-                    <button onClick = {setReview}>Review items!</button> {/*TODO Maybe cache box content*/}
-                    <button onClick = {setPublished}>See published items!</button>
+                    <h1>Partner Page Skeleton</h1> {/*Welcome name big*/}
+                    <p>Lorem Ipsum</p> {/*Selecte what you'd like to do small?*/}
+                    <button onClick = {setContribute}>Contribute item!</button> {/*Justify left*/}
+                    <button onClick = {() => confirmNavigate("Review")}>Review items!</button> {/*TODO Maybe cache box content or warn-Justify centre*/}
+                    <button onClick = {() => confirmNavigate("Published")}>See published items!</button> {/*Justify right*/}
                 </div>
                 <div className = 'PartnerBody'>
                 {showContribute && <div className = 'PartnerContribute'>{contributeSection}</div>}
@@ -392,8 +424,7 @@ const Partner = (props) => {
             </div>}
             
 
-        </div>
-        
+        </Box>
     )
 }
 
