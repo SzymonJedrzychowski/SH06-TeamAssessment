@@ -30,7 +30,7 @@ const PartnerReviewChange = (props) => {
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -70,7 +70,6 @@ const PartnerReviewChange = (props) => {
         .then(
             //Process response into JSON
             function(response){
-                console.log(item);
                 if (response.status === 200){
                     return response.json();
                 }
