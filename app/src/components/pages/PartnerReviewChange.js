@@ -3,8 +3,8 @@ import {Link, useNavigate, useLocation} from 'react-router-dom';
 import {Button} from '@mui/material';
 import { EditorState, ContentState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
-import TextEditorView from "./TextEditorView";
-import TextEditor from './TextEditorView';
+import { Markup } from 'interweave';
+import draftToHtml from 'draftjs-to-html';
 
 /**
  * PartnerReviewChange page
@@ -20,9 +20,7 @@ const PartnerReviewChange = (props) => {
     const item = useLocation();
 
     // State variable hooks
-    const [itemSuggestion, setItemSuggestion] = useState(null);
-    const [contentState, setContentState] = useState(null);
-    const [commentState, setCommentState] = useState(null);
+    const [itemSuggestion, setItemSuggestion] = useState();
     const [response, setResponse] = useState(null);
 
     const [authenticated, setAuthenticated] = useState(false);
@@ -30,7 +28,7 @@ const PartnerReviewChange = (props) => {
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -63,7 +61,7 @@ const PartnerReviewChange = (props) => {
                 }
             )
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state[0],
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state[0],
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -81,12 +79,6 @@ const PartnerReviewChange = (props) => {
         .then(
             (json) => {
                 setItemSuggestion(json.data);
-                const contentBlock = htmlToDraft(json.data[0]["suggestion_content"]);
-                const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-                setContentState(EditorState.createWithContent(content));
-                const commentBlock = htmlToDraft(json.data[0]["suggestion_comment"]);
-                const comment = ContentState.createFromBlockArray(commentBlock.contentBlocks);
-                setCommentState(EditorState.createWithContent(comment));
                 setLoading(false);
             }
         )
@@ -154,7 +146,7 @@ const PartnerReviewChange = (props) => {
                 formDataSuggestion.append('suggestion_id', itemSuggestion[0].suggestion_id);
                 formDataSuggestion.append('item_id', item.state[0]);
                 formDataSuggestion.append('item_status', item.state[1])
-                fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postsuggestionresponse",
+                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postsuggestionresponse",
                     {
                         method: 'POST',
                         headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -184,7 +176,7 @@ const PartnerReviewChange = (props) => {
                 formDataItem.append('content', itemSuggestion[0]["suggestion_content"]);
                 formDataItem.append('item_id', item.state[0]);
                 formDataItem.append('item_checked', item.state[1]);
-                fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
                         {
                             method: 'POST',
                             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -227,17 +219,9 @@ const PartnerReviewChange = (props) => {
                 </div>
                 <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
                 <div className = 'PartnerBody'>
-                    <TextEditorView
-                    type={"content"} content={contentState} setContent={setContentState}
-                    defaultContentState = {itemSuggestion.suggestion_content}
-                    toolbarHidden = {true}
-                    />
+                    <Markup content={draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_content"]))}/>
                     <h2>Comments</h2>
-                    <TextEditorView
-                    type={"comment"} content={commentState} setContent={setCommentState}
-                    defaultContentState = {itemSuggestion.suggestion_comment}
-                    toolbarHidden = {true} //TODO change for normal boxes
-                    />
+                    <Markup content={draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_comment"]))}/>
                     <Button onClick = {acceptConfirm}>Accept</Button>
                     <Button onClick={rejectConfirm}>Reject</Button>
                     <p>Comments to editor</p>

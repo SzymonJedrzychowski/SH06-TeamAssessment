@@ -1,7 +1,5 @@
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableRow, Typography } from "@mui/material";
-import { ContentState, convertToRaw, EditorState } from 'draft-js';
-import draftToHtml from 'draftjs-to-html';
-import htmlToDraft from 'html-to-draftjs';
+import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import TextEditor from "./TextEditor";
@@ -42,7 +40,7 @@ const SuggestChanges = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading newsletter item
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -53,8 +51,7 @@ const SuggestChanges = (props) => {
                 (json) => {
                     if (json.message === "Success" && json.data.length === 1) {
                         setNewsletterItem(json.data[0]);
-                        const contentBlock = htmlToDraft(json.data[0]["content"]);
-                        const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+                        const content = convertFromRaw(JSON.parse(json.data[0]["content"]));
                         setContentState(EditorState.createWithContent(content));
                         setLoading(false);
                     } else if (json.message === "Success" && json.data.length === 0) {
@@ -80,7 +77,7 @@ const SuggestChanges = (props) => {
         }
 
         //Verifying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -114,11 +111,11 @@ const SuggestChanges = (props) => {
     const suggestChange = () => {
         const changeData = new FormData();
         changeData.append('item_id', item.state);
-        changeData.append('suggestion_content', draftToHtml(convertToRaw(contentState.getCurrentContent())));
-        changeData.append('suggestion_comment', draftToHtml(convertToRaw(commentState.getCurrentContent())));
+        changeData.append('suggestion_content', JSON.stringify(convertToRaw(contentState.getCurrentContent())));
+        changeData.append('suggestion_comment', JSON.stringify(convertToRaw(commentState.getCurrentContent())));
         
         //Submit the suggestion
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewslettersuggestion",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewslettersuggestion",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
