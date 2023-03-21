@@ -131,17 +131,17 @@ const Partner = (props) => {
             }
     
         const navigate = useNavigate();
+    
+        // -Other
+        const uploadConfirm = () => {
+            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, upload now.", "No, do not upload."]);
+        }
 
-        const handleClose = (confirmation) => {
+        const handleUploadClose = (confirmation) => {
             setAlertData([false, null, null, null, null, null]);
             if (confirmation.target.value === "true") {
                 uploadItem();
             }
-        }
-    
-        // -Other
-        const uploadConfirm = () => {
-            setAlertData([true, (confirmation) => handleClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, upload now.", "No, do not upload."]);
         }
 
         const uploadItem = () => {
@@ -154,7 +154,6 @@ const Partner = (props) => {
             formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
             formData.append('item_title', editorTitle); //TODO FIX
-            //console.log(formData);
             fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
                     method: 'POST',
@@ -173,6 +172,44 @@ const Partner = (props) => {
                         else if (json.message === "Success"){
                             console.log("Success")
                             setInformData([true, () => {resetInformData(); navigate('/')}, "Upload Successful.", []]);
+                        }
+                    })
+                .catch(
+                    (e) => {
+                        console.log(e.message)
+                    })
+        }
+
+        const deleteConfirm = (value) => {
+            setAlertData([true, (confirmation) => handleDeleteClose(confirmation, value), "Confirm Deletion", ["Are you sure you want to delete this item?", "This is permanent!"], "Yes, delete.", "No, do not delete."]);
+        }
+
+        const handleDeleteClose = (confirmation, value) => {
+            setAlertData([false, null, null, null, null, null]);
+            if (confirmation.target.value === "true") {
+                deleteNewsletterItem(value);
+            }
+        }
+
+        const deleteNewsletterItem = (value) => {
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem?item_id=" + value,
+                {
+                    method: 'POST',
+                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                })
+                .then(
+                    (response) => response.json()
+                )
+                .then(
+                    (json) => {
+                        console.log("ID: " + value);
+                        if (json.message !== "Success") {
+                            console.log(json);
+                            setInformData([true, () => {resetInformData()}, "Deletion Failed.", ['Check the console for details.']]);
+                        }
+                        else if (json.message === "Success"){
+                            console.log("Success")
+                            setInformData([true, () => {resetInformData(); navigate('/')}, "Deletion Successful.", []]);
                         }
                     })
                 .catch(
@@ -234,12 +271,17 @@ const Partner = (props) => {
                 if (value.item_checked === "1"){
                     suggestionMade = true;
                 }
+                let deletable = false;
+                if (value.item_checked === "-1" || value.item_checked === "0"){
+                    deletable = true;
+                }
                 const itemContent = <Markup content={value.content}/>
                 return(
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>
                         <div>{checkValues[value.item_checked]}</div>
                         <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
+                        {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
                         {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
                         {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {value.item_id}>See suggestion</Button></div>}
                     </div>); 
