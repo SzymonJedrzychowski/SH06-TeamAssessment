@@ -55,9 +55,14 @@ class PostSuggestionResponse extends Verify
                         ON newsletter_item.item_id = item_suggestion.item_id)"
                     ;
 
+            $isApproved = 0;
+            if ($_POST['approved'] == "true"){
+                $isApproved = 1;
+            }
+
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-                'approved' => $_POST['approved'],
+                'approved' => $isApproved,
                 'suggestion_response' => $_POST['suggestion_response'],
                 'suggestion_id' => $_POST['suggestion_id'],
                 'user_id' => $tokenData->sub
