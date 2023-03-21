@@ -31,7 +31,7 @@ const Partner = (props) => {
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -64,7 +64,7 @@ const Partner = (props) => {
                 }
             )
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -154,7 +154,7 @@ const Partner = (props) => {
             formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
             formData.append('item_title', editorTitle); //TODO FIX
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -192,7 +192,7 @@ const Partner = (props) => {
         }
 
         const deleteNewsletterItem = (value) => {
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem?item_id=" + value,
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem?item_id=" + value,
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

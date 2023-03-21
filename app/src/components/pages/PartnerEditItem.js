@@ -31,7 +31,7 @@ const PartnerEditItem = (props) => {
     // On render hook
     useEffect(() => {
         // Verify user identity
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -58,7 +58,7 @@ const PartnerEditItem = (props) => {
                 }
             )
 
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -104,7 +104,7 @@ const PartnerEditItem = (props) => {
         formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
         formData.append('item_id', item.state);
         formData.append('item_checked', itemToEdit['item_checked']);
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
