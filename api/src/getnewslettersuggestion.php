@@ -22,7 +22,7 @@ class GetNewsletterSuggestion extends Verify
         $this->validateRequestMethod("GET");
 
         // Initialise SQL reques
-        $sql = "SELECT suggestion_id, suggestion_content, suggestion_comment
+        $sql = "SELECT suggestion_id, suggestion_content, suggestion_comment, suggestion_response, approved
         FROM item_suggestion
         WHERE item_id = :item_id";
         $params = array();
