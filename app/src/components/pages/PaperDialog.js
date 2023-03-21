@@ -12,6 +12,7 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { Markup } from "interweave";
+import draftToHtml from 'draftjs-to-html';
 /**
  * @ return PaperDialog using MUI Full-screen dialogs component
  * @author Noorullah Niamatullah w18002720
@@ -52,7 +53,7 @@ export default function PaperDialog(props) {
     }
   }
   const newsContentMa =(value,index)=>{
-    return <Markup key={index}content={value}/>
+    return <Markup key={index}content={draftToHtml(JSON.parse(value))}/>
   }
   return (
     <div>

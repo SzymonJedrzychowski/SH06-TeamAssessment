@@ -1,6 +1,6 @@
 import { Delete as DeleteIcon, Edit as EditIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon } from '@mui/icons-material';
 import { Box, Button, FormControl, InputLabel, List, ListItem, MenuItem, Select, Typography } from "@mui/material";
-import { ContentState, convertToRaw, EditorState } from 'draft-js';
+import { ContentState, convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 import htmlToDraft from 'html-to-draftjs';
 import { Markup } from 'interweave';
@@ -55,7 +55,7 @@ const Publish = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all newsletter items
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -96,7 +96,7 @@ const Publish = (props) => {
         }
 
         //Verifying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -138,14 +138,14 @@ const Publish = (props) => {
     const startEditing = (index) => {
         setEditMode(index);
         const contentBlock = htmlToDraft(newsletterData[index]["data"]);
-        const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+        const content = convertFromRaw(newsletterData[index]["data"]);
         setParagraph(() => EditorState.createWithContent(content));
     }
 
     //Function used to save data of edited paragraph
     const editParagraph = () => {
         var temp = [...newsletterData];
-        temp[editMode] = { "type": "paragraph", "data": draftToHtml(convertToRaw(paragraph.getCurrentContent())) };
+        temp[editMode] = { "type": "paragraph", "data": JSON.stringify(convertToRaw(paragraph.getCurrentContent())) };
         setNewsletterData(temp);
         setEditMode(-1);
         setParagraph(() => EditorState.createEmpty());
@@ -188,13 +188,13 @@ const Publish = (props) => {
 
     //Function used to add new paragraph to the newsletter
     const addParagraph = () => {
-        setNewsletterData(newsletterData => [...newsletterData, { "type": "paragraph", "data": draftToHtml(convertToRaw(paragraph.getCurrentContent())) }]);
+        setNewsletterData(newsletterData => [...newsletterData, { "type": "paragraph", "data": JSON.stringify(convertToRaw(paragraph.getCurrentContent())) }]);
         setParagraph(() => EditorState.createEmpty());
     }
 
     //Function used to send newsletter
     const sendNewsletter = () => {
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/sendnewsletter",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/sendnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -238,7 +238,7 @@ const Publish = (props) => {
         formData.append('newsletter_items', JSON.stringify(temp));
 
         //Publish the newsletter
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -282,7 +282,7 @@ const Publish = (props) => {
         formData.append('newsletter_items', JSON.stringify(temp));
 
         //Edit the newsletter
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -328,7 +328,7 @@ const Publish = (props) => {
 
     //Function used to get baic display of newsletter item data 
     const combineData = (data) => {
-        return "".concat("<h4>", data["item_title"], "</h4>", "<h5>", data["first_name"], " " + data["last_name"], " - ", data["organisation_name"], "</h5>", data["date_uploaded"], data["content"]);
+        return "".concat("<h4>", data["item_title"], "</h4>", "<h5>", data["first_name"], " " + data["last_name"], " - ", data["organisation_name"], "</h5>", data["date_uploaded"], draftToHtml(JSON.parse(data["content"])));
     }
 
     //Create an entry with text (newsletter item or paragraph)
@@ -336,7 +336,7 @@ const Publish = (props) => {
         if (value["type"] === "paragraph") {
             return <ListItem key={index} sx={{ display: "flex", flexDirection: { xs: "column", sm: "columnd", md: "row" }, justifyContent: "space-between" }}>
                 <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
-                    <Markup content={value["data"]} />
+                    <Markup content={draftToHtml(JSON.parse(value["data"]))} />
                 </Box>
                 <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
                     {editMode === -1 && <>
