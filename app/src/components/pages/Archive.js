@@ -21,7 +21,7 @@ const Archive = () => {
    */
   useEffect(() => {
     fetch(
-      "http://unn-W18002720.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters"
+      "http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters"
     )
       .then((response) => response.json())
       .then((res) => setdata(res.data));

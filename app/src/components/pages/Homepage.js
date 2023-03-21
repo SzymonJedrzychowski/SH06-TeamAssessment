@@ -18,7 +18,7 @@ const Homepage = () => {
   };
   useEffect(() => {
     fetch(
-      "http://unn-W18002720.newnumyspace.co.uk/teamAssessment/api/getlastpublishednewsletter"
+      "http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getlastpublishednewsletter"
     )
       .then((response) => response.json())
       .then((json) => {
