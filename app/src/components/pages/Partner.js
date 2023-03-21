@@ -192,10 +192,13 @@ const Partner = (props) => {
         }
 
         const deleteNewsletterItem = (value) => {
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem?item_id=" + value,
+            const formData = new FormData();
+            formData.append('item_id', value);
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                    body: formData
                 })
                 .then(
                     (response) => response.json()
