@@ -18,20 +18,22 @@ const Partner = (props) => {
 
     // State variable hooks
     const [loadingReviewItems, setLoadingReviewItems] = useState(true);
+    const [loadingPublishedItems, setLoadingPublishedItems] = useState(true);
     const [showContribute, setShowcontribute] = useState(true);
     const [showReview, setShowReview] = useState(false);
     const [showPublished, setShowPublished] = useState(false);
     const [itemsInReview, setItemsInReview] = useState([]);
+    const [publishedItems, setPublishedItems] = useState([]);
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
     const [editorContent, setEditorContent] = useState(null);
-    const [editorTitle, setEditorTitle] = useState("Placeholder")
+    const [editorTitle, setEditorTitle] = useState("Placeholder");
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -43,6 +45,7 @@ const Partner = (props) => {
                     if (json.message === "Success") {
                         if (["1", "2", "3"].includes(json.data[0]["authorisation"])) {
                             setAuthenticated(true);
+                            setLoading(false);
                         } else {
                             setAuthenticated(false);
                             setLoading(false);
@@ -64,7 +67,7 @@ const Partner = (props) => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=false",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -72,12 +75,10 @@ const Partner = (props) => {
             //Process response into JSON
             function(response){
                 if (response.status === 200){
-                    setLoading(false);
                     return response.json();
                 }
                 else {
                     console.log(response.json);
-                    setLoading(false);
                 }
             }
         )
@@ -93,7 +94,33 @@ const Partner = (props) => {
             }
         )
 
-        console.log("Render complete")
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=true",
+        {
+            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+        })
+        .then(
+            //Process response into JSON
+            function(response){
+                if (response.status === 200){
+                    return response.json();
+                }
+                else {
+                    console.log(response.json);
+                }
+            }
+        )
+        .then(
+            (json) => {
+                setPublishedItems(json.data);
+                setLoadingPublishedItems(false);
+            }
+        )
+        .catch(
+            (e) => {
+                console.log("The following error occurred: ", e);
+            }
+        )
+
     }, []);
 
     // Other variables
@@ -154,7 +181,7 @@ const Partner = (props) => {
             formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
             formData.append('item_title', editorTitle); //TODO FIX
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -192,10 +219,13 @@ const Partner = (props) => {
         }
 
         const deleteNewsletterItem = (value) => {
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem?item_id=" + value,
+            const formData = new FormData();
+            formData.append('item_id', value);
+            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                    body: formData
                 })
                 .then(
                     (response) => response.json()
@@ -216,6 +246,10 @@ const Partner = (props) => {
                     (e) => {
                         console.log(e.message)
                     })
+        }
+
+        const getItemTitle = (title) => {
+            setEditorTitle(title.target.value)
         }
 
         const truncateText = (text) => {
@@ -248,7 +282,7 @@ const Partner = (props) => {
         <input 
             type = 'title'
             content = {editorTitle}
-            setContent = {setEditorTitle}
+            onChange = {getItemTitle}
             />
         </div>
         
@@ -266,7 +300,7 @@ const Partner = (props) => {
         // -Review
         
             // --Items
-            const createItemBox = (value) => {
+            const createReviewItemBox = (value) => {
                 let suggestionMade = false;
                 if (value.item_checked === "1"){
                     suggestionMade = true;
@@ -283,7 +317,7 @@ const Partner = (props) => {
                         <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
                         {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
                         {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
-                        {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {value.item_id}>See suggestion</Button></div>}
+                        {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {[value.item_id, value.item_checked]}>See suggestion</Button></div>}
                     </div>); 
             }
 
@@ -300,19 +334,40 @@ const Partner = (props) => {
             {loadingReviewItems && <p>Loading...</p>}
         </div>
         <div className = 'PartnerReviewContent'>
-            itemsInReview
             {itemsInReview.filter(filterChecked).map(
                 function (value) {
-                return createItemBox(value);
+                return createReviewItemBox(value);
             }
             )}
         </div>
         </div>
 
+
+
         // -Published
+
+            // --Items
+            const createPublishedItemBox = (value) => {
+                const itemContent = <Markup content={value.content}/>
+                return(
+                    <div key = {value.item_id}>
+                        <div>{value.item_title}</div>
+                        <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
+                    </div>); 
+            }
+        
         const publishedSection = <div className = 'PartnerPublished'>
             <div className = 'PartnerPublishedContent'>
-                Boxes go here.
+            <div className = 'PartnerPublishedLoading'>
+                {loadingPublishedItems && <p>Loading...</p>}
+            </div>
+            <div className = 'PartnerPublishedContent'>
+                {publishedItems.map(
+                    function (value) {
+                    return createPublishedItemBox(value);
+            }
+            )}
+        </div>
             </div>
         </div>
 

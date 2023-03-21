@@ -76,7 +76,7 @@ class RemoveNewsletterItem extends Verify
      */
     private function validateParameters()
     {
-        $requiredParameters = 'item_id';
+        $requiredParameters = ['item_id'];
         $this->checkRequiredParameters($requiredParameters);
     }
 

@@ -23,13 +23,14 @@ const PartnerReviewChange = (props) => {
     const [itemSuggestion, setItemSuggestion] = useState();
     const [contentState, setContentState] = useState(null);
     const [commentState, setCommentState] = useState(null);
+    const [response, setResponse] = useState(null);
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -62,14 +63,13 @@ const PartnerReviewChange = (props) => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state,
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state[0],
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
         .then(
             //Process response into JSON
             function(response){
-                console.log(item);
                 if (response.status === 200){
                     return response.json();
                 }
@@ -107,6 +107,11 @@ const PartnerReviewChange = (props) => {
         // -Navigation
         const navigate = useNavigate();
 
+        // -Other
+        const getSuggestionResponse = (response) =>{
+            setResponse(response.target.value);
+        }
+
         // -Reject suggestion
         const rejectConfirm = () => {
             setAlertData([true, (confirmation) => handleRejection(confirmation), "Confirm Reject", ["Are you sure you want to reject this suggestion?", "Please include a comment explaining why this suggestion isn't suitable for you."], "Yes, reject changes.", "No, cancel."]);
@@ -115,7 +120,7 @@ const PartnerReviewChange = (props) => {
         const handleRejection = (confirmation) => {
             setAlertData([false, null, null, null, null, null]);
             if (confirmation.target.value === "true") {
-                rejectSuggestion();
+                updateItemSuggestion(false);
             }
         }
     
@@ -132,18 +137,84 @@ const PartnerReviewChange = (props) => {
         const handleAcceptance = (confirmation) => {
             setAlertData([false, null, null, null, null, null]);
             if (confirmation.target.value === "true") {
-                acceptSuggestion();
+                updateItemSuggestion(true);
             }
         }
 
         const acceptSuggestion = () => {
-
-            console.log("Upload Accept");
+            console.log("Upload Accept");//Redundant ofc
             navigate("/partner");
         }
 
         const updateItemSuggestion = (status) => {
+            try{
+                const formDataSuggestion = new FormData();
+                formDataSuggestion.append('approved', status);
+                formDataSuggestion.append('suggestion_response', response);
+                formDataSuggestion.append('suggestion_id', itemSuggestion[0].suggestion_id);
+                formDataSuggestion.append('item_id', item.state[0]);
+                formDataSuggestion.append('item_status', item.state[1])
+                fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postsuggestionresponse",
+                    {
+                        method: 'POST',
+                        headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                        body: formDataSuggestion
+                    })
+                    .then(
+                        (response) => response.json()
+                    )
+                    .then(
+                        (json) => {
+                            console.log(json);
+                            if (json.message !== "Success") {
+                                setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
+                            }
+                            else if (json.message === "Success"){
+                                console.log("Success");
+                                setInformData([true, () => {resetInformData(); navigate('/partner')}, "Upload Successful.", []]);
+                            }
+                        })
+                    .catch(
+                        (e) => {
+                            console.log(e.message)
+                        }
+                    );
 
+                const formDataItem = new FormData();
+                formDataItem.append('content', itemSuggestion[0]["suggestion_content"]);
+                formDataItem.append('item_id', item.state[0]);
+                formDataItem.append('item_checked', item.state[1]);
+                fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+                        {
+                            method: 'POST',
+                            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                            body: formDataItem
+                        })
+                        .then(
+                            (response) => response.json()
+                        )
+                        .then(
+                            (json) => {
+                                if (json.message !== "Success") {
+                                    console.log(json);
+                                    setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
+                                }
+                                else if (json.message === "Success"){
+                                    console.log("Success")
+                                    setInformData([true, () => {resetInformData(); navigate('/partner')}, "Upload Successful.", []]);
+                                }
+                            })
+                        .catch(
+                            (e) => {
+                                console.log(e.message)
+                            }
+                        );
+            }
+            catch(e){
+                setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Error follows:', e.message]]);
+                console.log(e.message)
+            }
+            
         }
 
 
@@ -159,18 +230,21 @@ const PartnerReviewChange = (props) => {
                     <TextEditorView
                     type={"content"} content={contentState} setContent={setContentState}
                     defaultContentState = {itemSuggestion.suggestion_content}
-                    toolbarHidden = {true} //TODO FIX - might because editor instead of text-editor
+                    toolbarHidden = {true}
                     />
                     <h2>Comments</h2>
                     <TextEditorView
                     type={"comment"} content={commentState} setContent={setCommentState}
                     defaultContentState = {itemSuggestion.suggestion_comment}
-                    toolbarHidden = {true} //TODO FIX
+                    toolbarHidden = {true} //TODO change for normal boxes
                     />
                     <Button onClick = {acceptConfirm}>Accept</Button>
                     <Button onClick={rejectConfirm}>Reject</Button>
                     <p>Comments to editor</p>
-                    <input/>
+                    <input
+                        type = 'text'
+                        content = {response}
+                        onChange = {getSuggestionResponse}/>
                 </div>
             </div>}
             
