@@ -58,35 +58,35 @@ const PartnerEditItem = (props) => {
                 }
             )
 
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
-            {
-                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
-            })
-            .then(
-                //Process response into JSON
-                function(response){
-                    if (response.status === 200){
-                        return response.json();
-                    }
-                    else {
-                        console.log(response.json);
-                    }
+        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        {
+            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
+        })
+        .then(
+            //Process response into JSON
+            function(response){
+                if (response.status === 200){
+                    return response.json();
                 }
-            )
-            .then(
-                (json) => {
-                    setItemToEdit(json.data);
-                    const contentBlock = htmlToDraft(json.data[0]["content"]);    //WIP
-                    const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
-                    setEditorContent(EditorState.createWithContent(content));
-                    setLoading(false);
+                else {
+                    console.log(response.json);
                 }
-            )
-            .catch(
-                (e) => {
-                    console.log("The following error occurred: ", e);
-                }
-            )
+            }
+        )
+        .then(
+            (json) => {
+                setItemToEdit(json.data);
+                const contentBlock = htmlToDraft(json.data[0]["content"]);    
+                const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+                setEditorContent(EditorState.createWithContent(content));
+                setLoading(false);
+            }
+        )
+        .catch(
+            (e) => {
+                console.log("The following error occurred: ", e);
+            }
+        )
 
     }, []);
 

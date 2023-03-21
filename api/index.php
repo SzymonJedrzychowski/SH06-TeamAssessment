@@ -87,6 +87,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/getnewslettersuggestion':
                 $endpoint = new GetNewsletterSuggestion();
                 break;
+            case '/postsuggestionresponse':
+                $endpoint = new PostSuggestionResponse();
+                break;
             case '/sendnewsletter':
                 $endpoint = new SendNewsletter();
                 break;
