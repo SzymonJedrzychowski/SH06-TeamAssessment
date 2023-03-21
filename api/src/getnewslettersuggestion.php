@@ -25,7 +25,7 @@ class GetNewsletterSuggestion extends Verify
         $sql = "SELECT suggestion_id, suggestion_content, suggestion_comment, suggestion_response, approved
         FROM item_suggestion
         WHERE item_id = :item_id 
-        ORDER BY suggestion_id ASC LIMIT 1";
+        ORDER BY suggestion_id DESC LIMIT 1";
         $params = array();
 
         // Ensure the correct parameters were provided
