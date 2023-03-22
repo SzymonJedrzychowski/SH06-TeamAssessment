@@ -96,6 +96,33 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/getlastpublishednewsletter':
                 $endpoint = new GetLastPublishedNewsletter();
                 break;
+            case '/getUsers':
+                $endpoint = new getUsers();
+                break;
+            case '/updateUser':
+                $endpoint = new updateUser();
+                break;
+            case '/getNextNewsletterDate':
+                $endpoint = new getNextNewsletterDate();
+                break;
+            case '/updateNextNewsletterDate':
+                $endpoint = new updateNextNewsletterDate();
+                break;
+            case '/getOrganisations':
+                $endpoint = new getOrganisations();
+                break;
+            case '/deleteOrganisation':
+                $endpoint = new deleteOrganisation();
+                break;
+            case '/createOrganisation':
+                $endpoint = new createOrganisation();
+                break;
+            case '/updateOrganisation':
+                $endpoint = new updateOrganisation();
+                break;
+            case '/getStats':
+                $endpoint = new getStats();
+                break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);
                 break;
