@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Link, useNavigate, useLocation} from 'react-router-dom';
-import {Button} from '@mui/material';
-import { EditorState, ContentState } from 'draft-js';
-import htmlToDraft from 'html-to-draftjs';
+import {Button, Box, Typography} from '@mui/material';
 import { Markup } from 'interweave';
 import draftToHtml from 'draftjs-to-html';
 import convertImages from '../helper/convertImages';
@@ -21,7 +19,7 @@ const PartnerReviewChange = (props) => {
     const item = useLocation();
 
     // State variable hooks
-    const [itemSuggestion, setItemSuggestion] = useState();
+    const [itemSuggestion, setItemSuggestion] = useState('');
     const [response, setResponse] = useState('');
 
     const [authenticated, setAuthenticated] = useState(false);
@@ -118,10 +116,6 @@ const PartnerReviewChange = (props) => {
             }
         }
     
-        const rejectSuggestion = () => {
-            navigate("/partner");
-            console.log("Upload Reject");
-        }
 
         // -Accept suggestion
         const acceptConfirm = () => {
@@ -133,11 +127,6 @@ const PartnerReviewChange = (props) => {
             if (confirmation.target.value === "true") {
                 updateItemSuggestion(true);
             }
-        }
-
-        const acceptSuggestion = () => {
-            console.log("Upload Accept");//Redundant ofc
-            navigate("/partner");
         }
 
         const updateItemSuggestion = (status) => {
@@ -214,27 +203,27 @@ const PartnerReviewChange = (props) => {
 
     // Content
     return(
-        <div className = 'PartnerReviewChange'>
+        <Box sx = {{display: "flex", flexDirection: "column", padding: 3}} className = 'PartnerReviewChange'>
             {(!loading && authenticated) && <div className = 'PartnerReviewChangeAuthenticated'>
-                <div className = 'PartnerReviewChangeHeader'>
-                    <h1>Review item 'name'</h1>
-                </div>
-                <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
+                <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
+                <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Item: {item.state[2]}</Typography>                
+                <Button variant = "contained" sx={{marginBottom: "1em", textDecoration: 'none'}} as = {Link} to = {"/Partner"}>Back</Button>
+                <p></p>
                 <div className = 'PartnerBody'>
                     <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_content"])))}/>
-                    <h2>Comments</h2>
+                    <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Comments</Typography>
                     <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_comment"])))}/>
-                    <Button onClick = {acceptConfirm}>Accept</Button>
-                    <Button onClick={rejectConfirm}>Reject</Button>
-                    <p>Comments to editor</p>
+                    <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Response to editor</Typography>
                     <input
                         type = 'text'
                         content = {response}
-                        onChange = {getSuggestionResponse}/>
+                        onChange = {getSuggestionResponse}/><br/><br/>
+                    <Button variant = "contained" sx={{marginRight: "1em", textDecoration: 'none'}} onClick = {acceptConfirm}>Accept</Button>
+                    <Button variant = "contained" sx={{marginLeft: "1em", textDecoration: 'none'}} onClick={rejectConfirm}>Reject</Button>
                 </div>
             </div>}
             
-        </div>
+        </Box>
         
     )
 }
