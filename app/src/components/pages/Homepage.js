@@ -56,11 +56,7 @@ const Homepage = () => {
   }
   console.log(paperContent);
   const newsContentMa = (value, index) => {
-<<<<<<< Updated upstream
     return <Markup content={value} />;
-=======
-    return <Markup content={convertImages(draftToHtml(JSON.parse(value)))} />;
->>>>>>> Stashed changes
   };
 
   for (let val in contentProcessd.content) {

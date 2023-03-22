@@ -12,11 +12,6 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { Markup } from "interweave";
-<<<<<<< Updated upstream
-=======
-import draftToHtml from 'draftjs-to-html';
-import convertImages from '../helper/convertImages';
->>>>>>> Stashed changes
 /**
  * @ return PaperDialog using MUI Full-screen dialogs component
  * @author Noorullah Niamatullah w18002720
@@ -57,11 +52,7 @@ export default function PaperDialog(props) {
     }
   }
   const newsContentMa =(value,index)=>{
-<<<<<<< Updated upstream
     return <Markup key={index}content={value}/>
-=======
-    return <Markup key={index}content={convertImages(draftToHtml(JSON.parse(value)))}/>
->>>>>>> Stashed changes
   }
   return (
     <div>
