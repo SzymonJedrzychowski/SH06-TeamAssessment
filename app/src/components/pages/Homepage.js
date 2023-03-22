@@ -1,6 +1,8 @@
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { Markup } from "interweave";
 import React, { useEffect, useState } from "react";
+import draftToHtml from 'draftjs-to-html';
+import convertImages from "../helper/convertImages";
 /**
  * 
  * @returns hompage whic is displaying the last published newsletter
@@ -18,7 +20,7 @@ const Homepage = () => {
   };
   useEffect(() => {
     fetch(
-      "http://unn-W18002720.newnumyspace.co.uk/teamAssessment/api/getlastpublishednewsletter"
+      "http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getlastpublishednewsletter"
     )
       .then((response) => response.json())
       .then((json) => {
@@ -49,14 +51,16 @@ const Homepage = () => {
   for (let v in ar) {
     for (let v1 in ar[v])
       if (ar[v][v1].type === "paragraph")
-        paperContent.push(ar[v][v1].data);
+        paperContent.push(convertImages(draftToHtml(JSON.parse(ar[v][v1].data))));
       else {
-        paperContent.push(ar[v][v1].data.content);
+        paperContent.push("Title : "+ar[v][v1].data.item_title)
+        paperContent.push(convertImages(draftToHtml(JSON.parse(ar[v][v1].data.content))));
+        paperContent.push("Contributing Author: "+ ar[v][v1].data.first_name+" " + ar[v][v1].data.last_name);
+        paperContent.push("Contributing Organisation: "+ ar[v][v1].data.organisation_name);
       }
   }
-  console.log(paperContent);
   const newsContentMa = (value, index) => {
-    return <Markup content={value} />;
+    return <Markup  key ={index} content={value} />;
   };
 
   for (let val in contentProcessd.content) {
@@ -76,7 +80,6 @@ const Homepage = () => {
     <Box sx={boxStyling}>
       {!loading && (
         <>
-          <h1>{contentProcessd.news.item_title}</h1>
           <p>By: {contentProcessd.author}</p>
           <p>{contentProcessd.date}</p>
           <p>{contentProcessd.news.organisation_name}</p>
