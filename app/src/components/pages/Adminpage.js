@@ -51,7 +51,7 @@ function Adminpage() {
             try {
                 const [editorsResponse, tagsResponse] = await Promise.all([
                     fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getUsers"),
-                    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags"),
+                    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getTag"),
                 ]);
                 const [editorsData, tagsData] = await Promise.all([
                     editorsResponse.json(),

@@ -123,6 +123,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
             case '/getStats':
                 $endpoint = new getStats();
                 break;
+            case '/getTag':
+                $endpoint = new getTag();
+                break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);
                 break;
