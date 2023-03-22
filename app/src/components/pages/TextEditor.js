@@ -20,7 +20,7 @@ const TextEditor = (props) => {
     
     return (
         <Editor
-            toolbar={{ options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'emoji', 'history', 'image'], 
+            toolbar={{ options: ['inline', 'blockType', 'fontSize', 'fontFamily', 'list', 'textAlign', 'colorPicker', 'emoji', 'history', 'image', 'link'], 
                        image: {
                         previewImage: true,
                         alignmentEnabled: 'LEFT'
