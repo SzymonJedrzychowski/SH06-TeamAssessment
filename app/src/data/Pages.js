@@ -16,6 +16,10 @@ export const pages =[
     path  : "/editorial"
   },
   {
+    label : "Admin",
+    path  : "/admin"
+  },
+  {
     label : "Join Us",
     path  : "/signUp"
   }

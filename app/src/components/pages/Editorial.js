@@ -78,7 +78,7 @@ const Editorial = (props) => {
 
     //Hook used to load the data and verify if user can see the page on renders
     useEffect(() => {
-        //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
+        //Verifying the privileges of the logged user (only Editor and Admin can access the page)
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })

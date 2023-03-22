@@ -25,7 +25,7 @@ const SignUp = (props) => {
       (json) => {
         if (json.message === "Success") {
           console.log("Success: ");
-          setInformData([true, () => {resetInformData(); navigate("/homepage")}, "Success", 
+          setInformData([true, () => {resetInformData(); navigate("/")}, "Success", 
           ["You have successfully subscribed to the newsletter!"]]);
         } else {
           console.log("Not success: ");

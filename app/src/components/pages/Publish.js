@@ -1,11 +1,11 @@
 import { Delete as DeleteIcon, Edit as EditIcon, KeyboardArrowDown as KeyboardArrowDownIcon, KeyboardArrowUp as KeyboardArrowUpIcon } from '@mui/icons-material';
 import { Box, Button, FormControl, InputLabel, List, ListItem, MenuItem, Select, Typography } from "@mui/material";
-import { ContentState, convertToRaw, EditorState } from 'draft-js';
+import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
-import htmlToDraft from 'html-to-draftjs';
 import { Markup } from 'interweave';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
+import convertImages from '../helper/convertImages';
 import TextEditor from "./TextEditor";
 
 /**
@@ -85,17 +85,17 @@ const Publish = (props) => {
         //If item.state exists, data of published newsletter will be loaded instead of creating new newsletter
         if (item.state) {
             let temp;
-            try{
+            try {
                 temp = JSON.parse(item.state["newsletter_content"]);
-            }catch{
-                setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error with loading data has ocurred.", "You will be redirected to the editorial page."]])
+            } catch {
+                setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error with loading data has occurred.", "You will be redirected to the editorial page."]])
                 return;
             }
             setNewsletterData(temp);
             setNewsletterId(item.state["newsletter_id"]);
         }
 
-        //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
+        //Verifying the privileges of the logged user (only Editor and Admin can access the page)
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
@@ -137,15 +137,14 @@ const Publish = (props) => {
     //Function used to load data of paragraph to edit text box
     const startEditing = (index) => {
         setEditMode(index);
-        const contentBlock = htmlToDraft(newsletterData[index]["data"]);
-        const content = ContentState.createFromBlockArray(contentBlock.contentBlocks);
+        const content = convertFromRaw(newsletterData[index]["data"]);
         setParagraph(() => EditorState.createWithContent(content));
     }
 
     //Function used to save data of edited paragraph
     const editParagraph = () => {
         var temp = [...newsletterData];
-        temp[editMode] = { "type": "paragraph", "data": draftToHtml(convertToRaw(paragraph.getCurrentContent())) };
+        temp[editMode] = { "type": "paragraph", "data": JSON.stringify(convertToRaw(paragraph.getCurrentContent())) };
         setNewsletterData(temp);
         setEditMode(-1);
         setParagraph(() => EditorState.createEmpty());
@@ -188,7 +187,7 @@ const Publish = (props) => {
 
     //Function used to add new paragraph to the newsletter
     const addParagraph = () => {
-        setNewsletterData(newsletterData => [...newsletterData, { "type": "paragraph", "data": draftToHtml(convertToRaw(paragraph.getCurrentContent())) }]);
+        setNewsletterData(newsletterData => [...newsletterData, { "type": "paragraph", "data": JSON.stringify(convertToRaw(paragraph.getCurrentContent())) }]);
         setParagraph(() => EditorState.createEmpty());
     }
 
@@ -250,10 +249,10 @@ const Publish = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        //sendNewsletter();
+                        sendNewsletter();
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
@@ -296,7 +295,7 @@ const Publish = (props) => {
                     if (json.message === "Success") {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was edited successfully.", "You can now leave the page."]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
@@ -328,54 +327,60 @@ const Publish = (props) => {
 
     //Function used to get baic display of newsletter item data 
     const combineData = (data) => {
-        return "".concat("<h4>", data["item_title"], "</h4>", "<h5>", data["first_name"], " " + data["last_name"], " - ", data["organisation_name"], "</h5>", data["date_uploaded"], data["content"]);
+        return "".concat("<h4>", data["item_title"], "</h4>", "<h5>", data["first_name"], " " + data["last_name"], " - ", data["organisation_name"], "</h5>", data["date_uploaded"], draftToHtml(JSON.parse(data["content"])));
     }
 
     //Create an entry with text (newsletter item or paragraph)
     const createEntry = (value, index) => {
         if (value["type"] === "paragraph") {
-            return <ListItem key={index} sx={{ display: "flex", flexDirection: { xs: "column", sm: "columnd", md: "row" }, justifyContent: "space-between" }}>
-                <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
-                    <Markup content={value["data"]} />
-                </Box>
-                <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
-                    {editMode === -1 && <>
-                        <Button variant="contained" onClick={() => startEditing(index)}><EditIcon /></Button>
-                        <Button variant="contained" onClick={() => handleRemoveItem(index)}><DeleteIcon /></Button>
-                        {index > 0 && <Button variant="contained" onClick={() => move(index, index - 1)}><KeyboardArrowUpIcon /></Button>}
-                        {index === 0 && <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>}
-                        {index < newsletterData.length - 1 && <Button variant="contained" onClick={() => move(index, index + 1)}><KeyboardArrowDownIcon /></Button>}
-                        {index === newsletterData.length - 1 && <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>}
-                    </>}
-                    {editMode !== -1 && <>
-                        <Button variant="contained" disabled><EditIcon /></Button>
-                        <Button variant="contained" disabled><DeleteIcon /></Button>
-                        <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>
-                        <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>
-                    </>}
-                </Box>
-            </ListItem>;
+            return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
+                <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
+                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
+                        <Markup content={convertImages(draftToHtml(JSON.parse(value["data"])))} />
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
+                        {editMode === -1 && <>
+                            <Button variant="contained" onClick={() => startEditing(index)}><EditIcon /></Button>
+                            <Button variant="contained" onClick={() => handleRemoveItem(index)}><DeleteIcon /></Button>
+                            {index > 0 && <Button variant="contained" onClick={() => move(index, index - 1)}><KeyboardArrowUpIcon /></Button>}
+                            {index === 0 && <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>}
+                            {index < newsletterData.length - 1 && <Button variant="contained" onClick={() => move(index, index + 1)}><KeyboardArrowDownIcon /></Button>}
+                            {index === newsletterData.length - 1 && <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>}
+                        </>}
+                        {editMode !== -1 && <>
+                            <Button variant="contained" disabled><EditIcon /></Button>
+                            <Button variant="contained" disabled><DeleteIcon /></Button>
+                            <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>
+                            <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>
+                        </>}
+                    </Box>
+                </ListItem>
+                <Box sx={{ marginLeft: "10%", maxWidth: "80%", borderBottom: "solid 1px gray" }}></Box>
+            </Box>;
         } else {
-            return <ListItem key={index} sx={{ display: "flex", flexDirection: { xs: "column", sm: "columnd", md: "row" }, justifyContent: "space-between" }}>
-                <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
-                    <Markup content={combineData(value["data"])} />
-                </Box>
-                <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
-                    {editMode === -1 && <>
-                        <Button variant="contained" onClick={() => handleRemoveItem(index)}><DeleteIcon /></Button>
-                        {index > 0 && <Button variant="contained" onClick={() => move(index, index - 1)}><KeyboardArrowUpIcon /></Button>}
-                        {index === 0 && <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>}
-                        {index < newsletterData.length - 1 && <Button variant="contained" onClick={() => move(index, index + 1)}><KeyboardArrowDownIcon /></Button>}
-                        {index === newsletterData.length - 1 && <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>}
-                    </>}
-                    {editMode !== -1 && <>
-                        <Button variant="contained" disabled><EditIcon /></Button>
-                        <Button variant="contained" disabled><DeleteIcon /></Button>
-                        <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>
-                        <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>
-                    </>}
-                </Box>
-            </ListItem >;
+            return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
+                <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
+                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
+                        <Markup content={convertImages(combineData(value["data"]))} />
+                    </Box>
+                    <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
+                        {editMode === -1 && <>
+                            <Button variant="contained" onClick={() => handleRemoveItem(index)}><DeleteIcon /></Button>
+                            {index > 0 && <Button variant="contained" onClick={() => move(index, index - 1)}><KeyboardArrowUpIcon /></Button>}
+                            {index === 0 && <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>}
+                            {index < newsletterData.length - 1 && <Button variant="contained" onClick={() => move(index, index + 1)}><KeyboardArrowDownIcon /></Button>}
+                            {index === newsletterData.length - 1 && <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>}
+                        </>}
+                        {editMode !== -1 && <>
+                            <Button variant="contained" disabled><EditIcon /></Button>
+                            <Button variant="contained" disabled><DeleteIcon /></Button>
+                            <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>
+                            <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>
+                        </>}
+                    </Box>
+                </ListItem >
+                <Box sx={{ marginLeft: "10%", maxWidth: "80%", borderBottom: "solid 1px gray" }}></Box>
+            </Box>;
         }
     }
 
