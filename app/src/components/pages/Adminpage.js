@@ -72,9 +72,7 @@ function Adminpage() {
         try {
             const response = await fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getStats", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
                 body: JSON.stringify({
                     userId: userId,
                     tagId: tagId,
@@ -93,9 +91,7 @@ function Adminpage() {
 
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updateUser", {
             method: "POST",
-            headers: {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
-            },
             body: JSON.stringify({
                 userId: userId,
                 authorisation: newData.authorisation,
@@ -157,9 +153,7 @@ function Adminpage() {
     const handleUpdateNewsletterDate = (newNewsletterDate) => {
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updateNextNewsletterDate", {
             method: "POST",
-            headers: {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
-            },
             body: JSON.stringify({
                 date: newNewsletterDate,
             }),
@@ -208,9 +202,7 @@ function Adminpage() {
     const handleSave = () => {
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updateOrganisation", {
             method: "POST",
-            headers: {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
-            },
             body: JSON.stringify(editedOrganisation),
         })
             .then((response) => response.json())
@@ -235,9 +227,7 @@ function Adminpage() {
         try {
             const response = await fetch(`http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/deleteOrganisation`, {
                 method: "DELETE",
-                headers: {
-                    headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
-                },
+                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
                 body: JSON.stringify({ organisation_id: org.organisation_id }),
             });
 
