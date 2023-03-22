@@ -29,7 +29,7 @@ const Partner = (props) => {
     const [editorTitle, setEditorTitle] = useState("Placeholder");
     const [userName, setUserName] = useState("IC3 Partner")
 
-    const [contributeColour, setContributeColour] = useState("black");
+    const [contributeColour, setContributeColour] = useState("yellow");
     const [reviewColour, setReviewColour] = useState("white");
     const [publishColour, setPublishColour] = useState("white");
 
