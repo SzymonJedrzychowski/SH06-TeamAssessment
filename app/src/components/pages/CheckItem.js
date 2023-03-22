@@ -256,7 +256,7 @@ const CheckItem = (props) => {
                         if (newStatus === "-1") {
                             setInformData([true, () => { resetInformData(); navigate(-1); }, "Success", ["The item was removed."]])
                         } else {
-                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["The status was changes."]])
+                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["The status was changed."]])
                         }
                     } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
