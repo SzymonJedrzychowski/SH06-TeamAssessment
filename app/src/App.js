@@ -18,6 +18,7 @@ import ManageTags from "./components/pages/ManageTags";
 import InformationDialog from "./components/pages/InformationDialog";
 import AlertDialog from "./components/pages/AlertDialog";
 import Archive from "./components/pages/Archive";
+import Adminpage from "./components/pages/Adminpage";
 
 /**
  * App is responsible for loading data and routing to other pages.
@@ -25,42 +26,49 @@ import Archive from "./components/pages/Archive";
  * @author Szymon Jedrzychowski
  */
 function App() {
-  const [informData, setInformData] = useState([false, null, null, null])
-  const [alertData, setAlertData] = useState([false, null, null, null, null, null])
+	//Hook to hold data of inform dialog
+	const [informData, setInformData] = useState([false, null, null, null])
 
-  const dialogData = () => {
-    const resetInformData = () => setInformData([false, null, null, null]);
-    return {setInformData, setAlertData, resetInformData};
-  }
+	//Hook to hold data of alert dialog
+	const [alertData, setAlertData] = useState([false, null, null, null, null, null])
 
-  return (
-    <div className="App">
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Homepage/>}/>
-          <Route path="/archive" element={<Archive/>}/>
-          
-          <Route path="/partner" element={<Partner dialogData={dialogData()}/>}/>
-          <Route path="/partnerEditItem" element={<PartnerEditItem dialogData={dialogData()}/>}/>
-          <Route path="/partnerReviewChange" element={<PartnerReviewChange dialogData={dialogData()}/>}/>
+	//Function used as handler for inform and alert dialogs
+	const dialogData = () => {
+		const resetInformData = () => setInformData([false, null, null, null]);
+		return { setInformData, setAlertData, resetInformData };
+	}
 
-          <Route path="/editorial" element={<Editorial dialogData={dialogData()}/>}/>
-          <Route path="/checkItem" element={<CheckItem dialogData={dialogData()}/>}/>
-          <Route path="/suggestChanges" element={<SuggestChanges dialogData={dialogData()}/>}/>
-          <Route path="/publish" element={<Publish dialogData={dialogData()}/>}/>
-          <Route path="/editPrevious" element={<EditPrevious dialogData={dialogData()}/>}/>
-          <Route path="/manageTags" element={<ManageTags dialogData={dialogData()}/>}/>
-          <Route path="/createAccount" element={<CreateAccount dialogData={dialogData()}/>}/>
-          <Route path="/login" element={<Login dialogData={dialogData()}/>}/>
-          <Route path="/signUp" element={<SignUp dialogData={dialogData()}/>}/>
-          
-          <Route path="*" element={<p>Not found</p>} />
-        </Routes>
-      </Layout>
-      <InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
-      <AlertDialog open={alertData[0]} handleClose={()=>alertData[1]} title={alertData[2]} message={alertData[3]} option1={alertData[4]} option2={alertData[5]} />
-    </div>
-  );
+	return (
+		<div className="App">
+			<Layout>
+				<Routes>
+					<Route path="/" element={<Homepage />} />
+					<Route path="/archive" element={<Archive />} />
+
+					<Route path="/admin" element={<Adminpage/>}/>
+
+					<Route path="/partner" element={<Partner dialogData={dialogData()} />} />
+					<Route path="/partnerEditItem" element={<PartnerEditItem dialogData={dialogData()} />} />
+					<Route path="/partnerReviewChange" element={<PartnerReviewChange dialogData={dialogData()} />} />
+
+					<Route path="/editorial" element={<Editorial dialogData={dialogData()} />} />
+					<Route path="/checkItem" element={<CheckItem dialogData={dialogData()} />} />
+					<Route path="/suggestChanges" element={<SuggestChanges dialogData={dialogData()} />} />
+					<Route path="/publish" element={<Publish dialogData={dialogData()} />} />
+					<Route path="/editPrevious" element={<EditPrevious dialogData={dialogData()} />} />
+					<Route path="/manageTags" element={<ManageTags dialogData={dialogData()} />} />
+					
+					<Route path="/createAccount" element={<CreateAccount dialogData={dialogData()} />} />
+					<Route path="/login" element={<Login dialogData={dialogData()} />} />
+					<Route path="/signUp" element={<SignUp dialogData={dialogData()} />} />
+
+					<Route path="*" element={<p>Not found</p>} />
+				</Routes>
+			</Layout>
+			<InformationDialog open={informData[0]} handleClose={() => informData[1]} title={informData[2]} message={informData[3]} />
+			<AlertDialog open={alertData[0]} handleClose={() => alertData[1]} title={alertData[2]} message={alertData[3]} option1={alertData[4]} option2={alertData[5]} />
+		</div>
+	);
 }
 
 export default App;

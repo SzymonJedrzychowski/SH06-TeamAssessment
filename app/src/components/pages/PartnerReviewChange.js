@@ -3,6 +3,7 @@ import {Link, useNavigate, useLocation} from 'react-router-dom';
 import {Button, Box, Typography} from '@mui/material';
 import { Markup } from 'interweave';
 import draftToHtml from 'draftjs-to-html';
+import convertImages from '../helper/convertImages';
 
 /**
  * PartnerReviewChange page
@@ -99,6 +100,7 @@ const PartnerReviewChange = (props) => {
 
         // -Other
         const getSuggestionResponse = (response) =>{
+            console.log(response.target.value);
             setResponse(response.target.value);
         }
 
@@ -208,9 +210,9 @@ const PartnerReviewChange = (props) => {
                 <Button variant = "contained" sx={{marginBottom: "1em", textDecoration: 'none'}} as = {Link} to = {"/Partner"}>Back</Button>
                 <p></p>
                 <div className = 'PartnerBody'>
-                    <Markup content={draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_content"]))}/>
+                    <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_content"])))}/>
                     <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Comments</Typography>
-                    <Markup content={draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_comment"]))}/>
+                    <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_comment"])))}/>
                     <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Response to editor</Typography>
                     <input
                         type = 'text'

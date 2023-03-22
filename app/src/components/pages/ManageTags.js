@@ -142,7 +142,7 @@ const ManageTags = (props) => {
                     } else if (json.message.slice(0, 3) === "EM:") {
                         setInformData([true, resetInformData, "Action failed", [json.message.slice(4)]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to home page."]])
                     }
 
                     setEditMode(-1);
@@ -178,7 +178,7 @@ const ManageTags = (props) => {
                         if (json.message === "Success") {
                             setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Tag was removed successfully."]])
                         } else {
-                            setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
+                            setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to home page."]])
                         }
                     }
                 )
@@ -224,7 +224,7 @@ const ManageTags = (props) => {
                     } else if (json.message.slice(0, 3) === "EM:") {
                         setInformData([true, resetInformData, "Action failed", [json.message.slice(4)]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to home page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to home page."]])
                     }
                     setEditMode(-1);
                     setNewTag('');

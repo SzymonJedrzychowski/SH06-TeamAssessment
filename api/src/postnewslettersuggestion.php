@@ -101,7 +101,7 @@ class PostNewsletterSuggestion extends Verify
 
             // Throw exception if no newsletter_item was updated.
             if ($data == 0) {
-                throw new ClientErrorException("Problem with finding item_id occured.");
+                throw new ClientErrorException("Problem with finding item_id occurred.");
             }
 
             // End step 4.

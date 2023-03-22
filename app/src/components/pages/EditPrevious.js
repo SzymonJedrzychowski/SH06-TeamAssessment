@@ -113,7 +113,7 @@ const EditPrevious = (props) => {
                         if (json.message === "Success") {
                             setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Newsletter was removed successfully."]])
                         } else {
-                            setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Unexpected error", ["Unnexpected error has occured.", "You will be redirected to editorial page."]])
+                            setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
                         }
                     }
                 )

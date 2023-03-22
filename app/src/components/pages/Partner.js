@@ -5,6 +5,7 @@ import TextEditor from "./TextEditor";
 import { Box, Button, Typography, Input, TableBody, TableRow, TableHead, TableCell, TableContainer, Paper, Table } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw } from 'draft-js';
+import convertImages from '../helper/convertImages';
 import ItemDialog from "./ItemDialog";
 
 /**
@@ -388,7 +389,7 @@ const Partner = (props) => {
                 if (value.item_checked === "-1" || value.item_checked === "0"){
                     deletable = true;
                 }
-                const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
+                const itemContent = <Markup content={convertImages(draftToHtml(JSON.parse(value.content)))}/>
                 
                 return(
                     <TableRow key = {value.item_id}>
@@ -450,7 +451,7 @@ const Partner = (props) => {
 
             // --Items
             const createPublishedItemBox = (value) => {
-                const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
+                const itemContent = <Markup content={convertImages(draftToHtml(JSON.parse(value.content)))}/>
                 return(
                     <Box sx = {{margin:3, padding: 2, borderBottom: 3}} key = {value.item_id}>
                         <Box sx = {{borderBottom:1}}>
