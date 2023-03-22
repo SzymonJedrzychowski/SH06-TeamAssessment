@@ -249,7 +249,7 @@ const Publish = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        //sendNewsletter();
+                        sendNewsletter();
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
                     } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
