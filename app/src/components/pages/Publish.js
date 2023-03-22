@@ -137,7 +137,7 @@ const Publish = (props) => {
     //Function used to load data of paragraph to edit text box
     const startEditing = (index) => {
         setEditMode(index);
-        const content = convertFromRaw(newsletterData[index]["data"]);
+        const content = convertFromRaw(JSON.parse(newsletterData[index]["data"]));
         setParagraph(() => EditorState.createWithContent(content));
     }
 
@@ -372,7 +372,6 @@ const Publish = (props) => {
                             {index === newsletterData.length - 1 && <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>}
                         </>}
                         {editMode !== -1 && <>
-                            <Button variant="contained" disabled><EditIcon /></Button>
                             <Button variant="contained" disabled><DeleteIcon /></Button>
                             <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>
                             <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>
