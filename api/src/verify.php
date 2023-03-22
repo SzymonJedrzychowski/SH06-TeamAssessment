@@ -109,7 +109,7 @@ class Verify extends Endpoint
     protected function initialiseSQL()
     {
         // Create SQL command to get data of the user.
-        $sql = "SELECT user_id, authorisation FROM user WHERE user_id = :user_id";
+        $sql = "SELECT user_id, authorisation, first_name, last_name FROM user WHERE user_id = :user_id";
         $this->setSQLCommand($sql);
         $this->setSQLParams(['user_id' => $this->getUserId()]);
     }
