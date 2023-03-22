@@ -116,10 +116,6 @@ const PartnerReviewChange = (props) => {
             }
         }
     
-        const rejectSuggestion = () => {
-            navigate("/partner");
-            console.log("Upload Reject");
-        }
 
         // -Accept suggestion
         const acceptConfirm = () => {
@@ -131,11 +127,6 @@ const PartnerReviewChange = (props) => {
             if (confirmation.target.value === "true") {
                 updateItemSuggestion(true);
             }
-        }
-
-        const acceptSuggestion = () => {
-            console.log("Upload Accept");//Redundant ofc
-            navigate("/partner");
         }
 
         const updateItemSuggestion = (status) => {

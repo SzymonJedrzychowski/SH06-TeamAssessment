@@ -2,9 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Markup } from 'interweave';
 import { Link, useNavigate } from 'react-router-dom';
 import TextEditor from "./TextEditor";
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Typography, Input } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
-import draftToMarkdown from 'draftjs-to-html';
 import { convertToRaw } from 'draft-js';
 
 /**
@@ -28,6 +27,11 @@ const Partner = (props) => {
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
     const [editorContent, setEditorContent] = useState("");
     const [editorTitle, setEditorTitle] = useState("Placeholder");
+    const [userName, setUserName] = useState("IC3 Partner")
+
+    const [contributeColour, setContributeColour] = useState("black");
+    const [reviewColour, setReviewColour] = useState("white");
+    const [publishColour, setPublishColour] = useState("white");
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -47,6 +51,7 @@ const Partner = (props) => {
                         if (["1", "2", "3"].includes(json.data[0]["authorisation"])) {
                             setAuthenticated(true);
                             setLoading(false);
+                            setUserName(json.data[0]["first_name"] + " " + json.data[0]["last_name"]);
                         } else {
                             setAuthenticated(false);
                             setLoading(false);
@@ -144,18 +149,27 @@ const Partner = (props) => {
             setShowReview(false);
             setShowPublished(false);
             setShowcontribute(true);
+            setContributeColour("yellow");
+            setReviewColour("white");
+            setPublishColour("white");
             }
     
             const setReview = () => {
             setShowcontribute(false);
             setShowPublished(false);
             setShowReview(true);
+            setContributeColour("white");
+            setReviewColour("yellow");
+            setPublishColour("white");
             }
     
             const setPublished = () => {
             setShowcontribute(false);
             setShowReview(false);
             setShowPublished(true);
+            setContributeColour("white");
+            setReviewColour("white");
+            setPublishColour("yellow");
             }
     
         const navigate = useNavigate();
@@ -307,15 +321,21 @@ const Partner = (props) => {
             flexDirection: "column",
             padding: 3,
           };
+        
+
 
         // -Contribute
         const contributeSection = <div className = 'PartnerContribute'>
-        <div className = 'PartnerContributeTitle'>Contribute an item
-        <input 
-            type = 'title'
-            content = {editorTitle}
-            onChange = {getItemTitle}
-            />
+        <div className = 'PartnerContributeTitle'>
+            <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.1em"}}>Contribute an item</Typography>
+            <Typography variant="p">
+                Item Title:
+                <Input 
+                    type = 'title'
+                    content = {editorTitle}
+                    onChange = {getItemTitle}
+                    />
+            </Typography>
         </div>
         
         <div className = 'PartnerContributeBox'>
@@ -325,7 +345,7 @@ const Partner = (props) => {
                 setContent = {setEditorContent}
             />
         </div>
-        {<button onClick = {uploadConfirm}>Upload</button>}
+        {<Button variant = "contained" sx = {{marginTop: "0.4em"}} onClick = {uploadConfirm}>Upload</Button>}
         </div>;
         
 
@@ -409,11 +429,11 @@ const Partner = (props) => {
             {(!loading && authenticated) && <div className = 'PartnerAuthenticated'>
                 <div className = 'PartnerHeader'>
                     <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
-                    <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.1em", borderBottom: 3 }}>Welcome, Partner</Typography>
-                    <Box sx = {{display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "left" } }>
-                        <Button variant = "contained" onClick = {setContribute}>Contribute item!</Button>
-                        <Button variant = "contained" onClick = {() => confirmNavigate("Review")}>Review items!</Button>
-                        <Button variant = "contained" onClick = {() => confirmNavigate("Published")}>See published items!</Button>
+                    <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.1em", borderBottom: 3 }}>Welcome, {userName}</Typography>
+                    <Box sx = {{display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "left", padding: 2 } }>
+                        <Button variant = "contained" sx = {{color:contributeColour}} onClick = {setContribute}>Contribute item!</Button>
+                        <Button variant = "contained" sx = {{color:reviewColour}} onClick = {() => confirmNavigate("Review")}>Review items!</Button>
+                        <Button variant = "contained" sx = {{color:publishColour}} onClick = {() => confirmNavigate("Published")}>See published items!</Button>
                     </Box>
                 </div>
 
@@ -424,8 +444,6 @@ const Partner = (props) => {
 
                 </div>
             </div>}
-            
-
         </Box>
     )
 }

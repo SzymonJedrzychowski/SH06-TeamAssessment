@@ -1,12 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import TextEditor from './TextEditor';
-import { Editor } from 'react-draft-wysiwyg';
 import { useLocation } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
 import {Button} from '@mui/material';
-import draftToHtml from 'draftjs-to-html';
-import { ContentState, convertToRaw, EditorState, convertFromRaw } from 'draft-js';
-import htmlToDraft from 'html-to-draftjs';
+import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 
 /**
  * PartnerEditItem page
@@ -100,7 +97,7 @@ const PartnerEditItem = (props) => {
     const uploadItem = () => {
 
         const formData = new FormData();
-        formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
+        formData.append('content', JSON.stringify(convertToRaw(editorContent.getCurrentContent())));
         formData.append('item_id', item.state);
         formData.append('item_checked', itemToEdit['item_checked']);
         fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
