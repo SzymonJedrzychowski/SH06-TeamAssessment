@@ -6,6 +6,7 @@ import { Box, Button } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
 import draftToMarkdown from 'draftjs-to-html';
 import { convertToRaw } from 'draft-js';
+import convertImages from '../helper/convertImages';
 
 /**
  * Partner page
@@ -341,7 +342,7 @@ const Partner = (props) => {
                 if (value.item_checked === "-1" || value.item_checked === "0"){
                     deletable = true;
                 }
-                const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
+                const itemContent = <Markup content={convertImages(draftToHtml(JSON.parse(value.content)))}/>
                 return(
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>
@@ -380,7 +381,7 @@ const Partner = (props) => {
 
             // --Items
             const createPublishedItemBox = (value) => {
-                const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
+                const itemContent = <Markup content={convertImages(draftToHtml(JSON.parse(value.content)))}/>
                 return(
                     <div key = {value.item_id}>
                         <div>{value.item_title}</div>

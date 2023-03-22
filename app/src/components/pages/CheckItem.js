@@ -2,8 +2,8 @@ import { Box, Button, Chip, FormControl, InputLabel, MenuItem, OutlinedInput, Pa
 import { Markup } from 'interweave';
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Parser } from 'html-to-react';
 import draftToHtml from 'draftjs-to-html';
+import convertImages from "../helper/convertImages";
 
 /**
  * CheckItem
@@ -365,8 +365,6 @@ const CheckItem = (props) => {
         </TableCell>
     }
 
-    const p = new Parser();
-
     return <Box sx={pageStyle}>
         {(loading && newsletterItem !== undefined) && <Box>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Check item</Typography>
@@ -426,7 +424,7 @@ const CheckItem = (props) => {
                         <TableRow>
                             <TableCell colSpan={2}>
                                 <Box sx={{ minHeight: "200px" }}>
-                                    <Markup content={draftToHtml(JSON.parse(newsletterItem["content"]))} />
+                                    <Markup content={convertImages(draftToHtml(JSON.parse(newsletterItem["content"])))} />
                                 </Box>
                             </TableCell>
                         </TableRow>
