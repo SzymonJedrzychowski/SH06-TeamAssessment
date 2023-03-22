@@ -238,7 +238,7 @@ const Partner = (props) => {
     
         // -Other
         const uploadConfirm = () => {
-            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, upload now.", "No, do not upload."]);
+            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item content later.", "YOU CANNOT CHANGE THE TITLE LATER."], "Yes, upload now.", "No, do not upload."]);
         }
 
         const handleUploadClose = (confirmation) => {
