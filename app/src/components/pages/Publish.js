@@ -2,7 +2,6 @@ import { Delete as DeleteIcon, Edit as EditIcon, KeyboardArrowDown as KeyboardAr
 import { Box, Button, FormControl, InputLabel, List, ListItem, MenuItem, Select, Typography } from "@mui/material";
 import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
-import htmlToDraft from 'html-to-draftjs';
 import { Markup } from 'interweave';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -138,7 +137,6 @@ const Publish = (props) => {
     //Function used to load data of paragraph to edit text box
     const startEditing = (index) => {
         setEditMode(index);
-        const contentBlock = htmlToDraft(newsletterData[index]["data"]);
         const content = convertFromRaw(newsletterData[index]["data"]);
         setParagraph(() => EditorState.createWithContent(content));
     }
@@ -251,7 +249,7 @@ const Publish = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        //sendNewsletter();
+                        sendNewsletter();
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
                     } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
