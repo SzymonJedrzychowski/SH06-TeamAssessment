@@ -18,6 +18,7 @@ import ManageTags from "./components/pages/ManageTags";
 import InformationDialog from "./components/pages/InformationDialog";
 import AlertDialog from "./components/pages/AlertDialog";
 import Archive from "./components/pages/Archive";
+import Adminpage from "./components/pages/Adminpage";
 
 /**
  * App is responsible for loading data and routing to other pages.
@@ -44,6 +45,8 @@ function App() {
 					<Route path="/" element={<Homepage />} />
 					<Route path="/archive" element={<Archive />} />
 
+					<Route path="/admin" element={<Adminpage/>}/>
+
 					<Route path="/partner" element={<Partner dialogData={dialogData()} />} />
 					<Route path="/partnerEditItem" element={<PartnerEditItem dialogData={dialogData()} />} />
 					<Route path="/partnerReviewChange" element={<PartnerReviewChange dialogData={dialogData()} />} />
@@ -54,8 +57,8 @@ function App() {
 					<Route path="/publish" element={<Publish dialogData={dialogData()} />} />
 					<Route path="/editPrevious" element={<EditPrevious dialogData={dialogData()} />} />
 					<Route path="/manageTags" element={<ManageTags dialogData={dialogData()} />} />
+					
 					<Route path="/createAccount" element={<CreateAccount dialogData={dialogData()} />} />
-
 					<Route path="/login" element={<Login dialogData={dialogData()} />} />
 					<Route path="/signUp" element={<SignUp dialogData={dialogData()} />} />
 
