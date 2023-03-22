@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Link, useNavigate, useLocation} from 'react-router-dom';
 import {Button} from '@mui/material';
-import { EditorState, ContentState } from 'draft-js';
-import htmlToDraft from 'html-to-draftjs';
 import { Markup } from 'interweave';
 import draftToHtml from 'draftjs-to-html';
 
@@ -20,8 +18,8 @@ const PartnerReviewChange = (props) => {
     const item = useLocation();
 
     // State variable hooks
-    const [itemSuggestion, setItemSuggestion] = useState();
-    const [response, setResponse] = useState(null);
+    const [itemSuggestion, setItemSuggestion] = useState('');
+    const [response, setResponse] = useState('');
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);

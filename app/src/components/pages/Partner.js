@@ -176,7 +176,7 @@ const Partner = (props) => {
 
         const confirmNavigate = (where) => {
             //if(draftToMarkdown(convertToRaw(editorContent.getCurrentContent())).trim() === "")
-            if (showContribute == true){ // && !((editorContent.getCurrentContent()).hasText())){
+            if (showContribute === true){ // && !((editorContent.getCurrentContent()).hasText())){
                 setAlertData([true, (confirmation) => handleConfirmNavigate(confirmation, where), "Confirm navigate.", ["Are you sure you wish to leave this page??", "Your progress will be lost."], "Yes, leave page.", "No, stay on page."]);
             }
             else {
@@ -192,10 +192,10 @@ const Partner = (props) => {
         }
 
         const navigatePartner = (where) => {
-            if (where == "Review") {
+            if (where === "Review") {
                 setReview();
             }
-            else if (where == "Published") {
+            else if (where === "Published") {
                 setPublished();
             }
         }
@@ -329,7 +329,7 @@ const Partner = (props) => {
         <div className = 'PartnerContributeTitle'>
             <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.1em"}}>Contribute an item</Typography>
             <Typography variant="p">
-                Item Title:
+                Item Title:&nbsp;&nbsp;
                 <Input 
                     type = 'title'
                     content = {editorTitle}
@@ -364,12 +364,14 @@ const Partner = (props) => {
                 const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
                 return(
                     <div key = {value.item_id}>
-                        <div>{value.item_title}</div>
-                        <div>{checkValues[value.item_checked]}</div>
-                        <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
-                        {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
-                        {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
-                        {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {[value.item_id, value.item_checked]}>See suggestion</Button></div>}
+                        <Box sx={{border : 2}}>
+                            <div>{value.item_title}</div>
+                            <div>{checkValues[value.item_checked]}</div>
+                            <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
+                            {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
+                            {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
+                            {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {[value.item_id, value.item_checked]}>See suggestion</Button></div>}
+                        </Box>
                     </div>); 
             }
 
