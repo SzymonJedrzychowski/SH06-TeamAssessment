@@ -48,7 +48,7 @@ class SendNewsletter extends Verify
         $email->setFrom("mikolaj.furmanczak@northumbria.ac.uk", "IC3 Newsletter");
         $email->setReplyTo("mikolaj.furmanczak@northumbria.ac.uk", "IC3 Reply");
         $email->setTemplateId("d-a0e49613988f410d8524b8aeea0f1740");
-        
+       
 
         $sendgrid = new SendGrid(API_KEY);
         try {
