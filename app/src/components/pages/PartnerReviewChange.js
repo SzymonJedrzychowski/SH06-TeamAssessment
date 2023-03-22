@@ -26,7 +26,7 @@ const PartnerReviewChange = (props) => {
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -59,7 +59,7 @@ const PartnerReviewChange = (props) => {
                 }
             )
 
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state[0],
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state[0],
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -135,7 +135,7 @@ const PartnerReviewChange = (props) => {
                 formDataSuggestion.append('suggestion_id', itemSuggestion[0].suggestion_id);
                 formDataSuggestion.append('item_id', item.state[0]);
                 formDataSuggestion.append('item_status', item.state[1])
-                fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/postsuggestionresponse",
+                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postsuggestionresponse",
                     {
                         method: 'POST',
                         headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -165,7 +165,7 @@ const PartnerReviewChange = (props) => {
                 formDataItem.append('content', itemSuggestion[0]["suggestion_content"]);
                 formDataItem.append('item_id', item.state[0]);
                 formDataItem.append('item_checked', item.state[1]);
-                fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
                         {
                             method: 'POST',
                             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

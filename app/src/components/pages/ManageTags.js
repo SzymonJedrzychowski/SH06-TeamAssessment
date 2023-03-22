@@ -51,7 +51,7 @@ const ManageTags = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all tags
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/gettags")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
             .then(
                 (response) => response.json()
             )
@@ -75,7 +75,7 @@ const ManageTags = (props) => {
     //Hook used to load the data and verify if user can see the page on renders (re-render is caused by change in update variable)
     useEffect(() => {
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -125,7 +125,7 @@ const ManageTags = (props) => {
         formData.append('tag_name', selectedItem);
 
         //Edit the tag name
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/edittag",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/edittag",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -164,7 +164,7 @@ const ManageTags = (props) => {
 
         if (confirmation.target.value === "true") {
             //Remove tag
-            fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/removetag",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removetag",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -207,7 +207,7 @@ const ManageTags = (props) => {
         formData.append('tag_name', newTag);
 
         //Add new tag
-        fetch("http://unn-w18040278.newnumyspace.co.uk/teamAssessment/api/addtag",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/addtag",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
