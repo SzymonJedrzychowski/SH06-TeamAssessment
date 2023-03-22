@@ -52,7 +52,7 @@ class EditNewsletter extends Verify
 
             // Check if row with given newsletter_id was found.
             if ($data == 0) {
-                throw new ClientErrorException("Problem with getting published_newsletter occured.");
+                throw new ClientErrorException("Problem with getting published_newsletter occurred.");
             }
 
             // End step 1.
@@ -89,7 +89,7 @@ class EditNewsletter extends Verify
             // Throw exception if there is a difference in updated items and length of array with items to update.
             if ($data != count($array)) {
                 if (count($array) == 1 and $data[0] != null) {
-                    throw new ClientErrorException("Problem with updating newsletter_item occured.");
+                    throw new ClientErrorException("Problem with updating newsletter_item occurred.");
                 }
             }
 
