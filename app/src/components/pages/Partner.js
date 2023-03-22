@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Markup } from 'interweave';
 import { Link, useNavigate } from 'react-router-dom';
 import TextEditor from "./TextEditor";
-import { Box, Button, Typography, Input } from '@mui/material';
+import { Box, Button, Typography, Input, TableBody, TableRow } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
 import { convertToRaw } from 'draft-js';
 
@@ -363,36 +363,39 @@ const Partner = (props) => {
                 }
                 const itemContent = <Markup content={draftToHtml(JSON.parse(value.content))}/>
                 return(
-                    <div key = {value.item_id}>
+                    <TableRow key = {value.item_id}>
                         <Box sx={{border : 2}}>
-                            <div>{value.item_title}</div>
+                            <Box sx={{justifyContent:"flex-end", border:2, width:200, height:200 }}>
+                                <div>{value.item_title}</div>
+                            </Box>
                             <div>{checkValues[value.item_checked]}</div>
                             <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
                             {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
                             {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
                             {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {[value.item_id, value.item_checked]}>See suggestion</Button></div>}
                         </Box>
-                    </div>); 
+                    </TableRow>); 
             }
 
         const reviewSection = <div className = 'PartnerReview'>
-        <div className = 'PartnerReviewFilters'>
+        <Box className = 'PartnerReviewFilters'>
             <ul>
-                <button onClick = {()=>setItemsFilter(["0", "1", "2"])}>Pending</button>
-                <button onClick = {()=>setItemsFilter(["3"])}>Accepted</button>
-                <button onClick = {()=>setItemsFilter(["-1"])}>Removed</button>
-                <button onClick = {()=>setItemsFilter([null])}>All</button>
+                <Button onClick = {()=>setItemsFilter(["0", "1", "2"])}>Pending</Button>
+                <Button onClick = {()=>setItemsFilter(["3"])}>Accepted</Button>
+                <Button onClick = {()=>setItemsFilter(["-1"])}>Removed</Button>
+                <Button onClick = {()=>setItemsFilter([null])}>All</Button>
             </ul>
-        </div>
+        </Box>
         <div className = 'PartnerReviewLoading'>
             {loadingReviewItems && <p>Loading...</p>}
         </div>
         <div className = 'PartnerReviewContent'>
-            {itemsInReview.filter(filterChecked).map(
-                function (value) {
-                return createReviewItemBox(value);
-            }
-            )}
+            <TableBody>
+                {itemsInReview.filter(filterChecked).map(
+                    function (value) {
+                    return createReviewItemBox(value);
+                } )}
+            </TableBody>
         </div>
         </div>
 
