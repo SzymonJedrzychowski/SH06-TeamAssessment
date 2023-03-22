@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import TextEditor from './TextEditor';
 import { useLocation } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
-import {Button} from '@mui/material';
+import {Button, Typography, Box} from '@mui/material';
 import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 
 /**
@@ -139,20 +139,19 @@ const PartnerEditItem = (props) => {
     
     //OUTPUT
     return(
-        <div className = 'PartnerEditItem'>
+        <Box sx = {{display: "flex", flexDirection: "column", padding: 3}} className = 'PartnerEditItem'>
              {(!loading && authenticated) && <div className = 'PartnerEditItemAuthenticated'>
-                <h2 className = 'PartnerEditItemTitle'>Your item</h2>
-                <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
-                <div className = 'PartnerContributeBox'>
-                    Box goes here.
-                    <TextEditor
-                        type={"content"} content={editorContent} setContent={setEditorContent}
-                        defaultContentState = {itemToEdit['content']}
-                    />
-                </div>
-            <button onClick = {uploadConfirm}>Upload</button>
+                <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
+                <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Item: {itemToEdit[0]['item_title']}</Typography>
+                <Button variant = "contained" sx={{marginBottom: "1em", textDecoration: 'none'}} as = {Link} to = {"/Partner"}>Back</Button>
+                <p></p>
+                <TextEditor sx = {{marginTop: "1em"}}
+                    type={"content"} content={editorContent} setContent={setEditorContent}
+                    defaultContentState = {itemToEdit['content']}
+                />
+            <Button variant = "contained" onClick = {uploadConfirm}>Upload</Button>
             </div>}
-        </div>
+        </Box>
     )
 }
 
