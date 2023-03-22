@@ -6,6 +6,7 @@ import htmlToDraft from 'html-to-draftjs';
 import { Markup } from 'interweave';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
+import convertImages from '../helper/convertImages';
 import TextEditor from "./TextEditor";
 
 /**
@@ -337,7 +338,7 @@ const Publish = (props) => {
             return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
                     <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
-                        <Markup content={draftToHtml(JSON.parse(value["data"]))} />
+                        <Markup content={convertImages(draftToHtml(JSON.parse(value["data"])))} />
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
                         {editMode === -1 && <>
@@ -362,7 +363,7 @@ const Publish = (props) => {
             return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
                     <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
-                        <Markup content={combineData(value["data"])} />
+                        <Markup content={convertImages(combineData(value["data"]))} />
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
                         {editMode === -1 && <>

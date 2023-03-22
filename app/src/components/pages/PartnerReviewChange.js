@@ -5,6 +5,7 @@ import { EditorState, ContentState } from 'draft-js';
 import htmlToDraft from 'html-to-draftjs';
 import { Markup } from 'interweave';
 import draftToHtml from 'draftjs-to-html';
+import convertImages from '../helper/convertImages';
 
 /**
  * PartnerReviewChange page
@@ -21,7 +22,7 @@ const PartnerReviewChange = (props) => {
 
     // State variable hooks
     const [itemSuggestion, setItemSuggestion] = useState();
-    const [response, setResponse] = useState(null);
+    const [response, setResponse] = useState('');
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -101,6 +102,7 @@ const PartnerReviewChange = (props) => {
 
         // -Other
         const getSuggestionResponse = (response) =>{
+            console.log(response.target.value);
             setResponse(response.target.value);
         }
 
@@ -219,9 +221,9 @@ const PartnerReviewChange = (props) => {
                 </div>
                 <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
                 <div className = 'PartnerBody'>
-                    <Markup content={draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_content"]))}/>
+                    <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_content"])))}/>
                     <h2>Comments</h2>
-                    <Markup content={draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_comment"]))}/>
+                    <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_comment"])))}/>
                     <Button onClick = {acceptConfirm}>Accept</Button>
                     <Button onClick={rejectConfirm}>Reject</Button>
                     <p>Comments to editor</p>

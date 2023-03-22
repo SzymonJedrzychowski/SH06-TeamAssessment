@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { Markup } from "interweave";
 import React, { useEffect, useState } from "react";
 import draftToHtml from 'draftjs-to-html';
+import convertImages from "../helper/convertImages";
 /**
  * 
  * @returns hompage whic is displaying the last published newsletter
@@ -56,7 +57,7 @@ const Homepage = () => {
       }
   }
   const newsContentMa = (value, index) => {
-    return <Markup content={draftToHtml(JSON.parse(value))} />;
+    return <Markup content={convertImages(draftToHtml(JSON.parse(value)))} />;
   };
 
   for (let val in contentProcessd.content) {
