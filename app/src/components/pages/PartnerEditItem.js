@@ -100,7 +100,7 @@ const PartnerEditItem = (props) => {
     const uploadItem = () => {
 
         const formData = new FormData();
-        formData.append('content', draftToHtml(convertToRaw(editorContent.getCurrentContent())));
+        formData.append('content', JSON.stringify(convertToRaw(editorContent.getCurrentContent())));
         formData.append('item_id', item.state);
         formData.append('item_checked', itemToEdit['item_checked']);
         fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",

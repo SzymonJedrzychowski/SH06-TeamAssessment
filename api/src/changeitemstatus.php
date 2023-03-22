@@ -46,7 +46,7 @@ class ChangeItemStatus extends Verify
 
             // Allow partners to only change their items and check if item was found in db.
             if (count($data) == 0) {
-                throw new ClientErrorException("Problem with getting newsletter_item occured.");
+                throw new ClientErrorException("Problem with getting newsletter_item occurred.");
             } else if ($data[0]["user_id"] != $tokenData->sub and $_POST["partner_access"] == "true") {
                 throw new BadRequest("Editors can only edit their own items.");
             }

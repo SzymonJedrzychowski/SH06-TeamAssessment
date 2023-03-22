@@ -55,7 +55,6 @@ const Homepage = () => {
         paperContent.push(ar[v][v1].data.content);
       }
   }
-  console.log(paperContent);
   const newsContentMa = (value, index) => {
     return <Markup content={draftToHtml(JSON.parse(value))} />;
   };

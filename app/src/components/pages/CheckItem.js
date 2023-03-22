@@ -3,7 +3,6 @@ import { Markup } from 'interweave';
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Parser } from 'html-to-react';
-import { convertFromRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
 
 /**
@@ -289,7 +288,7 @@ const CheckItem = (props) => {
                     if (json.message === "Success") {
                         setInformData([true, () => { resetInformData(); setUpdate(update + 1) }, "Success", ["The tags were updated."]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate('/editorial') }, "Error", ["Unexpected error has occured.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate('/editorial') }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
