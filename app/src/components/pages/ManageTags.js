@@ -265,8 +265,8 @@ const ManageTags = (props) => {
 
             {editMode === -1 && <TableCell><Button variant="contained" onClick={() => { setEditMode(index); setSelectedItem(value.tag_name) }}>Edit</Button></TableCell>}
             {(editMode !== -1 && editMode !== index) && <TableCell><Button variant="contained" disabled>Edit</Button></TableCell>}
-            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Box sx={{display: "flex", flexDirection: "row", alignItems: "stretch", columnGap:"3px"}}><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
-            {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Box sx={{display: "flex", flexDirection: "row", alignItems: "stretch", columnGap:"3px"}}><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
+            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
+            {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
 
             {editMode === -1 && <TableCell><Button variant="contained" value={value.tag_id} onClick={handleRemove}>Remove</Button></TableCell>}
             {editMode !== -1 && <TableCell><Button variant="contained" disabled>Remove</Button></TableCell>}
