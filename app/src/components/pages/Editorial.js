@@ -52,7 +52,7 @@ const Editorial = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all unpublished newsletter items
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?published=false",
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?published=false",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -79,7 +79,7 @@ const Editorial = (props) => {
     //Hook used to load the data and verify if user can see the page on renders
     useEffect(() => {
         //Verifying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
