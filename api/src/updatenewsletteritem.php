@@ -31,12 +31,12 @@ class UpdateNewsletterItem extends Verify
         $tokenData = parent::validateToken();
 
         // Ensure user is signed in
-        if (!in_array($tokenData->auth, ["1", "2", "3"])){
+        if (!in_array($tokenData->auth, ["1", "2", "3"])) {
             throw new BadRequest("You must be signed in to edit items, please sign in!");
         }
 
         // Ensure the item can be edited
-        if (in_array($_POST['item_checked'], ["-1", "3"])){
+        if (in_array($_POST['item_checked'], ["-1", "3"])) {
             throw new BadRequest("You can no longer edit this item! If you see an error, please contact an editor or admin.");
         }
 
@@ -45,29 +45,39 @@ class UpdateNewsletterItem extends Verify
 
         try {
             // Initialise SQL for insertion
-            if(filter_has_var(INPUT_POST, "item_title")){
+            if (filter_has_var(INPUT_POST, "item_title")) {
                 $sql = "UPDATE newsletter_item
                 SET content = :content, item_title = :item_title
                 WHERE item_id = :item_id";
-            }else{
+
+                $this->setSQLParams([
+
+                    // Main item content passed via POST
+                    ':content' => $_POST['content'],
+
+                    // Item title passed via POST
+                    ':item_title' => $_POST['item_title'],
+
+                    // User ID from the token authorising them
+                    ':item_id' => $_POST['item_id']
+                ]);
+            } else {
                 $sql = "UPDATE newsletter_item
                 SET content = :content
                 WHERE item_id = :item_id";
+
+                $this->setSQLParams([
+
+                    // Main item content passed via POST
+                    ':content' => $_POST['content'],
+
+                    // User ID from the token authorising them
+                    ':item_id' => $_POST['item_id']
+                ]);
             }
 
             // Safely pass the values into the SQL command
             $this->setSQLCommand($sql);
-            $this->setSQLParams([
-
-                // Main item content passed via POST
-                ':content' => $_POST['content'],
-
-                // Item title passed via POST
-                ':item_title' => $_POST['item_title'],
-
-                // User ID from the token authorising them
-                ':item_id' => $_POST['item_id']
-            ]);
 
             // Execute the SQL command
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
@@ -81,8 +91,7 @@ class UpdateNewsletterItem extends Verify
                 "message" => "Success",
                 "data" => null
             ));
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $db->rollbackTransaction();
             throw $e;
         }
@@ -93,7 +102,7 @@ class UpdateNewsletterItem extends Verify
      * @throws ClientErrorException if incorrect parameters were used.
      */
     private function validateParameters()
-    {   
+    {
         $requiredParameters = array('content', 'item_id', 'item_checked');
         $this->checkRequiredParameters($requiredParameters);
     }
