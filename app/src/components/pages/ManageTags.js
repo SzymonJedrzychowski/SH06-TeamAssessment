@@ -51,7 +51,7 @@ const ManageTags = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all tags
-        fetch(process.env.REACT_APP_API_LINK + "gettags")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
             .then(
                 (response) => response.json()
             )
@@ -75,7 +75,7 @@ const ManageTags = (props) => {
     //Hook used to load the data and verify if user can see the page on renders (re-render is caused by change in update variable)
     useEffect(() => {
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch(process.env.REACT_APP_API_LINK + "verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -125,7 +125,7 @@ const ManageTags = (props) => {
         formData.append('tag_name', selectedItem);
 
         //Edit the tag name
-        fetch(process.env.REACT_APP_API_LINK + "edittag",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/edittag",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -164,7 +164,7 @@ const ManageTags = (props) => {
 
         if (confirmation.target.value === "true") {
             //Remove tag
-            fetch(process.env.REACT_APP_API_LINK + "removetag",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removetag",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -207,7 +207,7 @@ const ManageTags = (props) => {
         formData.append('tag_name', newTag);
 
         //Add new tag
-        fetch(process.env.REACT_APP_API_LINK + "addtag",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/addtag",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -265,7 +265,6 @@ const ManageTags = (props) => {
 
             {editMode === -1 && <TableCell><Button variant="contained" onClick={() => { setEditMode(index); setSelectedItem(value.tag_name) }}>Edit</Button></TableCell>}
             {(editMode !== -1 && editMode !== index) && <TableCell><Button variant="contained" disabled>Edit</Button></TableCell>}
-
             {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Box sx={{display: "flex", flexDirection: "row", alignItems: "stretch", columnGap:"3px"}}><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
             {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Box sx={{display: "flex", flexDirection: "row", alignItems: "stretch", columnGap:"3px"}}><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
 

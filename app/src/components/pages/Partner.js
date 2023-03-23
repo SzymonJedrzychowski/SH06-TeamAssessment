@@ -44,7 +44,7 @@ const Partner = (props) => {
 
     // On render hook
     useEffect(() => {
-        fetch(process.env.REACT_APP_API_LINK + "verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -79,7 +79,7 @@ const Partner = (props) => {
                 }
             )
 
-        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?partner_access=true&published=false",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=false",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -106,7 +106,7 @@ const Partner = (props) => {
             }
         )
 
-        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?partner_access=true&published=true",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=true",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -258,7 +258,7 @@ const Partner = (props) => {
             formData.append('content', JSON.stringify(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
             formData.append('item_title', editorTitle);
-            fetch(process.env.REACT_APP_API_LINK + "postnewsletteritem",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -298,7 +298,7 @@ const Partner = (props) => {
         const deleteNewsletterItem = (value) => {
             const formData = new FormData();
             formData.append('item_id', value);
-            fetch(process.env.REACT_APP_API_LINK + "removenewsletteritem",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

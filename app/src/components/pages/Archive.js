@@ -21,7 +21,7 @@ const Archive = () => {
    */
   useEffect(() => {
     fetch(
-      process.env.REACT_APP_API_LINK + "getpublishednewsletters"
+      "http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters"
     )
       .then((response) => response.json())
       .then((res) => setdata(res.data));

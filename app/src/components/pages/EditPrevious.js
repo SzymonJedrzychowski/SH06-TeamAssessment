@@ -39,7 +39,7 @@ const EditPrevious = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all published newsletters
-        fetch(process.env.REACT_APP_API_LINK + "getpublishednewsletters")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters")
             .then(
                 (response) => response.json()
             )
@@ -62,7 +62,7 @@ const EditPrevious = (props) => {
 
     //Hook used to load the data and verify if user can see the page on renders
     useEffect(() => {
-        fetch(process.env.REACT_APP_API_LINK + "verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -99,7 +99,7 @@ const EditPrevious = (props) => {
         formData.append('newsletter_id', newsletterToRemove);
 
         if (confirmation.target.value === "true") {
-            fetch(process.env.REACT_APP_API_LINK + "removepublishednewsletter",
+            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removepublishednewsletter",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

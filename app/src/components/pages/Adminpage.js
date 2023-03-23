@@ -23,9 +23,9 @@ function Adminpage() {
     useEffect(() => {
         try {
             Promise.all([
-                fetch(process.env.REACT_APP_API_LINK + "getUsers"),
-                fetch(process.env.REACT_APP_API_LINK + "getOrganisations"),
-                fetch(process.env.REACT_APP_API_LINK + "getNextNewsletterDate")
+                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getUsers"),
+                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getOrganisations"),
+                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getNextNewsletterDate")
             ])
                 .then(
                     ([usersResponse, organisationsResponse, newsletterDateResponse]) =>
@@ -50,8 +50,8 @@ function Adminpage() {
         async function fetchEditorsAndTags() {
             try {
                 const [editorsResponse, tagsResponse] = await Promise.all([
-                    fetch(process.env.REACT_APP_API_LINK + "getUsers"),
-                    fetch(process.env.REACT_APP_API_LINK + "getTag"),
+                    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getUsers"),
+                    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getTag"),
                 ]);
                 const [editorsData, tagsData] = await Promise.all([
                     editorsResponse.json(),
@@ -70,7 +70,7 @@ function Adminpage() {
     async function handleSubmit(event) {
         event.preventDefault();
         try {
-            const response = await fetch(process.env.REACT_APP_API_LINK + "getStats", {
+            const response = await fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getStats", {
                 method: "POST",
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
                 body: JSON.stringify({
@@ -89,7 +89,7 @@ function Adminpage() {
     const handleUpdateUpdateUser = (userId, newData) => {
         console.log("Updating user: ", userId, newData);
 
-        fetch(process.env.REACT_APP_API_LINK + "updateUser", {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updateUser", {
             method: "POST",
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
             body: JSON.stringify({
@@ -151,7 +151,7 @@ function Adminpage() {
     };
 
     const handleUpdateNewsletterDate = (newNewsletterDate) => {
-        fetch(process.env.REACT_APP_API_LINK + "updateNextNewsletterDate", {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updateNextNewsletterDate", {
             method: "POST",
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
             body: JSON.stringify({
@@ -179,7 +179,7 @@ function Adminpage() {
 
 
     const handleCreate = async () => {
-        const response = await fetch(process.env.REACT_APP_API_LINK + "createOrganisation", {
+        const response = await fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/createOrganisation", {
             method: "POST",
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
             body: JSON.stringify({
@@ -200,7 +200,7 @@ function Adminpage() {
     };
 
     const handleSave = () => {
-        fetch(process.env.REACT_APP_API_LINK + "updateOrganisation", {
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updateOrganisation", {
             method: "POST",
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token'), "Content-Type": "application/json" }),
             body: JSON.stringify(editedOrganisation),

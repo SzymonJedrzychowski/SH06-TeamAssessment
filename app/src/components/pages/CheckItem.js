@@ -95,7 +95,7 @@ const CheckItem = (props) => {
     //Function that loads data of newsletter suggestion if there is one.
     const loadItemState = () => {
         //Loading the newsletter item
-        fetch(process.env.REACT_APP_API_LINK + "getnewslettersuggestion?item_id=" + item.state,
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -124,7 +124,7 @@ const CheckItem = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading the newsletter item
-        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?item_id=" + item.state,
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -155,7 +155,7 @@ const CheckItem = (props) => {
             )
 
         //Loading the tags of the newsletter item
-        fetch(process.env.REACT_APP_API_LINK + "getitemtags?item_id=" + item.state)
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
             .then(
                 (response) => response.json()
             )
@@ -175,7 +175,7 @@ const CheckItem = (props) => {
                 })
 
         //Loading all available tags
-        fetch(process.env.REACT_APP_API_LINK + "gettags")
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
             .then(
                 (response) => response.json()
             )
@@ -205,7 +205,7 @@ const CheckItem = (props) => {
         }
 
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch(process.env.REACT_APP_API_LINK + "verify",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -241,7 +241,7 @@ const CheckItem = (props) => {
         formData.append('item_checked', newStatus);
         formData.append('item_id', item.state);
 
-        fetch(process.env.REACT_APP_API_LINK + "changeitemstatus",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -274,7 +274,7 @@ const CheckItem = (props) => {
         formData.append('item_tags', newTags.length > 0 ? JSON.stringify(newTags) : JSON.stringify([null]));
         formData.append('item_id', item.state);
 
-        fetch(process.env.REACT_APP_API_LINK + "postitemtags",
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postitemtags",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

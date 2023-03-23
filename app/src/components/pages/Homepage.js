@@ -20,7 +20,7 @@ const Homepage = () => {
   };
   useEffect(() => {
     fetch(
-      process.env.REACT_APP_API_LINK + "getlastpublishednewsletter"
+      "http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getlastpublishednewsletter"
     )
       .then((response) => response.json())
       .then((json) => {
