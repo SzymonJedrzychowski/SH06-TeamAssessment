@@ -136,6 +136,10 @@ const Publish = (props) => {
 
     //Function used to load data of paragraph to edit text box
     const startEditing = (index) => {
+        const element = document.getElementById("textEditor");
+        if(element !== null){
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
         setEditMode(index);
         const content = convertFromRaw(JSON.parse(newsletterData[index]["data"]));
         setParagraph(() => EditorState.createWithContent(content));
@@ -407,7 +411,7 @@ const Publish = (props) => {
                 {(editMode !== -1 || selectedItem === '') && <Button sx={{ xs: "100%", sm: "100%", md: "200px" }} variant="contained" disabled>Add newsletter item</Button>}
             </ListItem>
             <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, rowGap: "5px", justifyContent: "space-between" }}>
-                <Box sx={{ maxWidth: { xs: "100%", sm: "100%", md: "70%" }, minWidth: { xs: "100%", sm: "100%", md: "70%" } }}>
+                <Box id="textEditor" sx={{ maxWidth: { xs: "100%", sm: "100%", md: "70%" }, minWidth: { xs: "100%", sm: "100%", md: "70%" } }}>
                     <TextEditor type={"paragraph"} content={paragraph} setContent={setParagraph} />
                 </Box>
                 <Box sx={{ display: "flex", flexDirection: "column", rowGap: "5px", minWidth: { xs: "100%", sm: "100%", md: "200px" } }}>
