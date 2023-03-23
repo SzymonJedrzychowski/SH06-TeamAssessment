@@ -19,8 +19,10 @@ import ItemDialog from "./ItemDialog";
 const Partner = (props) => {
 
     // State variable hooks
-    const [showContribute, setShowcontribute] = useState(false);
-    const [showReview, setShowReview] = useState(true);
+    const [loadingReviewItems, setLoadingReviewItems] = useState(true);
+    const [loadingPublishedItems, setLoadingPublishedItems] = useState(true);
+    const [showContribute, setShowcontribute] = useState(true);
+    const [showReview, setShowReview] = useState(false);
     const [showPublished, setShowPublished] = useState(false);
     const [itemsInReview, setItemsInReview] = useState([]);
     const [publishedItems, setPublishedItems] = useState([]);
@@ -29,8 +31,8 @@ const Partner = (props) => {
     const [editorTitle, setEditorTitle] = useState("Placeholder");
     const [userName, setUserName] = useState("IC3 Partner")
 
-    const [contributeColour, setContributeColour] = useState("white");
-    const [reviewColour, setReviewColour] = useState("yellow");
+    const [contributeColour, setContributeColour] = useState("yellow");
+    const [reviewColour, setReviewColour] = useState("white");
     const [publishColour, setPublishColour] = useState("white");
     const [filterPendingColour, setFilterPendingColour] = useState("yellow");
     const [filterAcceptedColour, setFilterAcceptedColour] = useState("white");
@@ -39,8 +41,6 @@ const Partner = (props) => {
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [loadingReviewItems, setLoadingReviewItems] = useState(true);
-    const [loadingPublishedItems, setLoadingPublishedItems] = useState(true);
 
     // On render hook
     useEffect(() => {
@@ -239,7 +239,7 @@ const Partner = (props) => {
     
         // -Other
         const uploadConfirm = () => {
-            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item content later."], "Yes, upload now.", "No, do not upload."]);
+            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item content later.", "YOU CANNOT CHANGE THE TITLE LATER."], "Yes, upload now.", "No, do not upload."]);
         }
 
         const handleUploadClose = (confirmation) => {
@@ -309,6 +309,7 @@ const Partner = (props) => {
                 )
                 .then(
                     (json) => {
+                        console.log("ID: " + value);
                         if (json.message !== "Success") {
                             console.log(json);
                             setInformData([true, () => {resetInformData()}, "Deletion Failed.", ['Check the console for details.']]);
@@ -358,6 +359,7 @@ const Partner = (props) => {
             <Typography variant="p">
                 Item Title:&nbsp;&nbsp;
                 <Input 
+                    type = 'title'
                     content = {editorTitle}
                     onChange = {getItemTitle}
                     />

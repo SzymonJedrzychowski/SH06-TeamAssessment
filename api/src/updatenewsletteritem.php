@@ -46,7 +46,7 @@ class UpdateNewsletterItem extends Verify
         try {
             // Initialise SQL for insertion
             $sql = "UPDATE newsletter_item
-            SET content = :content, item_title = :item_title
+            SET content = :content
             WHERE item_id = :item_id";
 
 
@@ -55,10 +55,7 @@ class UpdateNewsletterItem extends Verify
             $this->setSQLParams([
 
                 // Main item content passed via POST
-                ':content' => $_POST['content'],
-
-                // Item title passed via POST
-                ':item_title' => $_POST['item_title'],
+                'content' => $_POST['content'],
 
                 // User ID from the token authorising them
                 ':item_id' => $_POST['item_id']
@@ -89,7 +86,7 @@ class UpdateNewsletterItem extends Verify
      */
     private function validateParameters()
     {   
-        $requiredParameters = array('content', 'item_id', 'item_checked', 'item_title');
+        $requiredParameters = array('content', 'item_id', 'item_checked');
         $this->checkRequiredParameters($requiredParameters);
     }
 
@@ -103,8 +100,7 @@ class UpdateNewsletterItem extends Verify
         return [
             'content' => 'string',
             'item_id' => 'string',
-            'item_checked' => 'string',
-            'item_title' => 'string'
+            'item_checked' => 'string'
         ];
     }
 }
