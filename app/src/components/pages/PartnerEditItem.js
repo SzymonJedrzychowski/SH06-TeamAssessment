@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import TextEditor from './TextEditor';
 import { useLocation } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
-import {Button, Typography, Box} from '@mui/material';
+import {Button, Typography, Box, Input} from '@mui/material';
 import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 
 /**
@@ -21,6 +21,7 @@ const PartnerEditItem = (props) => {
     // State variable hooks
     const [itemToEdit, setItemToEdit] = useState(null);
     const [editorContent, setEditorContent] = useState(null);
+    const [itemTitle, setItemTitle] = useState(null)
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -75,6 +76,7 @@ const PartnerEditItem = (props) => {
                 setItemToEdit(json.data);
                 const content = convertFromRaw(JSON.parse(json.data[0]["content"]));
                 setEditorContent(EditorState.createWithContent(content));
+                setItemTitle(json.data[0]["item_title"])
                 setLoading(false);
             }
         )
@@ -94,6 +96,10 @@ const PartnerEditItem = (props) => {
     // Functions
     const navigate = useNavigate();
 
+    const getItemTitle = (title) => {
+        setItemTitle(title.target.value)
+    }
+
     const uploadItem = () => {
 
         const formData = new FormData();
@@ -108,6 +114,7 @@ const PartnerEditItem = (props) => {
                 })
                 .then(
                     (response) => response.json()
+                    
                 )
                 .then(
                     (json) => {
@@ -142,7 +149,8 @@ const PartnerEditItem = (props) => {
         <Box sx = {{display: "flex", flexDirection: "column", padding: 3}} className = 'PartnerEditItem'>
              {(!loading && authenticated) && <div className = 'PartnerEditItemAuthenticated'>
                 <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
-                <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Item: {itemToEdit[0]['item_title']}</Typography>
+                <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Item: {itemToEdit[0]['item_title']}</Typography><br/>
+                <Typography variant="p" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Edit title:  </Typography><Input defaultValue = {itemTitle} onChange = {getItemTitle}/><br/><br/>
                 <Button variant = "contained" sx={{marginBottom: "1em", textDecoration: 'none'}} as = {Link} to = {"/Partner"}>Back</Button>
                 <p></p>
                 <TextEditor sx = {{marginTop: "1em"}}
