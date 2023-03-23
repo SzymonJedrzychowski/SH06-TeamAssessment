@@ -162,36 +162,38 @@ const PartnerReviewChange = (props) => {
                             console.log(e.message)
                         }
                     );
-
-                const formDataItem = new FormData();
-                formDataItem.append('content', itemSuggestion[0]["suggestion_content"]);
-                formDataItem.append('item_id', item.state[0]);
-                formDataItem.append('item_checked', item.state[1]);
-                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
-                        {
-                            method: 'POST',
-                            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
-                            body: formDataItem
-                        })
-                        .then(
-                            (response) => response.json()
-                        )
-                        .then(
-                            (json) => {
-                                if (json.message !== "Success") {
-                                    console.log(json);
-                                    setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
-                                }
-                                else if (json.message === "Success"){
-                                    console.log("Success")
-                                    setInformData([true, () => {resetInformData(); navigate('/partner')}, "Upload Successful.", []]);
-                                }
+                
+                if (status === true){
+                    const formDataItem = new FormData();
+                    formDataItem.append('content', itemSuggestion[0]["suggestion_content"]);
+                    formDataItem.append('item_id', item.state[0]);
+                    formDataItem.append('item_checked', item.state[1]);
+                    fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+                            {
+                                method: 'POST',
+                                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                                body: formDataItem
                             })
-                        .catch(
-                            (e) => {
-                                console.log(e.message)
-                            }
-                        );
+                            .then(
+                                (response) => response.json()
+                            )
+                            .then(
+                                (json) => {
+                                    if (json.message !== "Success") {
+                                        console.log(json);
+                                        setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
+                                    }
+                                    else if (json.message === "Success"){
+                                        console.log("Success")
+                                        setInformData([true, () => {resetInformData(); navigate('/partner')}, "Upload Successful.", []]);
+                                    }
+                                })
+                            .catch(
+                                (e) => {
+                                    console.log(e.message)
+                                }
+                            );
+                    }
             }
             catch(e){
                 setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Error follows:', e.message]]);
