@@ -137,7 +137,7 @@ const Publish = (props) => {
     //Function used to load data of paragraph to edit text box
     const startEditing = (index) => {
         const element = document.getElementById("textEditor");
-        if(element !== null){
+        if (element !== null) {
             element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
         setEditMode(index);
@@ -207,7 +207,11 @@ const Publish = (props) => {
             )
             .then(
                 (json) => {
-                    console.log(json);
+                    if (json.message === "Success") {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
+                    }else{
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully, but it wasn't sent to newsletter list.", "You can now leave the page."]])
+                    }
                 })
             .catch(
                 (e) => {
@@ -254,7 +258,6 @@ const Publish = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         sendNewsletter();
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
                     } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
@@ -337,7 +340,7 @@ const Publish = (props) => {
     //Create an entry with text (newsletter item or paragraph)
     const createEntry = (value, index) => {
         if (value["type"] === "paragraph") {
-            return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
+            return <Box key={index} sx={{ display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
                     <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
                         <Markup content={convertImages(draftToHtml(JSON.parse(value["data"])))} />
@@ -362,7 +365,7 @@ const Publish = (props) => {
                 <Box sx={{ marginLeft: "10%", maxWidth: "80%", borderBottom: "solid 1px gray" }}></Box>
             </Box>;
         } else {
-            return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
+            return <Box key={index} sx={{ display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
                     <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
                         <Markup content={convertImages(combineData(value["data"]))} />
