@@ -263,6 +263,8 @@ function Adminpage() {
             setShowSuccessMessageMessage(true);
             setTimeout(() => {
                 setShowSuccessMessageMessage(false);
+                window.location.reload(); // reload the page
+
             }, 500).catch((error) => {
                 console.error("Error updating organisation:", editedOrganisation, error);
                 // log the error message to the console
@@ -297,47 +299,42 @@ function Adminpage() {
             }
         };
 
+    const handleDeleteUser = (userId) => {
+        console.log("Deleting user: ", userId);
 
-    const handleDeleteUser = async (user) => {
-        try {
-            const response = await fetch(`http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/deleteUser`, {
-                method: "POST",
-                headers: new Headers({
-                    "Authorization": "Bearer " + localStorage.getItem('token'),
-                    "Content-Type": "application/json"
-                }),
-                body: JSON.stringify({userId: user.user_id}),
+        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/deleteUser", {
+            method: "POST",
+            headers: new Headers({
+                "Authorization": "Bearer " + localStorage.getItem('token'),
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify({
+                userId: userId,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("Delete successful: ", data);
+
+                // Show success message for 2 seconds
+                setShowSuccessMessageMessage(true);
+                setTimeout(() => {
+                    setShowSuccessMessageMessage(false);
+                }, 500);
+            })
+            .catch((error) => {
+                console.error("Error deleting user:", error);
             });
-
-            if (response.ok) {
-                setUsers((prevEditors) =>
-                    prevEditors.map((user) => {
-                        if (user.user_id === userId) {
-                            return {
-                                ...user,
-                            };
-                        } else {
-                            return user;
-                        }
-                    })
-                );
-            } else {
-                console.error("Failed to delete user");
-            }
-        } catch (error) {
-            console.error("Failed to delete user", error);
-        }
     };
-
-
-
+    
     if (!isAuthenticated) {
-        return <p>You must be logged in as an admin to access this page.</p>;
+        return <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em", marginTop: "0.5em" }}>You must be logged in as an admin to access this page.</Typography>
+
     } else {
         return (
 
-            <div>
-                <h1>{user} admin page</h1>
+            <div style={{ margin: "0 2%" }}>
+                <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em", marginTop: "0.5em" }}>{user} admin page</Typography>
 
                 {showSuccessMessage && <p style={{color: "green"}}>Success!</p>}
                 <h1 style={{marginBottom: "20px"}}>List of Users</h1>
