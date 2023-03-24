@@ -635,7 +635,6 @@ class Client
 
                 return null;
             }
-            echo $url;
 
             return $this->makeRequest($name, $url, $body, $headers, $retryOnLimit);
         }
