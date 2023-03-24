@@ -13,7 +13,7 @@ class deleteOrganisation extends Verify {
             $db = new Database("db/database.db");
 
             // Check if correct request method was used.
-            $this->validateRequestMethod("DELETE");
+            $this->validateRequestMethod("POST");
 
             $request_body = file_get_contents('php://input');
             $data = json_decode($request_body, true);
