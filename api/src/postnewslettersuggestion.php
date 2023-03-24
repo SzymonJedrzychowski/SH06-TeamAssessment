@@ -1,76 +1,114 @@
 <?php
 
 /**
- * Responsible for handling /postnewsletteritem endpoint.
+ * Responsible for handling /postnewslettersuggestion endpoint.
  *
- * This class validates and updates newsletter items
+ * This class is used to post newsletter suggestion.
  *
- * @author Matthew Cartwright
+ * @author Szymon Jedrzychowski
  */
-
-class UpdateNewsletterItem extends Verify
+class PostNewsletterSuggestion extends Verify
 {
     /**
-     * Override the __construct method to match the requirements of the /updatenewsletteritem endpoint.
-     * 
-     * @throws BadRequest           If request method is incorrect
+     * Override the __construct method to match the requirements of the /postnewslettersuggestion endpoint.
+     *
+     * @throws BadRequest           If request method is incorrect or non-authorised user used the endpoint.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
-    public function __construct()
+    public  function __construct()
     {
-        // Connect
+        // Connect to the database.
         $db = new Database("db/database.db");
 
-        // Ensure correct method has been used
+        // Check if correct request method was used.
         $this->validateRequestMethod("POST");
 
-        // Ensure correct parameters used
+        // Check if correct params were provided.
         $this->checkAvailableParams($this->getAvailableParams());
         $this->validateParameters();
 
-        // Validate JWT
+        // Validate the JWT.
         $tokenData = parent::validateToken();
 
-        // Ensure user is signed in
-        if (!in_array($tokenData->auth, ["1", "2", "3"])) {
-            throw new BadRequest("You must be signed in to edit items, please sign in!");
+        // Throw exception if user is not editor or admin.
+        if (!in_array($tokenData->auth, ["2", "3"])) {
+            throw new BadRequest("Only editor and admin can publish a newsletter suggestion.");
         }
 
-        // Ensure the item can be edited
-        if (in_array($_POST['item_checked'], ["-1", "3"])) {
-            throw new BadRequest("You can no longer edit this item! If you see an error, please contact an editor or admin.");
-        }
-
-        // Start transaction
+        // Start the transaction.
         $db->beginTransaction();
 
         try {
-            // Initialise SQL for insertion
-            $sql = "UPDATE newsletter_item
-            SET content = :content, item_title = :item_title
-            WHERE item_id = :item_id";
+            // Step 1. Check if there is unresolved suggestion for the newsletter_item.
+            $sql = "SELECT * FROM item_suggestion WHERE item_id = :item_id AND approved IS NULL";
 
-
-            // Safely pass the values into the SQL command
             $this->setSQLCommand($sql);
             $this->setSQLParams([
-
-                // Main item content passed via POST
-                ':content' => $_POST['content'],
-
-                // Item title passed via POST
-                ':item_title' => $_POST['item_title'],
-
-                // User ID from the token authorising them
-                ':item_id' => $_POST['item_id']
+                'item_id' => $_POST['item_id']
             ]);
 
-            // Execute the SQL command
+            $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw an exception if there is unresolved suggestion.
+            if (count($data) > 0) {
+                throw new ClientErrorException("EM: There is an unresolved suggestion for this item.");
+            }
+
+            // End step 1.
+
+            // Step 2. Check if the newsletter_item is already published.
+            $sql = "SELECT * FROM newsletter_item WHERE item_id = :item_id AND published_newsletter_id IS NOT NULL";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'item_id' => $_POST['item_id']
+            ]);
+
+            $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw an exception if the newsletter_item is already ready.
+            if (count($data) > 0) {
+                throw new ClientErrorException("EM: This item is already published.");
+            }
+
+            // End step 2.
+
+            // Step 3. Insert the newsletter suggestion.
+            $sql = "INSERT INTO item_suggestion (item_id, suggestion_content, suggestion_comment, user_id) 
+                VALUES (:item_id, :suggestion_content, :suggestion_comment, :user_id)";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'item_id' => $_POST['item_id'],
+                'suggestion_content' => $_POST['suggestion_content'],
+                'suggestion_comment' => $_POST['suggestion_comment'],
+                'user_id' => $tokenData->sub
+            ]);
+
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // Commit the transaction
+            // End step 3.
+
+            // Step 4. Update the status of the newsletter_item.
+            $sql = "UPDATE newsletter_item SET item_checked = 1 WHERE item_id = :item_id";
+
+            $this->setSQLCommand($sql);
+            $this->setSQLParams([
+                'item_id' => $_POST['item_id']
+            ]);
+
+            $data = $db->executeCountedSQL($this->getSQLCommand(), $this->getSQLParams());
+
+            // Throw exception if no newsletter_item was updated.
+            if ($data == 0) {
+                throw new ClientErrorException("Problem with finding item_id occurred.");
+            }
+
+            // End step 4.
+
+            // Commit the transaction.
             $db->commitTransaction();
 
-            // Confirm
             $this->setData(array(
                 "length" => 0,
                 "message" => "Success",
@@ -81,29 +119,29 @@ class UpdateNewsletterItem extends Verify
             throw $e;
         }
     }
+
     /**
      * Check if correct parameters were used.
      *
-     * @throws ClientErrorException if incorrect parameters were used.
+     * @throws ClientErrorException If incorrect parameters were used.
      */
     private function validateParameters()
     {
-        $requiredParameters = array('content', 'item_id', 'item_checked', 'item_title');
+        $requiredParameters = array('item_id', 'suggestion_content', 'suggestion_comment');
         $this->checkRequiredParameters($requiredParameters);
     }
 
     /**
-     * Set the array of available parameters for /postnewsletteritem endpoint.
+     * Set the array of available parameters for /postnewslettersuggestion endpoint.
      *
      * @return string[] Array of available params.
      */
     protected function getAvailableParams()
     {
         return [
-            'content' => 'string',
-            'item_id' => 'string',
-            'item_checked' => 'string',
-            'item_title' => 'string'
+            'item_id' => 'int',
+            'suggestion_content' => 'string',
+            'suggestion_comment' => 'string'
         ];
     }
 }

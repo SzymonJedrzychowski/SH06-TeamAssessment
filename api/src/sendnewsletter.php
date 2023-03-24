@@ -57,7 +57,7 @@ class SendNewsletter extends Verify
             print_r($response->headers());
             print $response->body() . "\n";
         } catch (Exception $e) {
-            echo 'Caught exception: '.  $e->getMessage(). "\n";
+            throw $e;
         }
         // Set the response data.
         $this->setData(array(
