@@ -8,6 +8,8 @@
 
 define('SECRET', "");
 define('API_KEY', "");
+define('EMAIL', "mikolaj.furmanczak@northumbria.ac.uk");
+define('PATH', "/teamAssessment/api");
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);

@@ -20,10 +20,11 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST', 'DELETE'])) {
 } else {
     $url = $_SERVER["REQUEST_URI"];
     $url = parse_url($url);
-    $path = str_replace("/teamAssessment/api", "", $url['path']);
+    $path = str_replace(PATH, "", $url['path']);
     try {
         switch ($path) {
             case '/':
+                $endpoint = new Base();
                 break;
             case '/getnewsletteritems':
                 $endpoint = new GetNewsletterItems();

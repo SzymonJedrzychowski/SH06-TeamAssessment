@@ -29,7 +29,7 @@ const PartnerEditItem = (props) => {
     // On render hook
     useEffect(() => {
         // Verify user identity
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -56,7 +56,7 @@ const PartnerEditItem = (props) => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?item_id=" + item.state,
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -107,7 +107,7 @@ const PartnerEditItem = (props) => {
         formData.append('item_id', item.state);
         formData.append('item_checked', itemToEdit['item_checked']);
         formData.append('item_title', itemTitle);
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+        fetch(process.env.REACT_APP_API_LINK + "updatenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
