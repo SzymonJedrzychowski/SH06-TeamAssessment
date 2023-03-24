@@ -31,13 +31,12 @@ class deleteuser extends Verify {
                 "user_id" => $data["userId"]
             ];
 
-
             // Start the transaction.
             $db->beginTransaction();
 
             try {
 
-            // delete the organisation from database
+            // delete the user from database
                 $sql = "UPDATE user SET authorisation = 0, email = '', password = '' WHERE user_id = :user_id";
 
                 $this->setSQLCommand($sql);

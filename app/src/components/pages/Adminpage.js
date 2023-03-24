@@ -315,6 +315,9 @@ function Adminpage() {
             .then((response) => response.json())
             .then((data) => {
                 console.log("Delete successful: ", data);
+                setUsers(
+                    users.filter((u) => u.user_id !== userId)
+                );
 
                 // Show success message for 2 seconds
                 setShowSuccessMessageMessage(true);
@@ -326,7 +329,7 @@ function Adminpage() {
                 console.error("Error deleting user:", error);
             });
     };
-    
+
     if (!isAuthenticated) {
         return <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em", marginTop: "0.5em" }}>You must be logged in as an admin to access this page.</Typography>
 
