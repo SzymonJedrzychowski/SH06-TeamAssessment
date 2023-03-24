@@ -12,7 +12,7 @@ class getUsers extends Endpoint
     {
 
             $db = new Database("db/database.db");
-            $sql = "SELECT user_id, first_name, last_name, authorisation from user";
+            $sql = "SELECT user_id, first_name, last_name, authorisation from user WHERE authorisation in (1,2,3)";
             $params = [];
 
             $this->validateRequestMethod("GET");
