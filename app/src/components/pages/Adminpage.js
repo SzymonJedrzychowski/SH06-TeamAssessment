@@ -298,7 +298,7 @@ function Adminpage() {
         };
 
 
-    const handleDeleteUser = async (org) => {
+    const handleDeleteUser = async (user) => {
         try {
             const response = await fetch(`http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/deleteUser`, {
                 method: "POST",
@@ -306,20 +306,29 @@ function Adminpage() {
                     "Authorization": "Bearer " + localStorage.getItem('token'),
                     "Content-Type": "application/json"
                 }),
-                body: JSON.stringify({organisation_id: org.organisation_id}),
+                body: JSON.stringify({userId: user.user_id}),
             });
 
             if (response.ok) {
-                setOrganisations(
-                    organisations.filter((o) => o.organisation_id !== org.organisation_id)
+                setUsers((prevEditors) =>
+                    prevEditors.map((user) => {
+                        if (user.user_id === userId) {
+                            return {
+                                ...user,
+                            };
+                        } else {
+                            return user;
+                        }
+                    })
                 );
             } else {
-                console.error("Failed to delete organisation");
+                console.error("Failed to delete user");
             }
         } catch (error) {
-            console.error("Failed to delete organisation", error);
+            console.error("Failed to delete user", error);
         }
     };
+
 
 
     if (!isAuthenticated) {

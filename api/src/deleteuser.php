@@ -38,7 +38,7 @@ class deleteuser extends Verify {
             try {
 
             // delete the organisation from database
-                $sql = "UPDATE user SET authorisation = 0 WHERE user_id = :user_id";
+                $sql = "UPDATE user SET authorisation = 0, email = '', password = '' WHERE user_id = :user_id";
 
                 $this->setSQLCommand($sql);
                 $this->setSQLParams([
