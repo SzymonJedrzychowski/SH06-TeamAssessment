@@ -52,12 +52,9 @@ class SendNewsletter extends Verify
 
         $sendgrid = new SendGrid(API_KEY);
         try {
-            $response = $sendgrid->send($email);
-            print $response->statusCode() . "\n";
-            print_r($response->headers());
-            print $response->body() . "\n";
+            $sendgrid->send($email);
         } catch (Exception $e) {
-            throw $e;
+            throw new BadRequest($e->getMessage());
         }
         // Set the response data.
         $this->setData(array(
