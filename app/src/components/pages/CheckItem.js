@@ -95,7 +95,7 @@ const CheckItem = (props) => {
     //Function that loads data of newsletter suggestion if there is one.
     const loadItemState = () => {
         //Loading the newsletter item
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?item_id=" + item.state,
+        fetch(process.env.REACT_APP_API_LINK + "getnewslettersuggestion?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -124,7 +124,7 @@ const CheckItem = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading the newsletter item
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -155,7 +155,7 @@ const CheckItem = (props) => {
             )
 
         //Loading the tags of the newsletter item
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
+        fetch(process.env.REACT_APP_API_LINK + "getitemtags?item_id=" + item.state)
             .then(
                 (response) => response.json()
             )
