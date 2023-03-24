@@ -10,11 +10,12 @@ include 'config/config.php';
 header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Headers: *");
+
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
+if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST', 'DELETE'])) {
     $endpoint = new ClientError("Invalid method: " . $_SERVER['REQUEST_METHOD'], 405);
 } else {
     $url = $_SERVER["REQUEST_URI"];
@@ -125,6 +126,9 @@ if (!in_array($_SERVER['REQUEST_METHOD'], ['GET', 'POST'])) {
                 break;
             case '/getTag':
                 $endpoint = new getTag();
+                break;
+            case '/deleteUser':
+                $endpoint = new deleteuser();
                 break;
             default:
                 $endpoint = new ClientError("Path not found: " . $path, 404);

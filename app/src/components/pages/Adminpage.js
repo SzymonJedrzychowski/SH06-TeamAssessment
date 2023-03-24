@@ -296,6 +296,32 @@ function Adminpage() {
                 console.error("Failed to delete organisation", error);
             }
         };
+
+
+    const handleDeleteUser = async (org) => {
+        try {
+            const response = await fetch(`http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/deleteUser`, {
+                method: "POST",
+                headers: new Headers({
+                    "Authorization": "Bearer " + localStorage.getItem('token'),
+                    "Content-Type": "application/json"
+                }),
+                body: JSON.stringify({organisation_id: org.organisation_id}),
+            });
+
+            if (response.ok) {
+                setOrganisations(
+                    organisations.filter((o) => o.organisation_id !== org.organisation_id)
+                );
+            } else {
+                console.error("Failed to delete organisation");
+            }
+        } catch (error) {
+            console.error("Failed to delete organisation", error);
+        }
+    };
+
+
     if (!isAuthenticated) {
         return <p>You must be logged in as an admin to access this page.</p>;
     } else {
@@ -318,6 +344,9 @@ function Adminpage() {
                         <th style={{border: "1px solid black", padding: "5px"}}>Role</th>
                         <th style={{border: "1px solid black", padding: "5px"}}>
                             Update
+                        </th>
+                        <th style={{border: "1px solid black", padding: "5px"}}>
+                            Delete
                         </th>
                     </tr>
                     </thead>
@@ -344,7 +373,7 @@ function Adminpage() {
                                     <option value="0">Subscriber</option>
                                 </select>
                             </td>
-                            <td style={{border: "1px solid black", padding: "5px"}}>
+                            <td style={{border: "1px solid black", padding: "5px", textAlign: "center"}}>
                                 <Button variant="contained"
 
                                         onClick={() => handleMakeChangeUpdateUser(user.user_id)}
@@ -353,16 +382,33 @@ function Adminpage() {
                                     Update
                                 </Button>
                             </td>
+                            <td
+                                style={{
+                                    border: "1px solid black",
+                                    padding: "5px",
+                                    textAlign: "center",
+                                }}
+                            >
+                                <Button variant="contained"
+                                        onClick={() => handleDeleteUser(user.user_id)}
+                                >
+                                    Delete
+                                </Button>
+                            </td>
                         </tr>
                     ))}
                     </tbody>
                 </table>
-                <Button variant="contained"
-                        onClick={() => setShowCreateForm(!showCreateForm)}
 
-                >
-                    {showCreateForm ? "Cancel" : "Create New Organisation"}
-                </Button>
+
+                <h1 style={{textAlign: "left"}}>List of Organisations
+                    <Button variant="contained"
+                            onClick={() => setShowCreateForm(!showCreateForm)}
+
+                    >
+                        {showCreateForm ? "Cancel" : "+"}
+                    </Button>
+                </h1>
                 {showCreateForm && (
                     <div style={{marginBottom: "20px"}}>
                         <input
@@ -397,7 +443,6 @@ function Adminpage() {
                         </Button>{" "}
                     </div>
                 )}
-                <h1 style={{textAlign: "left"}}>List of Organisations</h1>
                 <table
                     style={{borderCollapse: "collapse", marginTop: "20px", width: "100%"}}
                 >
