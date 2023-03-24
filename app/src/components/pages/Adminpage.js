@@ -302,7 +302,7 @@ function Adminpage() {
     const handleDeleteUser = (userId) => {
         console.log("Deleting user: ", userId);
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/deleteUser", {
+        fetch(process.env.REACT_APP_API_LINK + "deleteUser", {
             method: "POST",
             headers: new Headers({
                 "Authorization": "Bearer " + localStorage.getItem('token'),

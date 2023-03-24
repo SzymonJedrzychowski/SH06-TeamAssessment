@@ -175,7 +175,7 @@ const CheckItem = (props) => {
                 })
 
         //Loading all available tags
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+        fetch(process.env.REACT_APP_API_LINK + "gettags")
             .then(
                 (response) => response.json()
             )
@@ -205,7 +205,7 @@ const CheckItem = (props) => {
         }
 
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -241,7 +241,7 @@ const CheckItem = (props) => {
         formData.append('item_checked', newStatus);
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
+        fetch(process.env.REACT_APP_API_LINK + "changeitemstatus",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -274,7 +274,7 @@ const CheckItem = (props) => {
         formData.append('item_tags', newTags.length > 0 ? JSON.stringify(newTags) : JSON.stringify([null]));
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postitemtags",
+        fetch(process.env.REACT_APP_API_LINK + "postitemtags",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
