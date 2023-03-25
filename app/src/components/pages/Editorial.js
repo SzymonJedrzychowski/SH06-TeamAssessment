@@ -10,8 +10,10 @@ import { Link, useNavigate } from "react-router-dom";
  * On /editorial page, newsletter items are displayed with their status and button to redirect the editor to /checkItem.
  * 
  * @author Szymon Jedrzychowski
- * Code for Multiple select option (displayed and function handleChange) based on the example code from https://mui.com/material-ui/react-select/ (Access date: 14/03/2023)
- * Code for TablePagination based on https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14/03/2023)
+ * Code for Multiple select option (displayed and function handleChange) based on the example code 
+ * MUI (no date), Select. Available at: https://mui.com/material-ui/react-select/ (Access date: 14.03.2023)
+ * Code for TablePagination based on 
+ * geeksforgeeks (2022), React MUI TablePagination API. Available at: https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.

@@ -9,7 +9,8 @@ import { useNavigate } from "react-router-dom";
  * /manageTags is a page for adding, removing and editing tags.
  * 
  * @author Szymon Jedrzychowski
- * Code for TablePagination based on https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14/03/2023)
+ * Code for TablePagination based on 
+ * geeksforgeeks (2022), React MUI TablePagination API. Available at: https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.

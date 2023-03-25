@@ -9,7 +9,8 @@ import { Link, useNavigate } from "react-router-dom";
  * /editPrevious is a page that allows editor to see previously published newsletters and access them to edit them.
  * 
  * @author Szymon Jedrzychowski
- * Code for TablePagination based on https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14/03/2023)
+ * Code for TablePagination based on 
+ * geeksforgeeks (2022), React MUI TablePagination API. Available at: https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.

@@ -13,7 +13,8 @@ import convertImages from "../helper/convertImages";
  * Additionally, it is used to redirect the editor to page /suggestchanges or allows to change the state of the newsletter item (approve or remove it).
  * 
  * @author Szymon Jedrzychowski
- * Code for Multiple select option (displayed, variable MenuProps and functions getStyles and handleChange) based on the example code from https://mui.com/material-ui/react-select/ (Access date: 14/03/2023)
+ * Code for Multiple select option (displayed, variable MenuProps and functions getStyles and handleChange) based on the example code
+ * MUI (no date), Select. Available at: https://mui.com/material-ui/react-select/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.

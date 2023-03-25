@@ -3,7 +3,9 @@ import { Editor } from 'react-draft-wysiwyg';
 /**
  * TextEditor
  * 
- * TextEditor based on the react-draft-wysiwyg module.
+ * TextEditor using the react-draft-wysiwyg module.
+ * Code based on example code from: 
+ * React Draft Wysiwyg (no date), Demo. Available at: https://jpuri.github.io/react-draft-wysiwyg/#/demo (Access date: 11.03.2023)
  * 
  * @author Szymon Jedrzychowski
  * @param {*} props

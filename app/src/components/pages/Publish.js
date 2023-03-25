@@ -15,7 +15,8 @@ import TextEditor from "./TextEditor";
  * /publish is a page that allows editor to publish or edit a published newsletter.
   * 
  * @author Szymon Jedrzychowski
- * Code for select option (displayed and function handleChange) based on the example code from https://mui.com/material-ui/react-select/ (Access date: 14/03/2023)
+ * Code for select option 
+ * MUI (no date), Select. Available at: https://mui.com/material-ui/react-select/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.
