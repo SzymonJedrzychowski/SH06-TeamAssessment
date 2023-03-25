@@ -9,12 +9,21 @@ import Search from "./Search";
  * author noorullah niamatullah
  */
 const Archive = () => {
+
+  //hook for all the published newsletter
   const [data, setdata] = useState([]);
+  //hook for the searchterm
   const [searchterm, setSearchTerm] = useState("");
+  //hook for pages
   const [page, setPage] = useState(0);
+  //hook for rows
   const [rows, setRows] = useState(5);
+  //hook for select
   const [selectValue, setSelectValue] = useState("");
-  const organisationName =[] 
+  //list of organisations
+  const organisationName =[]
+  const [error , setError] = useState(null) ;
+  const [loading , setLoading] = useState (true);
 
   /**
    * makes request to the getpublished newsletter
@@ -22,38 +31,64 @@ const Archive = () => {
    * set the data as the parsed responses
    */
   useEffect(() => {
-    fetch(
-      process.env.REACT_APP_API_LINK + "getpublishednewsletters"
-    )
-      .then((response) => response.json())
-      .then((res) => setdata(res.data));
-  }, []);
+      fetch(
+        process.env.REACT_APP_API_LINK + "getpublishednewsletters"
+      )
+        .then((response) => {
+          if(!response.ok){
+            throw Error('Could not fetch the data for that resource');
+                          }  
+          return response.json()
+        })
+        .then((res) => {
+          setdata(res.data)
+          setLoading(false);
+          setError(null)
+        })
+        .catch((e) => {
+          console.log(e.message);
+          setLoading(false)
+          setError(e.message)
+        });
+        ;
+    }, []);
+  
+  
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
-  const listOfPapers =[]
- 
+
+  const listOfNewsletters =[]
+  
+  //geting the deatils of the nesletters
   if (data) {
     
     for(let i in data){
       let temp = { id: 0, title: "", editor: "", date: "",contributer:"" ,org:"" };
-      let cont = [];
+      let tempContentParsed = [];
+      let tempOrg = "";
+      let tempCont = "";
+      let tempTitle = ""
       temp.id = data[i].newsletter_id;
       temp.date = data[i].date_published
       temp.editor = data[i].first_name+ " " +data[i].last_name
-       cont.push(JSON.parse(data[i].newsletter_content))
-      for (let i in cont)
-      for (let j in cont[i])
-        if (cont[i][j].type === "newsletter"){
-        temp.title = cont[i][j].data.item_title;
-        temp.contributer= cont[i][j].data.first_name +" " + cont[i][j].data.last_name +" ";
-        temp.org =cont[i][j].data.organisation_name
-        organisationName.push(cont[i][j].data.organisation_name);
+       tempContentParsed.push(JSON.parse(data[i].newsletter_content))
+      for (let i in tempContentParsed)
+      for (let j in tempContentParsed[i])
+        if (tempContentParsed[i][j].type === "newsletter"){
+        tempTitle = tempTitle + " " +tempContentParsed[i][j].data.item_title +" - ";
+        tempCont= tempCont + " "+ tempContentParsed[i][j].data.first_name +" " + tempContentParsed[i][j].data.last_name +"  /";        
+        tempOrg = tempOrg + " " +tempContentParsed[i][j].data.organisation_name + " "
+        organisationName.push(tempContentParsed[i][j].data.organisation_name);
         }
-      listOfPapers.push(temp)
+        temp.org = tempOrg
+        temp.contributer = tempCont
+        temp.title = tempTitle
+        listOfNewsletters.push(temp)
     }
 
   }
+  //remove dupliactes for filter
   function removeDuplicates(arr) {
     return organisationName.filter((item,
         index) => organisationName.indexOf(item) === index);
@@ -68,10 +103,13 @@ const Archive = () => {
     return paperDetails.includes(searchterm.toLowerCase());
   };
 
+  //filter 
   const onChangeSelect = (event) => {
     setSearchTerm(event.target.value);
     setSelectValue(event.target.value);
   };
+
+  //create table row
   const createRow =(value)=>{
     return <TableRow key ={value.id}>
         <TableCell>{value.title}</TableCell>
@@ -87,6 +125,9 @@ const Archive = () => {
   if (data) {
     return (
       <Box sx={{ padding: 2}}>
+        {error && <div>{error}</div>}
+        { !loading && (
+        <>
         <Typography variant="h4" textAlign={"center"} gutterBottom>List of all Newsletters</Typography>
         <Box container display="flex"gap="20px" sx={{ paddingBottom:2 }}
             >
@@ -110,7 +151,7 @@ const Archive = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Title</TableCell>
+                  <TableCell>Titles</TableCell>
                   <TableCell>Published Date</TableCell>
                   <TableCell>Editor</TableCell>
                   <TableCell>Contributing Author</TableCell>
@@ -119,7 +160,7 @@ const Archive = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {listOfPapers.filter(searchPapers).slice(page * rows, page * rows + rows).map((value)=>createRow(value)) }
+                {listOfNewsletters.filter(searchPapers).slice(page * rows, page * rows + rows).map((value)=>createRow(value)) }
               </TableBody>
             </Table>
           </TableContainer>
@@ -127,12 +168,12 @@ const Archive = () => {
                     sx={{ 'div > p': { marginBottom: "0px !important" } }}
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
-                    count={listOfPapers.length}
+                    count={listOfNewsletters.length}
                     rowsPerPage={rows}
                     page={page}
                     onPageChange={(event, page) => setPage(page)}
                     onRowsPerPageChange={(event) => { setRows(parseInt(event.target.value, 10)); setPage(0) }} />
-      
+            </>)}{loading &&(<p>Loading ...</p>)}
       </Box>
     );
   }
