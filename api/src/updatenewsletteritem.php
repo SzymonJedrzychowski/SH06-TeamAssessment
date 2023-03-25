@@ -35,9 +35,15 @@ class UpdateNewsletterItem extends Verify
             throw new BadRequest("You must be signed in to edit items, please sign in!");
         }
 
+        $itemChecked = $_POST['item_checked'];
         // Ensure the item can be edited
-        if (in_array($_POST['item_checked'], ["-1", "3"])) {
-            throw new BadRequest("You can no longer edit this item! If you see an error, please contact an editor or admin.");
+        if ($itemChecked == "-1") {
+            throw new BadRequest("You can no longer edit this item!");
+        }
+
+        // If item is ready, unready it        
+        if ($itemChecked == "3") {
+            $itemChecked = "0";
         }
 
         // Start transaction
@@ -47,7 +53,7 @@ class UpdateNewsletterItem extends Verify
             // Initialise SQL for insertion
             if (filter_has_var(INPUT_POST, "item_title")) {
                 $sql = "UPDATE newsletter_item
-                SET content = :content, item_title = :item_title
+                SET content = :content, item_title = :item_title, item_checked = :item_checked 
                 WHERE item_id = :item_id";
 
                 $this->setSQLParams([
@@ -58,18 +64,24 @@ class UpdateNewsletterItem extends Verify
                     // Item title passed via POST
                     ':item_title' => $_POST['item_title'],
 
+                    // Item status passed via variable (should only change if it was "3")
+                    ':item_checked' => $itemChecked,
+
                     // User ID from the token authorising them
                     ':item_id' => $_POST['item_id']
                 ]);
             } else {
                 $sql = "UPDATE newsletter_item
-                SET content = :content
+                SET content = :content, item_checked = :item_checked
                 WHERE item_id = :item_id";
 
                 $this->setSQLParams([
 
                     // Main item content passed via POST
                     ':content' => $_POST['content'],
+
+                    // Item status passed via variable (should only change if it was "3")
+                    ':item_checked' => $itemChecked,
 
                     // User ID from the token authorising them
                     ':item_id' => $_POST['item_id']
