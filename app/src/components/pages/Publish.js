@@ -342,7 +342,7 @@ const Publish = (props) => {
         if (value["type"] === "paragraph") {
             return <Box key={index} sx={{ display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
-                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
+                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" }, "img": {maxWidth: "100%", maxHeight: "100%"}}} >
                         <Markup content={convertImages(draftToHtml(JSON.parse(value["data"])))} />
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>

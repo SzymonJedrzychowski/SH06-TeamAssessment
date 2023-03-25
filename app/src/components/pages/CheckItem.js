@@ -423,7 +423,7 @@ const CheckItem = (props) => {
                         </TableRow>}
                         <TableRow>
                             <TableCell colSpan={2}>
-                                <Box sx={{ minHeight: "200px" }}>
+                                <Box sx={{ minHeight: "200px", "img": {maxWidth: "100%", maxHeight: "100%"}}}>
                                     <Markup content={convertImages(draftToHtml(JSON.parse(newsletterItem["content"])))} />
                                 </Box>
                             </TableCell>
