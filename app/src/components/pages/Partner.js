@@ -140,7 +140,7 @@ const Partner = (props) => {
         "-1" : "Removed",
         "0"  : "In review",
         "1"  : "Edit requested!", 
-        "2"  : "In review",
+        "2"  : "Awaiting editor decision",
         "3"  : "Approved"
     }
 
