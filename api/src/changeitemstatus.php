@@ -89,6 +89,10 @@ class ChangeItemStatus extends Verify
     {
         $requiredParameters = array('item_id', 'item_checked');
         $this->checkRequiredParameters($requiredParameters);
+
+        if(!in_array($_POST["item_checked"], array(-1,0,1,2,3))){
+            throw new ClientErrorException("EM: Item status needs to be number from -1 to 3.");
+        }
     }
 
     /**

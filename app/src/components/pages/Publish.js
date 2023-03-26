@@ -71,13 +71,14 @@ const Publish = (props) => {
                         ));
                         setLoading(false);
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 }
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 }
             )
     }
@@ -89,7 +90,7 @@ const Publish = (props) => {
             try {
                 temp = JSON.parse(item.state["newsletter_content"]);
             } catch {
-                setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error with loading data has occurred.", "You will be redirected to the editorial page."]])
+                setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 return;
             }
             setNewsletterData(temp);
@@ -122,7 +123,8 @@ const Publish = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/") }, "Error", ["Unexpected error has occurred while veryfying account.", "You will be redirected to home page."]]);
                 }
             )
     }, []);
@@ -142,8 +144,12 @@ const Publish = (props) => {
             element.scrollIntoView({ behavior: "smooth", block: "start" });
         }
         setEditMode(index);
-        const content = convertFromRaw(JSON.parse(newsletterData[index]["data"]));
-        setParagraph(() => EditorState.createWithContent(content));
+        try {
+            const content = convertFromRaw(JSON.parse(newsletterData[index]["data"]));
+            setParagraph(() => EditorState.createWithContent(content));
+        } catch (e) {
+            setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading content.", "You will be redirected to editorial page."]])
+        }
     }
 
     //Function used to save data of edited paragraph
@@ -166,6 +172,16 @@ const Publish = (props) => {
         if (!newsletterItems[selectedItem]) {
             return;
         }
+
+        //Check if item can be displayed
+        try {
+            draftToHtml(JSON.parse(newsletterItems[selectedItem]));
+        } catch (e) {
+            setInformData([true, resetInformData, "Action failed", ["This item is corrupted.", "You can continue working, but selected item will not be added to the newsletter."]]);
+            setSelectedItem('');
+            return;
+        }
+
         let temp = [...newsletterItems];
         temp.splice(selectedItem, 1);
         setNewsletterItems(temp);
@@ -174,15 +190,19 @@ const Publish = (props) => {
     }
 
     //Function used to remove newsletter item or paragraph from the newsletter
-    const handleRemoveItem = (e) => {
-        let temp = [...newsletterData];
-        if (newsletterData[e]["type"] === "newsletter") {
-            let temp2 = [...newsletterItems];
-            temp2.push(newsletterData[e]["data"]);
-            setNewsletterItems(temp2);
+    const handleRemoveItem = (item) => {
+        try {
+            let temp = [...newsletterData];
+            if (newsletterData[item]["type"] === "newsletter") {
+                let temp2 = [...newsletterItems];
+                temp2.push(newsletterData[item]["data"]);
+                setNewsletterItems(temp2);
+            }
+            temp.splice(item, 1);
+            setNewsletterData(temp);
+        } catch (e) {
+            setInformData([true, resetInformData, "Action failed", ["Unnexpected error has occurred while removing item.", "You can manually save your progress, but it might be impossible to post the newsletter without page refresh."]]);
         }
-        temp.splice(e, 1);
-        setNewsletterData(temp);
     };
 
     //Function used to change the selectedItem value based on the select box
@@ -210,7 +230,7 @@ const Publish = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
-                    }else{
+                    } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully, but it wasn't sent to newsletter list.", "You can now leave the page."]])
                     }
                 })
@@ -260,12 +280,13 @@ const Publish = (props) => {
                     if (json.message === "Success") {
                         sendNewsletter();
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, resetInformData, "Action failed", ["Unnexpected error has occurred while submiting newsletter.", "You can manually save your progress, but it might be impossible to post the newsletter without page refresh."]])
                     }
                 })
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, resetInformData, "Action failed", ["Unnexpected error has occurred.", "You can manually save your progress, but it might be impossible to post the newsletter without page refresh."]])
                 })
 
     }
@@ -303,12 +324,13 @@ const Publish = (props) => {
                     if (json.message === "Success") {
                         setInformData([true, () => { resetInformData(); navigate("/editPrevious") }, "Success", ["Newsletter was edited successfully.", "You can now leave the page."]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, resetInformData, "Action failed", ["Unnexpected error has occurred while updating newsletter.", "You can manually save your progress, but it might be impossible to post the newsletter without page refresh."]])
                     }
                 })
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, resetInformData, "Action failed", ["Unnexpected error has occurred while updating newsletter.", "You can manually save your progress, but it might be impossible to post the newsletter without page refresh."]]);
                 })
 
     }
@@ -335,7 +357,28 @@ const Publish = (props) => {
 
     //Function used to get baic display of newsletter item data 
     const combineData = (data) => {
-        return "".concat("<h4>", data["item_title"], "</h4>", "<h5>", data["first_name"], " " + data["last_name"], " - ", data["organisation_name"], "</h5>", data["date_uploaded"], draftToHtml(JSON.parse(data["content"])));
+        let finalText = "<h4>" + data["item_title"] + "</h4<h5>";
+        if (data["first_name"] !== null) {
+            finalText = finalText + data["first_name"];
+        }
+        if (data["last_name"] !== null) {
+            finalText = finalText + " " + data["last_name"];
+        }
+        if (data["organisation_name"] !== null) {
+            finalText = finalText + " - " + data["organisation_name"];
+        }
+        finalText = finalText + "</h5>" + data["date_uploaded"] + generateMarkup(data["content"]);
+        return finalText;
+    }
+
+    //Function to generate markup from text.
+    const generateMarkup = (content) => {
+        try {
+            return convertImages(draftToHtml(JSON.parse(content)));
+        } catch (e) {
+            setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading content.", "You will be redirected to editorial page."]]);
+            return "";
+        }
     }
 
     //Create an entry with text (newsletter item or paragraph)
@@ -343,8 +386,8 @@ const Publish = (props) => {
         if (value["type"] === "paragraph") {
             return <Box key={index} sx={{ display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
-                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" }, "img": {maxWidth: "100%", maxHeight: "100%"}}} >
-                        <Markup content={convertImages(draftToHtml(JSON.parse(value["data"])))} />
+                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" }, "img": { maxWidth: "100%", maxHeight: "100%" } }} >
+                        <Markup content={generateMarkup(value["data"])} />
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
                         {editMode === -1 && <>
@@ -369,7 +412,7 @@ const Publish = (props) => {
             return <Box key={index} sx={{ display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
                     <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
-                        <Markup content={convertImages(combineData(value["data"]))} />
+                        <Markup content={combineData(value["data"])} />
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
                         {editMode === -1 && <>
@@ -391,6 +434,15 @@ const Publish = (props) => {
         }
     }
 
+    //Functionm to create menu items
+    const createMenuItem = (value, index) => {
+        try {
+            return <MenuItem key={value.item_id} value={index}> {value.item_title} {(value.first_name || value.last_name) && "-"} {value.first_name && value.first_name[0] + "."} {value.last_name} </MenuItem>;
+        } catch (e) {
+            setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading content.", "You will be redirected to editorial page."]])
+        }
+    }
+
     return <Box sx={pageStyle}>
         {!loading && <><List>
             {newsletterId === null && <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Publish</Typography>}
@@ -407,7 +459,7 @@ const Publish = (props) => {
                             label="Newsletter"
                             onChange={handleChange}
                         >
-                            {newsletterItems.map((value, index) => <MenuItem key={value.item_id} value={index}>{value.item_title} - {value.first_name && value.first_name[0] + "."} {value.last_name}</MenuItem>)}
+                            {newsletterItems.map((value, index) => createMenuItem(value, index))}
                         </Select>
                     </FormControl>
                 </Box>

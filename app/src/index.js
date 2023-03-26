@@ -10,9 +10,6 @@ import App from './App';
 import './styles/index.css';
 import '../node_modules/react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 
-// Import bootstrap
-import 'bootstrap/dist/css/bootstrap.min.css';
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
 	<BrowserRouter basename='/teamAssessment/app'>

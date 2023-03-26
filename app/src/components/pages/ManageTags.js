@@ -62,13 +62,14 @@ const ManageTags = (props) => {
                         setTags(json.data);
                         setLoading(false);
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading tags.", "You will be redirected to editorial page."]])
                     }
                 }
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading tags.", "You will be redirected to editorial page."]]);
                 }
             )
     }
@@ -101,7 +102,8 @@ const ManageTags = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/") }, "Error", ["Unexpected error has occurred while veryfying account.", "You will be redirected to home page."]]);
                 }
             )
     }, [update]);
@@ -113,11 +115,6 @@ const ManageTags = (props) => {
             setEditMode(-1);
             setSelectedItem('');
             setInformData([true, resetInformData, "Action failed", ["No changes in tag name were made."]])
-            return;
-        } else if (selectedItem.length === 0) {
-            setEditMode(-1);
-            setSelectedItem('');
-            setInformData([true, resetInformData, "Action failed", ["Tag name must be longer than 0 letters."]])
             return;
         }
 
@@ -143,7 +140,7 @@ const ManageTags = (props) => {
                     } else if (json.message.slice(0, 3) === "EM:") {
                         setInformData([true, resetInformData, "Action failed", [json.message.slice(4)]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to home page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Error", ["Unnexpected error has occurred while editing tag.", "You will be redirected to editorial page."]])
                     }
 
                     setEditMode(-1);
@@ -152,7 +149,8 @@ const ManageTags = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unnexpected error has occurred while editing tag.", "You will be redirected to editorial page."]]);
                 }
             )
     }
@@ -177,15 +175,21 @@ const ManageTags = (props) => {
                 .then(
                     (json) => {
                         if (json.message === "Success") {
-                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Tag was removed successfully."]])
+                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Tag was removed successfully."]]);
+                            if(tagsToShow !== null && tagsToShow !== undefined){
+                                if((tagsToShow.length-1)/rows === page && tagsToShow.length > 0){
+                                    setPage(page-1);
+                                };
+                            }
                         } else {
-                            setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to home page."]])
+                            setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Error", ["Unexpected error has occurred while removing tag.", "You will be redirected to editorial page."]])
                         }
                     }
                 )
                 .catch(
                     (e) => {
-                        console.log(e.message)
+                        console.log(e.message);
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while removing tag.", "You will be redirected to editorial page."]]);
                     }
                 )
         }
@@ -198,12 +202,6 @@ const ManageTags = (props) => {
 
     //Function used to add new tag
     const addNewTag = () => {
-        //Check if tag name has at least one character
-        if (newTag.length === 0) {
-            setInformData([true, resetInformData, "Action failed", ["Tag name must be longer than 0 letters."]])
-            return;
-        }
-
         let formData = new FormData();
         formData.append('tag_name', newTag);
 
@@ -213,8 +211,7 @@ const ManageTags = (props) => {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
                 body: formData
-            }
-        )
+            })
             .then(
                 (response) => response.json()
             )
@@ -225,7 +222,7 @@ const ManageTags = (props) => {
                     } else if (json.message.slice(0, 3) === "EM:") {
                         setInformData([true, resetInformData, "Action failed", [json.message.slice(4)]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to home page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Error", ["Unnexpected error has occurred while adding new tag.", "You will be redirected to editorial page."]])
                     }
                     setEditMode(-1);
                     setNewTag('');
@@ -233,13 +230,20 @@ const ManageTags = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Error", ["Unnexpected error has occurred while adding new tag.", "You will be redirected to editorial page."]])
                 }
             )
     }
 
     //Function used to filter the displayed tags based on the search term
-    const filterTags = (value) => (value.tag_name.toLowerCase().includes(search.toLowerCase()));
+    const filterTags = (value) => {
+        try {
+            return value.tag_name.toLowerCase().includes(search.toLowerCase());
+        } catch (e) {
+            return false;
+        }
+    };
 
     //Variable to hold the filtered tags 
     let tagsToShow = null;
@@ -266,8 +270,8 @@ const ManageTags = (props) => {
 
             {editMode === -1 && <TableCell><Button variant="contained" onClick={() => { setEditMode(index); setSelectedItem(value.tag_name) }}>Edit</Button></TableCell>}
             {(editMode !== -1 && editMode !== index) && <TableCell><Button variant="contained" disabled>Edit</Button></TableCell>}
-            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Box sx={{display: "flex", flexDirection: {xs: "column", sm: "column", md: "row"}, alignItems: "stretch", gap:"3px"}}><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
-            {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Box sx={{display: "flex", flexDirection: {xs: "column", sm: "column", md: "row"}, alignItems: "stretch", gap:"3px"}}><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
+            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, alignItems: "stretch", gap: "3px" }}><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
+            {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, alignItems: "stretch", gap: "3px" }}><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
 
             {editMode === -1 && <TableCell><Button variant="contained" value={value.tag_id} onClick={handleRemove}>Remove</Button></TableCell>}
             {editMode !== -1 && <TableCell><Button variant="contained" disabled>Remove</Button></TableCell>}
@@ -300,7 +304,6 @@ const ManageTags = (props) => {
                 </Table>
                 </TableContainer>
                 <TablePagination
-                    sx={{ 'div > p': { marginBottom: "0px !important" } }}
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
                     count={tagsToShow.length}

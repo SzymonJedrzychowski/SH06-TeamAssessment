@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import TextEditor from "./TextEditor";
 import { Box, Button, Typography, Input, TableBody, TableRow, TableHead, TableCell, TableContainer, Paper, Table } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
-import { convertToRaw } from 'draft-js';
+import { convertToRaw, EditorState } from 'draft-js';
 import convertImages from '../helper/convertImages';
 import ItemDialog from "./ItemDialog";
 
@@ -25,7 +25,7 @@ const Partner = (props) => {
     const [itemsInReview, setItemsInReview] = useState([]);
     const [publishedItems, setPublishedItems] = useState([]);
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
-    const [editorContent, setEditorContent] = useState("");
+    const [editorContent, setEditorContent] = useState(() => EditorState.createEmpty());
     const [editorTitle, setEditorTitle] = useState("Placeholder");
     const [userName, setUserName] = useState("IC3 Partner")
 

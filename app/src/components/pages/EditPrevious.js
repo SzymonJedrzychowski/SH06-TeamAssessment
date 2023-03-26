@@ -50,13 +50,14 @@ const EditPrevious = (props) => {
                         setNewsletters(json.data);
                         setLoading(false);
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 }
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 }
             )
     }
@@ -88,7 +89,8 @@ const EditPrevious = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/") }, "Error", ["Unexpected error has occurred while veryfying account.", "You will be redirected to home page."]]);
                 }
             )
     }, [update]);
@@ -112,15 +114,21 @@ const EditPrevious = (props) => {
                 .then(
                     (json) => {
                         if (json.message === "Success") {
-                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Newsletter was removed successfully."]])
+                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["Newsletter was removed successfully."]]);
+                            if(newsletters !== null){
+                                if((newsletters.length-1)/rows === page && newsletters.length > 0){
+                                    setPage(page-1);
+                                };
+                            }
                         } else {
-                            setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
+                            setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Error", ["Unnexpected error has occurred while removing newsletter.", "You will be redirected to editorial page."]])
                         }
                     }
                 )
                 .catch(
                     (e) => {
-                        console.log(e.message)
+                        console.log(e.message);
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 )
         }
@@ -173,7 +181,6 @@ const EditPrevious = (props) => {
                 </TableBody>
             </Table></TableContainer>
             <TablePagination
-                sx={{ 'div > p': { marginBottom: "0px !important" } }}
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
                 count={newsletters.length}

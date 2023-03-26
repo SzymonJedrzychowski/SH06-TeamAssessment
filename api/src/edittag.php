@@ -25,8 +25,6 @@ class EditTag extends Verify
 
         // Check if correct params were provided.
         $this->checkAvailableParams($this->getAvailableParams());
-
-        // Validate the update parameters.
         $this->validateParameters();
 
         // Validate the JWT.
@@ -99,6 +97,21 @@ class EditTag extends Verify
     {
         $requiredParameters = array('tag_id', 'tag_name');
         $this->checkRequiredParameters($requiredParameters);
+
+        //Throw exception if tag name is longer than 25 characters.
+        if (strlen($_POST["tag_name"]) > 25) {
+            throw new ClientErrorException("EM: Tag name cannot be longer than 25 characters.");
+        }
+
+        //Throw exception if tag name is 0 characters long.
+        if (strlen($_POST["tag_name"]) == 0) {
+            throw new ClientErrorException("EM: Tag name needs to be at least one character long.");
+        }
+
+        //Throw exception if tag name starts or ends with space.
+        if (strlen(trim($_POST["tag_name"])) == 0 || strlen(trim($_POST["tag_name"])) != strlen($_POST["tag_name"])) {
+            throw new ClientErrorException("EM: Tag name cannot start or end with a space.");
+        }
     }
 
     /**

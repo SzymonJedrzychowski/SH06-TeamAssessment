@@ -52,7 +52,7 @@ class EditNewsletter extends Verify
 
             // Check if row with given newsletter_id was found.
             if ($data == 0) {
-                throw new ClientErrorException("Problem with getting published_newsletter occurred.");
+                throw new ClientErrorException("EM: Edited newsletter could not be found.");
             }
 
             // End step 1.
@@ -73,7 +73,7 @@ class EditNewsletter extends Verify
             $array = json_decode($_POST["newsletter_items"]);
 
             if ($array === null) {
-                throw new BadRequest("Incorrect format of newsletter_items array.");
+                throw new ClientErrorException("EM: Problems with reading the newsletter items occurred.");
             }
 
             $in = join(',', array_fill(0, count($array), '?'));
@@ -89,7 +89,7 @@ class EditNewsletter extends Verify
             // Throw exception if there is a difference in updated items and length of array with items to update.
             if ($data != count($array)) {
                 if (count($array) == 1 and $data[0] != null) {
-                    throw new ClientErrorException("Problem with updating newsletter_item occurred.");
+                    throw new ClientErrorException("EM: Problems with updating the newsletter items occurred.");
                 }
             }
 

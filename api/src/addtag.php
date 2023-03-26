@@ -92,8 +92,19 @@ class AddTag extends Verify
         $requiredParameters = array('tag_name');
         $this->checkRequiredParameters($requiredParameters);
 
-        if (strlen($_POST['tag_name']) == 0) {
-            throw new ClientErrorException("tag_name must be longer than 0 characters.");
+        //Throw exception if tag name is longer than 25 characters.
+        if (strlen($_POST["tag_name"]) > 25) {
+            throw new ClientErrorException("EM: Tag name cannot be longer than 25 characters.");
+        }
+        
+        //Throw exception if tag name is 0 characters long.
+        if (strlen($_POST["tag_name"]) == 0){
+            throw new ClientErrorException("EM: Tag name needs to be at least one character long.");
+        }
+
+        //Throw exception if tag name starts or ends with space.
+        if (strlen(trim($_POST["tag_name"])) == 0 || strlen(trim($_POST["tag_name"])) != strlen($_POST["tag_name"])){
+            throw new ClientErrorException("EM: Tag name cannot start or end with a space.");
         }
     }
 

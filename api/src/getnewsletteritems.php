@@ -22,8 +22,8 @@ class GetNewsletterItems extends Verify
         // Create SQL command to get newsletter items.
         $sql = "SELECT item_id, content, date_uploaded, published_newsletter_id, item_title, item_checked, user.first_name, user.last_name, organisation.organisation_name 
         FROM newsletter_item 
-        JOIN user ON newsletter_item.user_id = user.user_id 
-        JOIN organisation ON user.organisation_id = organisation.organisation_id 
+        LEFT JOIN user ON newsletter_item.user_id = user.user_id 
+        LEFT JOIN organisation ON user.organisation_id = organisation.organisation_id 
         WHERE";
         $params = array();
 

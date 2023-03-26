@@ -165,7 +165,6 @@ const Archive = () => {
             </Table>
           </TableContainer>
           <TablePagination
-                    sx={{ 'div > p': { marginBottom: "0px !important" } }}
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
                     count={listOfNewsletters.length}

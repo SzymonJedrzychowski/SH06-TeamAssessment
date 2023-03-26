@@ -39,7 +39,39 @@ class PostItemTags extends Verify
         $db->beginTransaction();
 
         try {
-            // Step 1. Remove previous tags.
+            // Step 1. Check if all tags are available
+            $array = json_decode($_POST["item_tags"]);
+
+            if ($array === null) {
+                throw new BadRequest("Incorrect format of newsletter_items array.");
+            }
+
+            if ($array[0] == null) {
+                array_pop($array);
+            }
+
+            if (count($array) > 0) {
+                $in = join(',', array_fill(0, count($array), '?'));
+                $sql = "SELECT COUNT(*) FROM tag WHERE tag_id IN (" . $in . ")";
+
+                $this->setSQLCommand($sql);
+
+                $temp = array();
+                foreach ($array as &$item) {
+                    array_push($temp, $item);
+                }
+                $this->setSQLParams($temp);
+
+                $data = $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+
+                if ($data[0]["COUNT(*)"] != count($temp) and $temp[0] != null) {
+                    throw new ClientErrorException("EM: Tag may have been removed. Refresh the website.");
+                }
+            }
+
+            // End step 1.
+
+            // Step 2. Remove previous tags.
             $sql = "DELETE FROM item_tag WHERE item_id = :item_id";
 
             $this->setSQLCommand($sql);
@@ -49,31 +81,26 @@ class PostItemTags extends Verify
 
             $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
 
-            // End step 1.
-
-            // Step 2. Insert new tags.
-            $array = json_decode($_POST["item_tags"]);
-
-            if ($array === null) {
-                throw new BadRequest("Incorrect format of newsletter_items array.");
-            }
-
-            $in = join(',', array_fill(0, count($array), '(?, ?)'));
-            $sql = "INSERT INTO item_tag (item_id, tag_id) VALUES " . $in;
-
-            $this->setSQLCommand($sql);
-            $temp = array();
-            foreach ($array as &$item) {
-                array_push($temp, $_POST['item_id']);
-                array_push($temp, $item);
-            }
-            $this->setSQLParams(
-                $temp
-            );
-
-            $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
-
             // End step 2.
+
+            // Step 3. Insert new tags.
+
+            if (count($array) > 0) {
+                $in = join(',', array_fill(0, count($array), '(?, ?)'));
+                $sql = "INSERT INTO item_tag (item_id, tag_id) VALUES " . $in;
+
+                $this->setSQLCommand($sql);
+
+                $temp = array();
+                foreach ($array as &$item) {
+                    array_push($temp, $_POST['item_id']);
+                    array_push($temp, $item);
+                }
+                $this->setSQLParams($temp);
+
+                $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());
+            }
+            // End step 3.
 
             // Commit the transaction.
             $db->commitTransaction();
