@@ -175,7 +175,7 @@ const Publish = (props) => {
 
         //Check if item can be displayed
         try {
-            draftToHtml(JSON.parse(newsletterItems[selectedItem]));
+            draftToHtml(JSON.parse(newsletterItems[selectedItem]["content"]));
         } catch (e) {
             setInformData([true, resetInformData, "Action failed", ["This item is corrupted.", "You can continue working, but selected item will not be added to the newsletter."]]);
             setSelectedItem('');
@@ -357,7 +357,7 @@ const Publish = (props) => {
 
     //Function used to get baic display of newsletter item data 
     const combineData = (data) => {
-        let finalText = "<h4>" + data["item_title"] + "</h4<h5>";
+        let finalText = "<h3>" + data["item_title"] + "</h3><h4>";
         if (data["first_name"] !== null) {
             finalText = finalText + data["first_name"];
         }
@@ -367,7 +367,7 @@ const Publish = (props) => {
         if (data["organisation_name"] !== null) {
             finalText = finalText + " - " + data["organisation_name"];
         }
-        finalText = finalText + "</h5>" + data["date_uploaded"] + generateMarkup(data["content"]);
+        finalText = finalText + "</h4>" + data["date_uploaded"] + generateMarkup(data["content"]);
         return finalText;
     }
 
