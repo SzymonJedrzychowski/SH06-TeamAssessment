@@ -20,11 +20,27 @@ class GetNewsletterItems extends Verify
         $this->validateRequestMethod("GET");
 
         // Create SQL command to get newsletter items.
-        $sql = "SELECT item_id, content, date_uploaded, published_newsletter_id, item_title, item_checked, user.first_name, user.last_name, organisation.organisation_name FROM newsletter_item JOIN user ON newsletter_item.user_id = user.user_id JOIN organisation ON user.organisation_id = organisation.organisation_id WHERE item_checked != -1";
+        $sql = "SELECT item_id, content, date_uploaded, published_newsletter_id, item_title, item_checked, user.first_name, user.last_name, organisation.organisation_name 
+        FROM newsletter_item 
+        JOIN user ON newsletter_item.user_id = user.user_id 
+        JOIN organisation ON user.organisation_id = organisation.organisation_id 
+        WHERE";
         $params = array();
 
         // Check if correct params were provided.
         $this->checkAvailableParams($this->getAvailableParams());
+
+        // Validate the JWT.
+        $tokenData = parent::validateToken();
+
+        // If accessed from partner page, show only item of given partner, and include removed items. Otherwise, do not return removed items.
+        if ($_GET['partner_access'] == "true") {
+            $sql .= " newsletter_item.user_id == :user_id";
+            $params["user_id"] = $tokenData->sub;
+        }
+        else{
+            $sql .= " item_checked != -1";
+        }
 
         // Get only published/unpublished items.
         if (filter_has_var(INPUT_GET, 'published')) {
@@ -33,6 +49,9 @@ class GetNewsletterItems extends Verify
             } elseif ($_GET['published'] == "false") {
                 $sql .= " AND published_newsletter_id IS NULL";
             }
+            else{
+                throw new BadRequest("Published must be true or false");
+            }
         }
 
         // Get only one item with given item_id.
@@ -40,15 +59,7 @@ class GetNewsletterItems extends Verify
             $sql .= " AND item_id == :item_id";
             $params["item_id"] = $_GET['item_id'];
         }
-
-        // Validate the JWT.
-        $tokenData = parent::validateToken();
-
-        // If accessed from partner page, show only item of given partner.
-        if ($_GET['partner_access'] == "true") {
-            $sql .= " AND newsletter_item.user_id = :user_id";
-            $params["user_id"] = $tokenData->sub;
-        }
+  
 
         $this->setSQLCommand($sql);
         $this->setSQLParams($params);

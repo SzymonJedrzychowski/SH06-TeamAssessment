@@ -105,7 +105,7 @@ const PartnerEditItem = (props) => {
         const formData = new FormData();
         formData.append('content', JSON.stringify(convertToRaw(editorContent.getCurrentContent())));
         formData.append('item_id', item.state);
-        formData.append('item_checked', itemToEdit['item_checked']);
+        formData.append('item_checked', itemToEdit[0]["item_checked"]);
         formData.append('item_title', itemTitle);
         fetch(process.env.REACT_APP_API_LINK + "updatenewsletteritem",
                 {
@@ -115,7 +115,6 @@ const PartnerEditItem = (props) => {
                 })
                 .then(
                     (response) => response.json()
-                    
                 )
                 .then(
                     (json) => {

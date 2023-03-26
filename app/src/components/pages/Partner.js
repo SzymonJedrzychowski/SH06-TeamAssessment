@@ -140,7 +140,7 @@ const Partner = (props) => {
         "-1" : "Removed",
         "0"  : "In review",
         "1"  : "Edit requested!", 
-        "2"  : "In review",
+        "2"  : "Awaiting editor decision",
         "3"  : "Approved"
     }
 
@@ -384,8 +384,12 @@ const Partner = (props) => {
                     suggestionMade = true;
                 }
                 let deletable = false;
+                let editable = true;
                 if (value.item_checked === "-1" || value.item_checked === "0"){
                     deletable = true;
+                }
+                if (value.item_checked === "-1"){
+                    editable = false;
                 }
                 const itemContent = <Markup content={convertImages(draftToHtml(JSON.parse(value.content)))}/>
                 
@@ -402,7 +406,7 @@ const Partner = (props) => {
                             </TableCell>
                             <TableCell>
                                 {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
-                                {!suggestionMade && <div><Button sx={{textDecoration: 'none'}} as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
+                                {!suggestionMade && editable && <div><Button sx={{textDecoration: 'none'}} as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
                                 {suggestionMade && <div><Button sx={{textDecoration: 'none'}} as = {Link} to = {"/PartnerReviewChange"} state = {[value.item_id, value.item_checked, value.item_title]}>See suggestion</Button></div>}
                             </TableCell>
                             
