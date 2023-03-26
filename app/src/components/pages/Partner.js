@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Markup } from 'interweave';
 import { Link, useNavigate } from 'react-router-dom';
 import TextEditor from "./TextEditor";
-import { Box, Button } from '@mui/material';
+import { Box, Button, Typography, Input, TableBody, TableRow, TableHead, TableCell, TableContainer, Paper, Table } from '@mui/material';
 import draftToHtml from 'draftjs-to-html';
-import draftToMarkdown from 'draftjs-to-html';
 import { convertToRaw } from 'draft-js';
 import convertImages from '../helper/convertImages';
+import ItemDialog from "./ItemDialog";
 
 /**
  * Partner page
@@ -19,23 +19,32 @@ import convertImages from '../helper/convertImages';
 const Partner = (props) => {
 
     // State variable hooks
-    const [loadingReviewItems, setLoadingReviewItems] = useState(true);
-    const [loadingPublishedItems, setLoadingPublishedItems] = useState(true);
-    const [showContribute, setShowcontribute] = useState(true);
-    const [showReview, setShowReview] = useState(false);
+    const [showContribute, setShowcontribute] = useState(false);
+    const [showReview, setShowReview] = useState(true);
     const [showPublished, setShowPublished] = useState(false);
     const [itemsInReview, setItemsInReview] = useState([]);
     const [publishedItems, setPublishedItems] = useState([]);
     const [itemsFilter, setItemsFilter] = useState(["0", "1", "2"]);
     const [editorContent, setEditorContent] = useState("");
     const [editorTitle, setEditorTitle] = useState("Placeholder");
+    const [userName, setUserName] = useState("IC3 Partner")
+
+    const [contributeColour, setContributeColour] = useState("white");
+    const [reviewColour, setReviewColour] = useState("yellow");
+    const [publishColour, setPublishColour] = useState("white");
+    const [filterPendingColour, setFilterPendingColour] = useState("yellow");
+    const [filterAcceptedColour, setFilterAcceptedColour] = useState("white");
+    const [filterRemovedColour, setFilterRemovedColour] = useState("white");
+    const [filterAllColour, setFilterAllColour] = useState("white");
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [loadingReviewItems, setLoadingReviewItems] = useState(true);
+    const [loadingPublishedItems, setLoadingPublishedItems] = useState(true);
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -48,6 +57,7 @@ const Partner = (props) => {
                         if (["1", "2", "3"].includes(json.data[0]["authorisation"])) {
                             setAuthenticated(true);
                             setLoading(false);
+                            setUserName(json.data[0]["first_name"] + " " + json.data[0]["last_name"]);
                         } else {
                             setAuthenticated(false);
                             setLoading(false);
@@ -69,7 +79,7 @@ const Partner = (props) => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=false",
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?partner_access=true&published=false",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -96,7 +106,7 @@ const Partner = (props) => {
             }
         )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?partner_access=true&published=true",
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?partner_access=true&published=true",
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -130,7 +140,7 @@ const Partner = (props) => {
         "-1" : "Removed",
         "0"  : "In review",
         "1"  : "Edit requested!", 
-        "2"  : "In review",
+        "2"  : "Awaiting editor decision",
         "3"  : "Approved"
     }
 
@@ -145,25 +155,65 @@ const Partner = (props) => {
             setShowReview(false);
             setShowPublished(false);
             setShowcontribute(true);
+            setContributeColour("yellow");
+            setReviewColour("white");
+            setPublishColour("white");
             }
     
-            const setReview = () => {
+        const setReview = () => {
             setShowcontribute(false);
             setShowPublished(false);
             setShowReview(true);
+            setContributeColour("white");
+            setReviewColour("yellow");
+            setPublishColour("white");
             }
     
-            const setPublished = () => {
+        const setPublished = () => {
             setShowcontribute(false);
             setShowReview(false);
             setShowPublished(true);
+            setContributeColour("white");
+            setReviewColour("white");
+            setPublishColour("yellow");
             }
+        
+        const setFilterPending = () => {
+            setItemsFilter(["0", "1", "2"]);
+            setFilterPendingColour("yellow");
+            setFilterAcceptedColour("white");
+            setFilterRemovedColour("white");
+            setFilterAllColour("white");
+        }
+
+        const setFilterAccepted = () => {
+            setItemsFilter(["3"]);
+            setFilterPendingColour("white");
+            setFilterAcceptedColour("yellow");
+            setFilterRemovedColour("white");
+            setFilterAllColour("white");
+        }
+
+        const setFilterRemoved = () => {
+            setItemsFilter(["-1"]);
+            setFilterPendingColour("white");
+            setFilterAcceptedColour("white");
+            setFilterRemovedColour("yellow");
+            setFilterAllColour("white");
+        }
+
+        const setFilterAll = () => {
+            setItemsFilter([null]);
+            setFilterPendingColour("white");
+            setFilterAcceptedColour("white");
+            setFilterRemovedColour("white");
+            setFilterAllColour("yellow");
+        }
     
         const navigate = useNavigate();
 
         const confirmNavigate = (where) => {
-            //if(draftToMarkdown(convertToRaw(editorContent.getCurrentContent())).trim() === "")
-            if (showContribute == true){ // && !((editorContent.getCurrentContent()).hasText())){
+            if (showContribute === true){ 
                 setAlertData([true, (confirmation) => handleConfirmNavigate(confirmation, where), "Confirm navigate.", ["Are you sure you wish to leave this page??", "Your progress will be lost."], "Yes, leave page.", "No, stay on page."]);
             }
             else {
@@ -179,17 +229,17 @@ const Partner = (props) => {
         }
 
         const navigatePartner = (where) => {
-            if (where == "Review") {
+            if (where === "Review") {
                 setReview();
             }
-            else if (where == "Published") {
+            else if (where === "Published") {
                 setPublished();
             }
         }
     
         // -Other
         const uploadConfirm = () => {
-            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item later."], "Yes, upload now.", "No, do not upload."]);
+            setAlertData([true, (confirmation) => handleUploadClose(confirmation), "Confirm Upload", ["Are you sure you are ready to upload?", "You can edit the item content later."], "Yes, upload now.", "No, do not upload."]);
         }
 
         const handleUploadClose = (confirmation) => {
@@ -208,7 +258,7 @@ const Partner = (props) => {
             formData.append('content', JSON.stringify(convertToRaw(editorContent.getCurrentContent())));
             formData.append('date_uploaded', yourDate.toISOString().split('T')[0]);
             formData.append('item_title', editorTitle);
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postnewsletteritem",
+            fetch(process.env.REACT_APP_API_LINK + "postnewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -248,7 +298,7 @@ const Partner = (props) => {
         const deleteNewsletterItem = (value) => {
             const formData = new FormData();
             formData.append('item_id', value);
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removenewsletteritem",
+            fetch(process.env.REACT_APP_API_LINK + "removenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -259,7 +309,6 @@ const Partner = (props) => {
                 )
                 .then(
                     (json) => {
-                        console.log("ID: " + value);
                         if (json.message !== "Success") {
                             console.log(json);
                             setInformData([true, () => {resetInformData()}, "Deletion Failed.", ['Check the console for details.']]);
@@ -279,16 +328,6 @@ const Partner = (props) => {
             setEditorTitle(title.target.value)
         }
 
-        const truncateText = (text) => {
-            // Credit: https://stackoverflow.com/a/1199420
-            return(
-                (text.length > 100 ) ?
-                    text.slice(0, 99) + '&hellip;'
-                    :
-                    text
-            );
-        }
-
         const filterChecked = (value) => {
             if (itemsFilter.includes(null)){
                 return true;
@@ -301,6 +340,7 @@ const Partner = (props) => {
             }
         }
 
+
     // Content
         // -Style
         const boxStyle = {
@@ -308,15 +348,20 @@ const Partner = (props) => {
             flexDirection: "column",
             padding: 3,
           };
+        
+
 
         // -Contribute
         const contributeSection = <div className = 'PartnerContribute'>
-        <div className = 'PartnerContributeTitle'>Contribute an item
-        <input 
-            type = 'title'
-            content = {editorTitle}
-            onChange = {getItemTitle}
-            />
+        <div className = 'PartnerContributeTitle'>
+            <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.1em"}}>Contribute an item</Typography>
+            <Typography variant="p">
+                Item Title:&nbsp;&nbsp;
+                <Input 
+                    content = {editorTitle}
+                    onChange = {getItemTitle}
+                    />
+            </Typography>
         </div>
         
         <div className = 'PartnerContributeBox'>
@@ -326,7 +371,7 @@ const Partner = (props) => {
                 setContent = {setEditorContent}
             />
         </div>
-        {<button onClick = {uploadConfirm}>Upload</button>}
+        {<Button variant = "contained" sx = {{marginTop: "0.4em"}} onClick = {uploadConfirm}>Upload</Button>}
         </div>;
         
 
@@ -339,39 +384,66 @@ const Partner = (props) => {
                     suggestionMade = true;
                 }
                 let deletable = false;
+                let editable = true;
                 if (value.item_checked === "-1" || value.item_checked === "0"){
                     deletable = true;
                 }
+                if (value.item_checked === "-1"){
+                    editable = false;
+                }
                 const itemContent = <Markup content={convertImages(draftToHtml(JSON.parse(value.content)))}/>
+                
                 return(
-                    <div key = {value.item_id}>
-                        <div>{value.item_title}</div>
-                        <div>{checkValues[value.item_checked]}</div>
-                        <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
-                        {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
-                        {!suggestionMade && <div><Button as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
-                        {suggestionMade && <div><Button as = {Link} to = {"/PartnerReviewChange"} state = {[value.item_id, value.item_checked]}>See suggestion</Button></div>}
-                    </div>); 
+                    <TableRow key = {value.item_id}>
+                            <TableCell>
+                                <div>{value.item_title}</div>
+                            </TableCell>
+                            <TableCell>
+                                <div>{checkValues[value.item_checked]}</div>
+                            </TableCell>
+                            <TableCell>
+                                {<ItemDialog id ={value.item_id} itemDialogContent = {itemContent} title = {value.item_title}/>}
+                            </TableCell>
+                            <TableCell>
+                                {deletable && <div><Button onClick={() => deleteConfirm(value.item_id)} state = {value.item_id}>Delete item</Button></div>}
+                                {!suggestionMade && editable && <div><Button sx={{textDecoration: 'none'}} as = {Link} to = {"/PartnerEditItem"} state = {value.item_id}>Edit</Button></div>}
+                                {suggestionMade && <div><Button sx={{textDecoration: 'none'}} as = {Link} to = {"/PartnerReviewChange"} state = {[value.item_id, value.item_checked, value.item_title]}>See suggestion</Button></div>}
+                            </TableCell>
+                            
+                    </TableRow>); 
             }
-
+            
         const reviewSection = <div className = 'PartnerReview'>
-        <div className = 'PartnerReviewFilters'>
+        <Box sx = {{display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "5px", rowGap: "5px", justifyContent: "left", padding: 2 } }>
             <ul>
-                <button onClick = {()=>setItemsFilter(["0", "1", "2"])}>Pending</button>
-                <button onClick = {()=>setItemsFilter(["3"])}>Accepted</button>
-                <button onClick = {()=>setItemsFilter(["-1"])}>Removed</button>
-                <button onClick = {()=>setItemsFilter([null])}>All</button>
+                <Button variant = "contained" sx = {{marginTop: "0.4em", color:filterPendingColour}} onClick = {setFilterPending}>Pending</Button>
+                <Button variant = "contained" sx = {{marginTop: "0.4em", color:filterAcceptedColour}} onClick = {setFilterAccepted}>Accepted</Button>
+                <Button variant = "contained" sx = {{marginTop: "0.4em", color:filterRemovedColour}} onClick = {setFilterRemoved}>Removed</Button>
+                <Button variant = "contained" sx = {{marginTop: "0.4em", color:filterAllColour}} onClick = {setFilterAll}>All</Button>
             </ul>
-        </div>
+        </Box>
         <div className = 'PartnerReviewLoading'>
             {loadingReviewItems && <p>Loading...</p>}
         </div>
         <div className = 'PartnerReviewContent'>
-            {itemsInReview.filter(filterChecked).map(
-                function (value) {
-                return createReviewItemBox(value);
-            }
-            )}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Item title</TableCell>
+                            <TableCell>Item status</TableCell>
+                            <TableCell>Link</TableCell>
+                            <TableCell>Options</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {itemsInReview.filter(filterChecked).map(
+                            function (value) {
+                            return createReviewItemBox(value);
+                        } )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </div>
         </div>
 
@@ -383,10 +455,12 @@ const Partner = (props) => {
             const createPublishedItemBox = (value) => {
                 const itemContent = <Markup content={convertImages(draftToHtml(JSON.parse(value.content)))}/>
                 return(
-                    <div key = {value.item_id}>
-                        <div>{value.item_title}</div>
-                        <div>{truncateText(itemContent)}</div> {/*TODO: Fix*/}
-                    </div>); 
+                    <Box sx = {{margin:3, padding: 2, borderBottom: 3}} key = {value.item_id}>
+                        <Box sx = {{borderBottom:1}}>
+                            {value.item_title}
+                        </Box>
+                        <div>{(itemContent)}</div>
+                    </Box>); 
             }
         
         const publishedSection = <div className = 'PartnerPublished'>
@@ -409,12 +483,15 @@ const Partner = (props) => {
         <Box sx = {boxStyle} className = 'Partner'>
             {(!loading && authenticated) && <div className = 'PartnerAuthenticated'>
                 <div className = 'PartnerHeader'>
-                    <h1>Partner Page Skeleton</h1> {/*Welcome name big*/}
-                    <p>Lorem Ipsum</p> {/*Selecte what you'd like to do small?*/}
-                    <button onClick = {setContribute}>Contribute item!</button> {/*Justify left*/}
-                    <button onClick = {() => confirmNavigate("Review")}>Review items!</button> {/*TODO Maybe cache box content or warn-Justify centre*/}
-                    <button onClick = {() => confirmNavigate("Published")}>See published items!</button> {/*Justify right*/}
+                    <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
+                    <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.1em", borderBottom: 3 }}>Welcome, {userName}</Typography>
+                    <Box sx = {{display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, columnGap: "10px", rowGap: "5px", justifyContent: "left", padding: 2 } }>
+                        <Button variant = "contained" sx = {{color:contributeColour}} onClick = {setContribute}>Contribute item!</Button>
+                        <Button variant = "contained" sx = {{color:reviewColour}} onClick = {() => confirmNavigate("Review")}>Review items!</Button>
+                        <Button variant = "contained" sx = {{color:publishColour}} onClick = {() => confirmNavigate("Published")}>See published items!</Button>
+                    </Box>
                 </div>
+
                 <div className = 'PartnerBody'>
                 {showContribute && <div className = 'PartnerContribute'>{contributeSection}</div>}
                 {showReview && <div className = 'PartnerReview'>{reviewSection}</div>}
@@ -422,8 +499,6 @@ const Partner = (props) => {
 
                 </div>
             </div>}
-            
-
         </Box>
     )
 }

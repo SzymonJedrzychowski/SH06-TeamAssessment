@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {Link, useNavigate, useLocation} from 'react-router-dom';
-import {Button} from '@mui/material';
-import { EditorState, ContentState } from 'draft-js';
-import htmlToDraft from 'html-to-draftjs';
+import {Button, Box, Typography} from '@mui/material';
 import { Markup } from 'interweave';
 import draftToHtml from 'draftjs-to-html';
 import convertImages from '../helper/convertImages';
@@ -21,7 +19,7 @@ const PartnerReviewChange = (props) => {
     const item = useLocation();
 
     // State variable hooks
-    const [itemSuggestion, setItemSuggestion] = useState();
+    const [itemSuggestion, setItemSuggestion] = useState('');
     const [response, setResponse] = useState('');
 
     const [authenticated, setAuthenticated] = useState(false);
@@ -29,7 +27,7 @@ const PartnerReviewChange = (props) => {
 
     // On render hook
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -62,7 +60,7 @@ const PartnerReviewChange = (props) => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?approved=true&item_id=" + item.state[0],
+        fetch(process.env.REACT_APP_API_LINK + "getnewslettersuggestion?approved=true&item_id=" + item.state[0],
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -102,7 +100,6 @@ const PartnerReviewChange = (props) => {
 
         // -Other
         const getSuggestionResponse = (response) =>{
-            console.log(response.target.value);
             setResponse(response.target.value);
         }
 
@@ -118,10 +115,6 @@ const PartnerReviewChange = (props) => {
             }
         }
     
-        const rejectSuggestion = () => {
-            navigate("/partner");
-            console.log("Upload Reject");
-        }
 
         // -Accept suggestion
         const acceptConfirm = () => {
@@ -135,11 +128,6 @@ const PartnerReviewChange = (props) => {
             }
         }
 
-        const acceptSuggestion = () => {
-            console.log("Upload Accept");//Redundant ofc
-            navigate("/partner");
-        }
-
         const updateItemSuggestion = (status) => {
             try{
                 const formDataSuggestion = new FormData();
@@ -148,7 +136,7 @@ const PartnerReviewChange = (props) => {
                 formDataSuggestion.append('suggestion_id', itemSuggestion[0].suggestion_id);
                 formDataSuggestion.append('item_id', item.state[0]);
                 formDataSuggestion.append('item_status', item.state[1])
-                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postsuggestionresponse",
+                fetch(process.env.REACT_APP_API_LINK + "postsuggestionresponse",
                     {
                         method: 'POST',
                         headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -173,36 +161,38 @@ const PartnerReviewChange = (props) => {
                             console.log(e.message)
                         }
                     );
-
-                const formDataItem = new FormData();
-                formDataItem.append('content', itemSuggestion[0]["suggestion_content"]);
-                formDataItem.append('item_id', item.state[0]);
-                formDataItem.append('item_checked', item.state[1]);
-                fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
-                        {
-                            method: 'POST',
-                            headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
-                            body: formDataItem
-                        })
-                        .then(
-                            (response) => response.json()
-                        )
-                        .then(
-                            (json) => {
-                                if (json.message !== "Success") {
-                                    console.log(json);
-                                    setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
-                                }
-                                else if (json.message === "Success"){
-                                    console.log("Success")
-                                    setInformData([true, () => {resetInformData(); navigate('/partner')}, "Upload Successful.", []]);
-                                }
+                
+                if (status === true){
+                    const formDataItem = new FormData();
+                    formDataItem.append('content', itemSuggestion[0]["suggestion_content"]);
+                    formDataItem.append('item_id', item.state[0]);
+                    formDataItem.append('item_checked', item.state[1]);
+                    fetch(process.env.REACT_APP_API_LINK + "updatenewsletteritem",
+                            {
+                                method: 'POST',
+                                headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
+                                body: formDataItem
                             })
-                        .catch(
-                            (e) => {
-                                console.log(e.message)
-                            }
-                        );
+                            .then(
+                                (response) => response.json()
+                            )
+                            .then(
+                                (json) => {
+                                    if (json.message !== "Success") {
+                                        console.log(json);
+                                        setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Check the console for details.']]);
+                                    }
+                                    else if (json.message === "Success"){
+                                        console.log("Success")
+                                        setInformData([true, () => {resetInformData(); navigate('/partner')}, "Upload Successful.", []]);
+                                    }
+                                })
+                            .catch(
+                                (e) => {
+                                    console.log(e.message)
+                                }
+                            );
+                    }
             }
             catch(e){
                 setInformData([true, () => {resetInformData()}, "Upload Failed.", ['Error follows:', e.message]]);
@@ -214,27 +204,27 @@ const PartnerReviewChange = (props) => {
 
     // Content
     return(
-        <div className = 'PartnerReviewChange'>
+        <Box sx = {{display: "flex", flexDirection: "column", padding: 3}} className = 'PartnerReviewChange'>
             {(!loading && authenticated) && <div className = 'PartnerReviewChangeAuthenticated'>
-                <div className = 'PartnerReviewChangeHeader'>
-                    <h1>Review item 'name'</h1>
-                </div>
-                <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
+                <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
+                <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Item: {item.state[2]}</Typography>                
+                <Button variant = "contained" sx={{marginBottom: "1em", textDecoration: 'none'}} as = {Link} to = {"/Partner"}>Back</Button>
+                <p></p>
                 <div className = 'PartnerBody'>
                     <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_content"])))}/>
-                    <h2>Comments</h2>
+                    <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Comments</Typography>
                     <Markup content={convertImages(draftToHtml(JSON.parse(itemSuggestion[0]["suggestion_comment"])))}/>
-                    <Button onClick = {acceptConfirm}>Accept</Button>
-                    <Button onClick={rejectConfirm}>Reject</Button>
-                    <p>Comments to editor</p>
+                    <Typography variant="h5" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Response to editor</Typography>
                     <input
                         type = 'text'
                         content = {response}
-                        onChange = {getSuggestionResponse}/>
+                        onChange = {getSuggestionResponse}/><br/><br/>
+                    <Button variant = "contained" sx={{marginRight: "1em", textDecoration: 'none'}} onClick = {acceptConfirm}>Accept</Button>
+                    <Button variant = "contained" sx={{marginLeft: "1em", textDecoration: 'none'}} onClick={rejectConfirm}>Reject</Button>
                 </div>
             </div>}
             
-        </div>
+        </Box>
         
     )
 }

@@ -1,10 +1,10 @@
 <?php
 /**
- * Delete Organisation endpoint
+ * Delete User endpoint
  * @author Joshua Bell
  */
 
-class deleteOrganisation extends Verify {
+class deleteuser extends Verify {
 //    private $data;
 
     public function __construct() {
@@ -25,24 +25,23 @@ class deleteOrganisation extends Verify {
             $tokenData = parent::validateToken();
 
             if ($tokenData->auth != "3") {
-                throw new BadRequest("Only admin can delete an organisation.");
+                throw new BadRequest("Only admin can delete a user.");
             }
             $params = [
-                "organisation_id" => $data["organisation_id"]
+                "user_id" => $data["userId"]
             ];
-
 
             // Start the transaction.
             $db->beginTransaction();
 
             try {
 
-            // delete the organisation from database
-            $sql = "DELETE FROM organisation WHERE organisation_id = :organisation_id;";
+            // delete the user from database
+                $sql = "UPDATE user SET authorisation = 0, email = '', password = '' WHERE user_id = :user_id";
 
                 $this->setSQLCommand($sql);
                 $this->setSQLParams([
-                    'organisation_id' => $params['organisation_id'],
+                    'user_id' => $params['user_id'],
                 ]);
 
                 $db->executeSQL($this->getSQLCommand(), $this->getSQLParams());

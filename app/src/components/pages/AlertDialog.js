@@ -6,7 +6,8 @@ import { Button, Dialog, DialogActions, DialogContent, DialogContentText, Dialog
  * Responsible for displaying dialogs that have 2 options to select from.
  * 
  * @author Szymon Jedrzychowski
- * Code based on the example dialog from https://mui.com/material-ui/react-dialog/ (Access date: 14/03/2023)
+ * Code based on the example dialog
+ * MUI (no date), Dialog. Available at: https://mui.com/material-ui/react-dialog/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  open        if alert dialog should be displayed (boolean)

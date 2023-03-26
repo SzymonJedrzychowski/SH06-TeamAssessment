@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect} from 'react';
 import TextEditor from './TextEditor';
-import { Editor } from 'react-draft-wysiwyg';
 import { useLocation } from 'react-router-dom';
 import { Link, useNavigate } from 'react-router-dom';
-import {Button} from '@mui/material';
-import draftToHtml from 'draftjs-to-html';
-import { ContentState, convertToRaw, EditorState, convertFromRaw } from 'draft-js';
-import htmlToDraft from 'html-to-draftjs';
+import {Button, Typography, Box, Input} from '@mui/material';
+import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 
 /**
  * PartnerEditItem page
@@ -24,6 +21,7 @@ const PartnerEditItem = (props) => {
     // State variable hooks
     const [itemToEdit, setItemToEdit] = useState(null);
     const [editorContent, setEditorContent] = useState(null);
+    const [itemTitle, setItemTitle] = useState(null)
 
     const [authenticated, setAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -31,7 +29,7 @@ const PartnerEditItem = (props) => {
     // On render hook
     useEffect(() => {
         // Verify user identity
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -58,7 +56,7 @@ const PartnerEditItem = (props) => {
                 }
             )
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?item_id=" + item.state,
         {
             headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
         })
@@ -78,6 +76,7 @@ const PartnerEditItem = (props) => {
                 setItemToEdit(json.data);
                 const content = convertFromRaw(JSON.parse(json.data[0]["content"]));
                 setEditorContent(EditorState.createWithContent(content));
+                setItemTitle(json.data[0]["item_title"])
                 setLoading(false);
             }
         )
@@ -97,13 +96,18 @@ const PartnerEditItem = (props) => {
     // Functions
     const navigate = useNavigate();
 
+    const getItemTitle = (title) => {
+        setItemTitle(title.target.value)
+    }
+
     const uploadItem = () => {
 
         const formData = new FormData();
         formData.append('content', JSON.stringify(convertToRaw(editorContent.getCurrentContent())));
         formData.append('item_id', item.state);
-        formData.append('item_checked', itemToEdit['item_checked']);
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/updatenewsletteritem",
+        formData.append('item_checked', itemToEdit[0]["item_checked"]);
+        formData.append('item_title', itemTitle);
+        fetch(process.env.REACT_APP_API_LINK + "updatenewsletteritem",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -142,20 +146,20 @@ const PartnerEditItem = (props) => {
     
     //OUTPUT
     return(
-        <div className = 'PartnerEditItem'>
+        <Box sx = {{display: "flex", flexDirection: "column", padding: 3}} className = 'PartnerEditItem'>
              {(!loading && authenticated) && <div className = 'PartnerEditItemAuthenticated'>
-                <h2 className = 'PartnerEditItemTitle'>Your item</h2>
-                <div><Button as = {Link} to = {"/Partner"}>Back</Button></div>
-                <div className = 'PartnerContributeBox'>
-                    Box goes here.
-                    <TextEditor
-                        type={"content"} content={editorContent} setContent={setEditorContent}
-                        defaultContentState = {itemToEdit['content']}
-                    />
-                </div>
-            <button onClick = {uploadConfirm}>Upload</button>
+                <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Partner</Typography>
+                <Typography variant="h4" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Item: {itemToEdit[0]['item_title']}</Typography><br/>
+                <Typography variant="p" sx={{ textAlign: "left", marginBottom: "0.3em", borderBottom: 3 }}>Edit title:  </Typography><Input defaultValue = {itemTitle} onChange = {getItemTitle}/><br/><br/>
+                <Button variant = "contained" sx={{marginBottom: "1em", textDecoration: 'none'}} as = {Link} to = {"/Partner"}>Back</Button>
+                <p></p>
+                <TextEditor sx = {{marginTop: "1em"}}
+                    type={"content"} content={editorContent} setContent={setEditorContent}
+                    defaultContentState = {itemToEdit['content']}
+                />
+            <Button variant = "contained" onClick = {uploadConfirm}>Upload</Button>
             </div>}
-        </div>
+        </Box>
     )
 }
 

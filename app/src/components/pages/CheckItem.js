@@ -13,7 +13,8 @@ import convertImages from "../helper/convertImages";
  * Additionally, it is used to redirect the editor to page /suggestchanges or allows to change the state of the newsletter item (approve or remove it).
  * 
  * @author Szymon Jedrzychowski
- * Code for Multiple select option (displayed, variable MenuProps and functions getStyles and handleChange) based on the example code from https://mui.com/material-ui/react-select/ (Access date: 14/03/2023)
+ * Code for Multiple select option (displayed, variable MenuProps and functions getStyles and handleChange) based on the example code
+ * MUI (no date), Select. Available at: https://mui.com/material-ui/react-select/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.
@@ -95,7 +96,7 @@ const CheckItem = (props) => {
     //Function that loads data of newsletter suggestion if there is one.
     const loadItemState = () => {
         //Loading the newsletter item
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewslettersuggestion?item_id=" + item.state,
+        fetch(process.env.REACT_APP_API_LINK + "getnewslettersuggestion?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -124,7 +125,7 @@ const CheckItem = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading the newsletter item
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems?item_id=" + item.state,
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems?item_id=" + item.state,
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -155,7 +156,7 @@ const CheckItem = (props) => {
             )
 
         //Loading the tags of the newsletter item
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getitemtags?item_id=" + item.state)
+        fetch(process.env.REACT_APP_API_LINK + "getitemtags?item_id=" + item.state)
             .then(
                 (response) => response.json()
             )
@@ -175,7 +176,7 @@ const CheckItem = (props) => {
                 })
 
         //Loading all available tags
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+        fetch(process.env.REACT_APP_API_LINK + "gettags")
             .then(
                 (response) => response.json()
             )
@@ -205,7 +206,7 @@ const CheckItem = (props) => {
         }
 
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -241,7 +242,7 @@ const CheckItem = (props) => {
         formData.append('item_checked', newStatus);
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/changeitemstatus",
+        fetch(process.env.REACT_APP_API_LINK + "changeitemstatus",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -256,7 +257,7 @@ const CheckItem = (props) => {
                         if (newStatus === "-1") {
                             setInformData([true, () => { resetInformData(); navigate(-1); }, "Success", ["The item was removed."]])
                         } else {
-                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["The status was changes."]])
+                            setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["The status was changed."]])
                         }
                     } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
@@ -274,7 +275,7 @@ const CheckItem = (props) => {
         formData.append('item_tags', newTags.length > 0 ? JSON.stringify(newTags) : JSON.stringify([null]));
         formData.append('item_id', item.state);
 
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/postitemtags",
+        fetch(process.env.REACT_APP_API_LINK + "postitemtags",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -423,7 +424,7 @@ const CheckItem = (props) => {
                         </TableRow>}
                         <TableRow>
                             <TableCell colSpan={2}>
-                                <Box sx={{ minHeight: "200px" }}>
+                                <Box sx={{ minHeight: "200px", "img": {maxWidth: "100%", maxHeight: "100%"}}}>
                                     <Markup content={convertImages(draftToHtml(JSON.parse(newsletterItem["content"])))} />
                                 </Box>
                             </TableCell>

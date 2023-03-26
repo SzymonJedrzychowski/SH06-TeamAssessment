@@ -2,7 +2,6 @@ import { Delete as DeleteIcon, Edit as EditIcon, KeyboardArrowDown as KeyboardAr
 import { Box, Button, FormControl, InputLabel, List, ListItem, MenuItem, Select, Typography } from "@mui/material";
 import { convertToRaw, EditorState, convertFromRaw } from 'draft-js';
 import draftToHtml from 'draftjs-to-html';
-import htmlToDraft from 'html-to-draftjs';
 import { Markup } from 'interweave';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
@@ -16,7 +15,8 @@ import TextEditor from "./TextEditor";
  * /publish is a page that allows editor to publish or edit a published newsletter.
   * 
  * @author Szymon Jedrzychowski
- * Code for select option (displayed and function handleChange) based on the example code from https://mui.com/material-ui/react-select/ (Access date: 14/03/2023)
+ * Code for select option 
+ * MUI (no date), Select. Available at: https://mui.com/material-ui/react-select/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.
@@ -56,7 +56,7 @@ const Publish = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all newsletter items
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getnewsletteritems",
+        fetch(process.env.REACT_APP_API_LINK + "getnewsletteritems",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -97,7 +97,7 @@ const Publish = (props) => {
         }
 
         //Verifying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -137,9 +137,12 @@ const Publish = (props) => {
 
     //Function used to load data of paragraph to edit text box
     const startEditing = (index) => {
+        const element = document.getElementById("textEditor");
+        if (element !== null) {
+            element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
         setEditMode(index);
-        const contentBlock = htmlToDraft(newsletterData[index]["data"]);
-        const content = convertFromRaw(newsletterData[index]["data"]);
+        const content = convertFromRaw(JSON.parse(newsletterData[index]["data"]));
         setParagraph(() => EditorState.createWithContent(content));
     }
 
@@ -195,7 +198,7 @@ const Publish = (props) => {
 
     //Function used to send newsletter
     const sendNewsletter = () => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/sendnewsletter",
+        fetch(process.env.REACT_APP_API_LINK + "sendnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -205,7 +208,11 @@ const Publish = (props) => {
             )
             .then(
                 (json) => {
-                    console.log(json);
+                    if (json.message === "Success") {
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
+                    }else{
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully, but it wasn't sent to newsletter list.", "You can now leave the page."]])
+                    }
                 })
             .catch(
                 (e) => {
@@ -239,7 +246,7 @@ const Publish = (props) => {
         formData.append('newsletter_items', JSON.stringify(temp));
 
         //Publish the newsletter
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/publishnewsletter",
+        fetch(process.env.REACT_APP_API_LINK + "publishnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -251,8 +258,7 @@ const Publish = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        //sendNewsletter();
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was published successfully.", "You can now leave the page."]])
+                        sendNewsletter();
                     } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
@@ -283,7 +289,7 @@ const Publish = (props) => {
         formData.append('newsletter_items', JSON.stringify(temp));
 
         //Edit the newsletter
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/editnewsletter",
+        fetch(process.env.REACT_APP_API_LINK + "editnewsletter",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -295,7 +301,7 @@ const Publish = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Success", ["Newsletter was edited successfully.", "You can now leave the page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editPrevious") }, "Success", ["Newsletter was edited successfully.", "You can now leave the page."]])
                     } else {
                         setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Unexpected error", ["Unnexpected error has occurred.", "You will be redirected to editorial page."]])
                     }
@@ -335,9 +341,9 @@ const Publish = (props) => {
     //Create an entry with text (newsletter item or paragraph)
     const createEntry = (value, index) => {
         if (value["type"] === "paragraph") {
-            return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
+            return <Box key={index} sx={{ display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
-                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
+                    <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" }, "img": {maxWidth: "100%", maxHeight: "100%"}}} >
                         <Markup content={convertImages(draftToHtml(JSON.parse(value["data"])))} />
                     </Box>
                     <Box sx={{ display: "flex", flexDirection: "row", columnGap: "3px" }}>
@@ -360,7 +366,7 @@ const Publish = (props) => {
                 <Box sx={{ marginLeft: "10%", maxWidth: "80%", borderBottom: "solid 1px gray" }}></Box>
             </Box>;
         } else {
-            return <Box key={index} sx={{display: "flex", flexDirection: "column" }}>
+            return <Box key={index} sx={{ display: "flex", flexDirection: "column" }}>
                 <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, justifyContent: "space-between" }}>
                     <Box sx={{ minWidth: { xs: "100%", sm: "100%", md: "70%" }, maxWidth: { xs: "100%", sm: "100%", md: "70%" } }} >
                         <Markup content={convertImages(combineData(value["data"]))} />
@@ -374,7 +380,6 @@ const Publish = (props) => {
                             {index === newsletterData.length - 1 && <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>}
                         </>}
                         {editMode !== -1 && <>
-                            <Button variant="contained" disabled><EditIcon /></Button>
                             <Button variant="contained" disabled><DeleteIcon /></Button>
                             <Button variant="contained" disabled><KeyboardArrowUpIcon /></Button>
                             <Button variant="contained" disabled><KeyboardArrowDownIcon /></Button>
@@ -410,7 +415,7 @@ const Publish = (props) => {
                 {(editMode !== -1 || selectedItem === '') && <Button sx={{ xs: "100%", sm: "100%", md: "200px" }} variant="contained" disabled>Add newsletter item</Button>}
             </ListItem>
             <ListItem sx={{ display: "flex", flexDirection: { xs: "column", sm: "column", md: "row" }, rowGap: "5px", justifyContent: "space-between" }}>
-                <Box sx={{ maxWidth: { xs: "100%", sm: "100%", md: "70%" }, minWidth: { xs: "100%", sm: "100%", md: "70%" } }}>
+                <Box id="textEditor" sx={{ maxWidth: { xs: "100%", sm: "100%", md: "70%" }, minWidth: { xs: "100%", sm: "100%", md: "70%" } }}>
                     <TextEditor type={"paragraph"} content={paragraph} setContent={setParagraph} />
                 </Box>
                 <Box sx={{ display: "flex", flexDirection: "column", rowGap: "5px", minWidth: { xs: "100%", sm: "100%", md: "200px" } }}>

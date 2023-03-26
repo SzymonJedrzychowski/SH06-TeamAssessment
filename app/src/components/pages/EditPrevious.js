@@ -9,7 +9,8 @@ import { Link, useNavigate } from "react-router-dom";
  * /editPrevious is a page that allows editor to see previously published newsletters and access them to edit them.
  * 
  * @author Szymon Jedrzychowski
- * Code for TablePagination based on https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14/03/2023)
+ * Code for TablePagination based on 
+ * geeksforgeeks (2022), React MUI TablePagination API. Available at: https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.
@@ -39,7 +40,7 @@ const EditPrevious = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all published newsletters
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/getpublishednewsletters")
+        fetch(process.env.REACT_APP_API_LINK + "getpublishednewsletters")
             .then(
                 (response) => response.json()
             )
@@ -62,7 +63,7 @@ const EditPrevious = (props) => {
 
     //Hook used to load the data and verify if user can see the page on renders
     useEffect(() => {
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -99,7 +100,7 @@ const EditPrevious = (props) => {
         formData.append('newsletter_id', newsletterToRemove);
 
         if (confirmation.target.value === "true") {
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removepublishednewsletter",
+            fetch(process.env.REACT_APP_API_LINK + "removepublishednewsletter",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),

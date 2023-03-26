@@ -1,4 +1,4 @@
-# Code based on the response of user "BrahimS", 2016, https://stackoverflow.com/a/40591955 (Access date: 6.01.2023)
+# Code based on the response of user "BrahimS", 2016. Available at: https://stackoverflow.com/a/40591955 (Access date: 6.01.2023)
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteBase /

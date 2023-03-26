@@ -9,7 +9,8 @@ import { useNavigate } from "react-router-dom";
  * /manageTags is a page for adding, removing and editing tags.
  * 
  * @author Szymon Jedrzychowski
- * Code for TablePagination based on https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14/03/2023)
+ * Code for TablePagination based on 
+ * geeksforgeeks (2022), React MUI TablePagination API. Available at: https://www.geeksforgeeks.org/react-mui-tablepagination-api/ (Access date: 14.03.2023)
  * 
  * @param {*} props
  *                  dialogData  data and handlers for managing the information and alert dialogs.
@@ -51,7 +52,7 @@ const ManageTags = (props) => {
     //Function that loads all data for the page
     const loadData = () => {
         //Loading all tags
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/gettags")
+        fetch(process.env.REACT_APP_API_LINK + "gettags")
             .then(
                 (response) => response.json()
             )
@@ -75,7 +76,7 @@ const ManageTags = (props) => {
     //Hook used to load the data and verify if user can see the page on renders (re-render is caused by change in update variable)
     useEffect(() => {
         //Veryfying the privileges of the logged user (only Editor and Admin can access the page)
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/verify",
+        fetch(process.env.REACT_APP_API_LINK + "verify",
             {
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') })
             })
@@ -125,7 +126,7 @@ const ManageTags = (props) => {
         formData.append('tag_name', selectedItem);
 
         //Edit the tag name
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/edittag",
+        fetch(process.env.REACT_APP_API_LINK + "edittag",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -164,7 +165,7 @@ const ManageTags = (props) => {
 
         if (confirmation.target.value === "true") {
             //Remove tag
-            fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/removetag",
+            fetch(process.env.REACT_APP_API_LINK + "removetag",
                 {
                     method: 'POST',
                     headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -207,7 +208,7 @@ const ManageTags = (props) => {
         formData.append('tag_name', newTag);
 
         //Add new tag
-        fetch("http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/addtag",
+        fetch(process.env.REACT_APP_API_LINK + "addtag",
             {
                 method: 'POST',
                 headers: new Headers({ "Authorization": "Bearer " + localStorage.getItem('token') }),
@@ -265,8 +266,8 @@ const ManageTags = (props) => {
 
             {editMode === -1 && <TableCell><Button variant="contained" onClick={() => { setEditMode(index); setSelectedItem(value.tag_name) }}>Edit</Button></TableCell>}
             {(editMode !== -1 && editMode !== index) && <TableCell><Button variant="contained" disabled>Edit</Button></TableCell>}
-            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
-            {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></TableCell>}
+            {(editMode === index && selectedItem.length > 0 && value.tag_name !== selectedItem) && <TableCell><Box sx={{display: "flex", flexDirection: {xs: "column", sm: "column", md: "row"}, alignItems: "stretch", gap:"3px"}}><Button variant="contained" onClick={() => submitChange(index + page * rows)}>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
+            {(editMode === index && (selectedItem.length === 0 || value.tag_name === selectedItem)) && <TableCell><Box sx={{display: "flex", flexDirection: {xs: "column", sm: "column", md: "row"}, alignItems: "stretch", gap:"3px"}}><Button variant="contained" disabled>Save</Button><Button variant="contained" onClick={() => { setEditMode(-1); setSelectedItem('') }}>Cancel</Button></Box></TableCell>}
 
             {editMode === -1 && <TableCell><Button variant="contained" value={value.tag_id} onClick={handleRemove}>Remove</Button></TableCell>}
             {editMode !== -1 && <TableCell><Button variant="contained" disabled>Remove</Button></TableCell>}
