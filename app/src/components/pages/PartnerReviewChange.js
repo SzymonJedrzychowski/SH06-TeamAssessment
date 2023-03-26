@@ -100,7 +100,6 @@ const PartnerReviewChange = (props) => {
 
         // -Other
         const getSuggestionResponse = (response) =>{
-            console.log(response.target.value);
             setResponse(response.target.value);
         }
 
