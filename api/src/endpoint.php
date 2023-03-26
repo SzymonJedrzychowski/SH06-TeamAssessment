@@ -154,6 +154,8 @@ abstract class Endpoint
                         throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
                     } else if ($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))) {
                         throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+                    } else if ($availableParams[$key] == "string" and !is_string($value)) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a string.");
                     }
                 }
             }
@@ -166,6 +168,8 @@ abstract class Endpoint
                         throw new BadRequest("Invalid parameter type " . $key . ". It should be a number.");
                     } else if ($availableParams[$key] == "boolean" and !in_array($value, array('true', 'false'))) {
                         throw new BadRequest("Invalid parameter type " . $key . ". It should be a boolean.");
+                    } else if ($availableParams[$key] == "string" and !is_string($value)) {
+                        throw new BadRequest("Invalid parameter type " . $key . ". It should be a string.");
                     }
                 }
             }

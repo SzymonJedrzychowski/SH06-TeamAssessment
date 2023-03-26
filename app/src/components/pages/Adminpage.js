@@ -278,7 +278,7 @@ function Adminpage() {
 
         const handleDelete = async (org) => {
             try {
-                const response = await fetch(`http://unn-w20020581.newnumyspace.co.uk/teamAssessment/api/deleteOrganisation`, {
+                const response = await fetch(process.env.REACT_APP_API_LINK + "deleteOrganisation", {
                     method: "POST",
                     headers: new Headers({
                         "Authorization": "Bearer " + localStorage.getItem('token'),

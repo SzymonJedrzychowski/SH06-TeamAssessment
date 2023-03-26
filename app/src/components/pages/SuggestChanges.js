@@ -25,13 +25,13 @@ const SuggestChanges = (props) => {
     //Hooks to hold the content (contentState for newsletter content, commentState for the comment content)
     const [contentState, setContentState] = useState(null);
     const [commentState, setCommentState] = useState(() => EditorState.createEmpty());
-    
+
     //Hook to determine if page fully loaded the data
     const [loading, setLoading] = useState(true);
 
     //Hook to navigate between pages
     const navigate = useNavigate();
-    
+
     //Handlers for the information and alert dialogs
     const setInformData = props.dialogData.setInformData;
     const setAlertData = props.dialogData.setAlertData;
@@ -51,19 +51,24 @@ const SuggestChanges = (props) => {
                 (json) => {
                     if (json.message === "Success" && json.data.length === 1) {
                         setNewsletterItem(json.data[0]);
-                        const content = convertFromRaw(JSON.parse(json.data[0]["content"]));
-                        setContentState(EditorState.createWithContent(content));
-                        setLoading(false);
+                        try {
+                            const content = convertFromRaw(JSON.parse(json.data[0]["content"]));
+                            setContentState(EditorState.createWithContent(content));
+                            setLoading(false);
+                        } catch (e) {
+                            setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading content.", "You will be redirected to editorial page."]])
+                        }
                     } else if (json.message === "Success" && json.data.length === 0) {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 }
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 }
             )
     }
@@ -102,7 +107,8 @@ const SuggestChanges = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/") }, "Error", ["Unexpected error has occurred while veryfying account.", "You will be redirected to home page."]]);
                 }
             )
     }, []);
@@ -113,7 +119,7 @@ const SuggestChanges = (props) => {
         changeData.append('item_id', item.state);
         changeData.append('suggestion_content', JSON.stringify(convertToRaw(contentState.getCurrentContent())));
         changeData.append('suggestion_comment', JSON.stringify(convertToRaw(commentState.getCurrentContent())));
-        
+
         //Submit the suggestion
         fetch(process.env.REACT_APP_API_LINK + "postnewslettersuggestion",
             {
@@ -128,14 +134,15 @@ const SuggestChanges = (props) => {
                 if (json.message === "Success") {
                     setInformData([true, () => { resetInformData(); navigate(-1) }, "Success", ["Suggestion was sent. You can now leave the page."]])
                 } else if (json.message.slice(0, 3) === "EM:") {
-                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", [json.message.slice(4), "You will be redirected to editorial page."]])
+                    setInformData([true, resetInformData, "Action failed", [json.message.slice(4), "You can manually save your progress, but it might be impossible to post the suggestion without page refresh."]])
                 } else {
-                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                    setInformData([true, resetInformData, "Action failed", ["Unexpected error has occurred while suggesting changes.", "You can manually save your progress, but it might be impossible to post the suggestion without page refresh."]])
                 }
             })
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while suggesting changes.", "You will be redirected to editorial page."]]);
                 })
     }
 

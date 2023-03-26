@@ -31,7 +31,7 @@ const CheckItem = (props) => {
     const [newTags, setNewTags] = useState([]);
 
     //Hook to hold the data of the newsletter item
-    const [newsletterItem, setNewsletterItem] = useState();
+    const [newsletterItem, setNewsletterItem] = useState(null);
 
     //Hook to hold the data of the item suggestion
     const [suggestion, setSuggestion] = useState(null);
@@ -109,15 +109,16 @@ const CheckItem = (props) => {
                         setSuggestion(json.data[0]);
                         setLoadingItemState(false);
                     } else if (json.message === "Success" && json.data.length === 0) {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 }
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 }
             )
     }
@@ -143,15 +144,16 @@ const CheckItem = (props) => {
                             setLoadingItemState(false);
                         }
                     } else if (json.message === "Success" && json.data.length === 0) {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 }
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 }
             )
 
@@ -167,12 +169,13 @@ const CheckItem = (props) => {
                         setNewTags(json.data.map((value) => value.tag_id));
                         setLoadingItemTags(false);
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 })
 
         //Loading all available tags
@@ -184,16 +187,21 @@ const CheckItem = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         let temp = {};
-                        json.data.forEach((value) => { temp[value.tag_id] = value.tag_name })
+                        json.data.forEach((value) => {
+                            if(value.tag_name !== null){
+                                temp[value.tag_id] = value.tag_name; 
+                            }
+                        })
                         setTagsList(temp);
                         setLoadingTags(false);
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]])
                     }
                 })
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading data.", "You will be redirected to editorial page."]]);
                 })
     }
 
@@ -231,7 +239,8 @@ const CheckItem = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/") }, "Error", ["Unexpected error has occurred while veryfying account.", "You will be redirected to home page."]]);
                 }
             )
     }, [update])
@@ -255,7 +264,7 @@ const CheckItem = (props) => {
                 (json) => {
                     if (json.message === "Success") {
                         if (newStatus === "-1") {
-                            setInformData([true, () => { resetInformData(); navigate(-1); }, "Success", ["The item was removed."]])
+                            setInformData([true, () => { resetInformData(); navigate("/editorial"); }, "Success", ["The item was removed."]])
                         } else {
                             setInformData([true, () => { resetInformData(); setUpdate(update + 1); }, "Success", ["The status was changed."]])
                         }
@@ -265,7 +274,8 @@ const CheckItem = (props) => {
                 })
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while editing data.", "You will be redirected to editorial page."]]);
                 })
     }
 
@@ -287,14 +297,17 @@ const CheckItem = (props) => {
             .then(
                 (json) => {
                     if (json.message === "Success") {
-                        setInformData([true, () => { resetInformData(); setUpdate(update + 1) }, "Success", ["The tags were updated."]])
+                        setInformData([true, () => { resetInformData(); setUpdate(update + 1) }, "Success", ["The tags were updated."]]);
+                    } else if (json.message.slice(0, 3) === "EM:") {
+                        setInformData([true, resetInformData, "Action failed", [json.message.slice(4)]])
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate('/editorial') }, "Error", ["Unexpected error has occurred.", "You will be redirected to editorial page."]])
+                        setInformData([true, () => { resetInformData(); }, "Error", ["Unexpected error has occurred while submitting tags."]]);
                     }
                 })
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while submitting tags.", "You will be redirected to editorial page."]]);
                 })
     }
 
@@ -310,6 +323,16 @@ const CheckItem = (props) => {
     //Function used to change the data displayed in the alert dialog
     const handleReject = () => {
         setAlertData([true, (confirmation) => handleClose(confirmation), "Are you sure you want to reject this newsletter item?", ["You cannot undo this operation."], "Reject the item", "Keep the item"])
+    }
+
+    //Function to generate markup from text.
+    const generateMarkup = (content) => {
+        try {
+            return convertImages(draftToHtml(JSON.parse(content)));
+        } catch {
+            setInformData([true, () => { resetInformData(); navigate("/editorial") }, "Error", ["Unexpected error has occurred while loading content.", "You will be redirected to editorial page."]]);
+            return "";
+        }
     }
 
     //Variable used to determine if website can be displayed (all data needs to be loaded)
@@ -367,7 +390,7 @@ const CheckItem = (props) => {
     }
 
     return <Box sx={pageStyle}>
-        {(loading && newsletterItem !== undefined) && <Box>
+        {(loading && newsletterItem !== null) && <Box>
             <Typography variant="h3" sx={{ textAlign: "center", marginBottom: "0.5em" }}>Check item</Typography>
             <TableContainer component={Paper} sx={{ marginTop: "2em" }}>
                 <Table>
@@ -404,7 +427,7 @@ const CheckItem = (props) => {
                                 {checkValues[newsletterItem["item_checked"]]}
                             </TableCell>
                         </TableRow>
-                        {["1", "2"].includes(newsletterItem["item_checked"]) && <TableRow>
+                        {(["1", "2"].includes(newsletterItem["item_checked"]) && suggestion !== null) && <TableRow>
                             <TableCell>
                                 Suggestion status
                             </TableCell>
@@ -414,7 +437,7 @@ const CheckItem = (props) => {
                                 {suggestion["approved"] === "1" && "Approved"}
                             </TableCell>
                         </TableRow>}
-                        {["2"].includes(newsletterItem["item_checked"]) && <TableRow>
+                        {(["2"].includes(newsletterItem["item_checked"]) && suggestion !== null) && <TableRow>
                             <TableCell>
                                 Suggestion response
                             </TableCell>
@@ -425,7 +448,7 @@ const CheckItem = (props) => {
                         <TableRow>
                             <TableCell colSpan={2}>
                                 <Box sx={{ minHeight: "200px", "img": {maxWidth: "100%", maxHeight: "100%"}}}>
-                                    <Markup content={convertImages(draftToHtml(JSON.parse(newsletterItem["content"])))} />
+                                    <Markup content={generateMarkup(newsletterItem["content"])} />
                                 </Box>
                             </TableCell>
                         </TableRow>

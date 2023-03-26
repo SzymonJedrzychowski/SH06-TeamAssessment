@@ -76,8 +76,8 @@ class PublishNewsletter extends Verify
 
             // Throw exception if there is a difference in updated items and length of array with items to update.
             if ($data != count($array)) {
-                if (count($array) == 1 and $data[0] != null) {
-                    throw new ClientErrorException("Problem with updating newsletter_item occurred.");
+                if (count($array) == 1 and $array[0] != null) {
+                    throw new ClientErrorException("EM: Problem with updating newsletter items occurred.");
                 }
             }
 

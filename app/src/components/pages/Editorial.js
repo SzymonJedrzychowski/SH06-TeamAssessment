@@ -67,13 +67,14 @@ const Editorial = (props) => {
                         setNewsletterItems(json.data);
                         setLoading(false);
                     } else {
-                        setInformData([true, () => { resetInformData(); navigate("/home") }, "Unexpected error", ["Data couldn't be loaded.", "You will be redirected to home screen."]])
+                        setInformData([true, () => { resetInformData(); navigate("/home") }, "Error", ["Data couldn't be loaded.", "You will be redirected to home screen."]])
                     }
                 }
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/home") }, "Error", ["Data couldn't be loaded.", "You will be redirected to home screen."]]);
                 }
             )
     }
@@ -107,19 +108,25 @@ const Editorial = (props) => {
             )
             .catch(
                 (e) => {
-                    console.log(e.message)
+                    console.log(e.message);
+                    setInformData([true, () => { resetInformData(); navigate("/") }, "Error", ["Unexpected error has occurred while veryfying account.", "You will be redirected to home page."]]);
                 }
             )
     }, []);
 
     //Function used to filter the displayed newsletter items based on the 2 filters
-    const filterItems = (value) => (
-        (value.item_title.toLowerCase().includes(search.toLowerCase()) ||
-            value.first_name.toLowerCase().includes(search.toLowerCase()) ||
-            value.last_name.toLowerCase().includes(search.toLowerCase()) ||
-            (value.first_name + " " + value.last_name.toLowerCase()).toLowerCase().includes(search.toLowerCase()) ||
-            value.organisation_name.toLowerCase().includes(search.toLowerCase())) &&
-        statusSearch.includes(value.item_checked));
+    const filterItems = (value) => {
+        try {
+            return (value.item_title.toLowerCase().includes(search.toLowerCase()) ||
+                value.first_name.toLowerCase().includes(search.toLowerCase()) ||
+                value.last_name.toLowerCase().includes(search.toLowerCase()) ||
+                (value.first_name + " " + value.last_name.toLowerCase()).toLowerCase().includes(search.toLowerCase()) ||
+                value.organisation_name.toLowerCase().includes(search.toLowerCase())) &&
+                statusSearch.includes(value.item_checked)
+        } catch (e) {
+            return false;
+        }
+    };
 
     //Function necessary for the multiple select component (that changes the statusSearch variable based on currently selected options)
     const handleChange = (event) => {
@@ -207,7 +214,6 @@ const Editorial = (props) => {
                     </TableBody>
                 </Table></TableContainer>
                 <TablePagination
-                    sx={{ 'div > p': { marginBottom: "0px !important" } }}
                     rowsPerPageOptions={[5, 10, 25]}
                     component="div"
                     count={itemsToShow.length}

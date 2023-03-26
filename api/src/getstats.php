@@ -13,7 +13,7 @@ class getStats extends Verify
         $db = new Database("db/database.db");
 
         if ($_SERVER["REQUEST_METHOD"] !== "GET" && $_SERVER["REQUEST_METHOD"] !== "POST") {
-            throw new ClientException(
+            throw new ClientErrorException(
                 "Invalid request method, please use GET OR POST"
             );
         }
