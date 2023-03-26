@@ -427,7 +427,7 @@ const CheckItem = (props) => {
                                 {checkValues[newsletterItem["item_checked"]]}
                             </TableCell>
                         </TableRow>
-                        {["1", "2"].includes(newsletterItem["item_checked"] && suggestion !== null) && <TableRow>
+                        {(["1", "2"].includes(newsletterItem["item_checked"]) && suggestion !== null) && <TableRow>
                             <TableCell>
                                 Suggestion status
                             </TableCell>
@@ -437,7 +437,7 @@ const CheckItem = (props) => {
                                 {suggestion["approved"] === "1" && "Approved"}
                             </TableCell>
                         </TableRow>}
-                        {["2"].includes(newsletterItem["item_checked"] && suggestion !== null) && <TableRow>
+                        {(["2"].includes(newsletterItem["item_checked"]) && suggestion !== null) && <TableRow>
                             <TableCell>
                                 Suggestion response
                             </TableCell>
